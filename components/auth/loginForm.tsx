@@ -4,7 +4,8 @@ import * as z from 'zod';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from '@/schemas';
-
+import { MdEmail, MdOutlineKey, } from 'react-icons/md';
+import { PiLockKeyFill } from "react-icons/pi";
 
 import { CardWrapper } from "./card-wraper";
 import { Input } from '../ui/input';
@@ -115,12 +116,14 @@ const LoginForm = () => {
                                             type="email"
                                             className={shouldAnimate && errors.email ? 'animate-shake' : ''}
                                             disabled={isPending}
+                                            Icon={MdEmail}
                                         />
                                     </FormControl>
                                    
                                 </FormItem>
                             )}
                         />
+                        
                         <FormField
                             control={control}
                             name="password"
@@ -134,7 +137,9 @@ const LoginForm = () => {
                                             type="password"
                                             className={shouldAnimate && errors.password ? 'animate-shake' : ''}
                                             disabled={isPending}
+                                            Icon={PiLockKeyFill}
                                         />
+                                        
                                     </FormControl>
                                    
                                 </FormItem>

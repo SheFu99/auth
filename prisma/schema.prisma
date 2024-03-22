@@ -28,6 +28,15 @@ model User{
 
 }
 
+model VerificationToken {
+  id String @id @default(cuid())
+  email String
+  token String @unique
+  expires DateTime
+
+  @@unique([email,token])
+}
+
 model Account {
   id                 String  @id @default(cuid())
   userId             String
@@ -43,6 +52,7 @@ model Account {
   session_state      String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
 
   @@unique([provider, providerAccountId])
 }

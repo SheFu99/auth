@@ -1,0 +1,27 @@
+.input-adornment {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    padding: 5px; /* Padding around the input and icon */
+  }
+  
+  .input-adornment .adornment-icon {
+    margin-right: 6px; /* Space between the icon and the input */
+    color: #757575; /* Icon color */
+    z-index: 1;
+    transform: scale(1.5);
+    margin-left: 15px;
+  }
+  
+  .input-adornment input {
+    border: none; /* Remove default input border */
+    outline: none; /* Remove focus outline */
+    flex-grow: 1; /* Allow input to fill space */
+   
+  }
+  
+  .input-adornment input:focus {
+    outline: none !important; /* Force remove focus outline */
+    border: none !important; /* Ensure no border is applied */
+  }
