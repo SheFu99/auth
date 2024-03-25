@@ -25,8 +25,10 @@ model User{
   password String?
   role UserRole @default(USER)
   accounts Account[]
-
+  isTwoFactorEnabled Boolean @default(false)
+  twoFactorConfirmation TwoFactorConformation?
 }
+
 
 
 
@@ -66,4 +68,21 @@ model PasswordResetToken {
   expires DateTime
 
   @@unique([email,token])
+}
+
+model TwoFactorToken{
+  id String @id @default(cuid())
+  email String
+  token String
+  expires DateTime
+
+  @@unique([email,token])
+}
+
+model TwoFactorConformation {
+  id String @id @default( cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
 }
