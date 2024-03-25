@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth  from "next-auth"
 import { UserRole } from "@prisma/client"
 import {PrismaAdapter} from '@auth/prisma-adapter'
 import { db } from "./lib/db"
@@ -27,14 +27,24 @@ export const {
     }
   },
   callbacks:{
-    // async signIn ({user}){
-    //   const existingUser = await getUserById(user.id)
-
-    //   if(!existingUser||!existingUser.emailVerified){
-    //     return false
-    //   } 
-    //   return true
-    // },
+    async signIn({user ,account}){
+      console.log({
+        user,
+        account,
+      })
+      if(account?.provider === "credentials")  {
+        const userId: string = user.id!
+          if (userId === undefined){
+            throw new Error('User ID is not defined')
+          }
+        const existingUser = await getUserById(userId)
+        if(!existingUser?.emailVerified) {
+          const error = new Error ('Email address is not verified.')
+          throw error
+        }
+    }
+    return true;
+    },
 
     async session({token , session}) {
         if(token.sub&&session.user){

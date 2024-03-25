@@ -3,9 +3,9 @@
 import * as z from 'zod';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema } from '@/schemas';
-import { MdEmail, MdOutlineKey, } from 'react-icons/md';
-import { PiLockKeyFill } from "react-icons/pi";
+import { LoginSchema, ResetSchema } from '@/schemas';
+import { MdEmail,  } from 'react-icons/md';
+
 
 import { CardWrapper } from "./card-wraper";
 import { Input } from '../ui/input';
@@ -14,9 +14,8 @@ import { Button } from '../ui/button';
 import { useEffect, useState, useTransition } from 'react';
 import { FormError } from '../form-error';
 import { FormSucces } from '../form-succes';
-import { login } from '@/actions/login';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { reset } from '@/actions/reset';
+
 
 interface LoginResponse {
     success?: string;
@@ -25,21 +24,17 @@ interface LoginResponse {
   
 
 
-const LoginForm = () => {
+const ResetForm = () => {
 
-    const searchParams = useSearchParams();
-    const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
-    ? "Email already in use with diferent provider" :""
-    const [error , setError] =useState<string| null>(null)
+    const [error , setError] =useState<string|undefined>(undefined)
     const [success , setSuccess] =useState<string| null>("")
     const [isPending, startTransition]= useTransition();
     const [shouldAnimate, setShouldAnimate] = useState(false);
     
     const form = useForm({
-        resolver: zodResolver(LoginSchema),
+        resolver: zodResolver(ResetSchema),
         defaultValues: {
             email: '',
-            password: '',
         },
     });
     
@@ -54,13 +49,13 @@ const LoginForm = () => {
         }
     }, [errors]);
     
-    const onSubmit = (data: z.infer<typeof LoginSchema>) => {
+    const onSubmit = (data: z.infer<typeof ResetSchema>) => {
         // console.log(data);
         setError("");
         setSuccess("");
         
         startTransition(()=>{
-            login(data)
+            reset(data)
             .then((response: any) => { // Explicitly type the response
                 
                 if (response?.error) {
@@ -69,7 +64,7 @@ const LoginForm = () => {
                 const successMessage = response?.success;
                 if (successMessage) {
                     setSuccess(successMessage);
-            }
+                }
         })
         .catch((error: any) => {
             if (success) {
@@ -96,10 +91,9 @@ const LoginForm = () => {
     return (  
        
         <CardWrapper
-            headerLable="Welcome back" 
-            backButtonLabel="Don't have an account?"
-            backButtonHref="/auth/register"
-            showSocial
+            headerLable="Forgot your password?" 
+            backButtonLabel="Back to login"
+            backButtonHref="/auth/login"
         >
             <Form {...form}>
                 <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
@@ -125,41 +119,12 @@ const LoginForm = () => {
                             )}
                         />
                         
-                        <FormField
-                            control={control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            placeholder="*******"
-                                            type="password"
-                                            className={shouldAnimate && errors.password ? 'animate-shake' : ''}
-                                            disabled={isPending}
-                                            Icon={PiLockKeyFill}
-                                        />
-                                        
-                                    </FormControl>
-                                   <Button
-                                    size='sm'
-                                    variant="link"
-                                    asChild
-                                    className='px-1 mt-2 mb-[-10px] font-normal'
-                                    >
-                                        <Link href='/auth/reset'>
-                                            Forgot password?
-                                        </Link>
-                                   </Button>
-                                </FormItem>
-                            )}
-                        />
+                     
                     </div>
-                     <FormError message={error || urlError}></FormError>
+                     <FormError message={error}></FormError>
                     
                     <FormSucces message={success}></FormSucces>
-                    <Button type="submit" className="w-full"  disabled={isPending}>Log In</Button>
+                    <Button type="submit" className="w-full"  disabled={isPending}>Send resend Email</Button>
                 </form>
             </Form>
         </CardWrapper>
@@ -167,4 +132,4 @@ const LoginForm = () => {
     );
 }
  
-export default LoginForm ;
+export default ResetForm ;

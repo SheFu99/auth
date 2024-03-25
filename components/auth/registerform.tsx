@@ -14,6 +14,7 @@ import { FormError } from '../form-error';
 import { FormSucces } from '../form-succes';
 import { RegisterSchema } from '@/schemas';
 import { register } from '@/actions/register';
+import { MdAccountBox } from 'react-icons/md';
 
 interface RegisterResponse {
     success?: string;
@@ -102,6 +103,7 @@ const RegisterForm = () => {
                                             placeholder="John Doe"
                                             className={shouldAnimate && errors.name ? 'animate-shake' : ''}
                                             disabled={isPending}
+                                            Icon={MdAccountBox}
                                         />
                                     </FormControl>
                                    

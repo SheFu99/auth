@@ -5,6 +5,8 @@ import * as z from "zod"
 import { db } from "@/lib/db";
 import { RegisterSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
+import generateVerificationToken from "@/data/tokens"
+import { sendVerificationEmail } from "@/data/mail";
 
 export const register = async (data: z.infer<typeof RegisterSchema>) => {
   
@@ -23,7 +25,7 @@ export const register = async (data: z.infer<typeof RegisterSchema>) => {
             return {error: "User already exists"}
         }
         
-     try{
+     
         await db.user.create({
             data:{
                 name,
@@ -32,11 +34,15 @@ export const register = async (data: z.infer<typeof RegisterSchema>) => {
                 
             }
         });
-     } catch(error) {
-       
-        console.error("Registration error:", error);
-        return { error: "An unexpected error occurred" };
-    }
+
+       const vericationToken = await 
+       generateVerificationToken(email)
+        await sendVerificationEmail(
+                vericationToken.email,
+                vericationToken.token,
+        )
+       return {success: 'Conformation email sent!'}
+    
         
     
    
@@ -46,5 +52,5 @@ export const register = async (data: z.infer<typeof RegisterSchema>) => {
     // }
 
     
-    return {success: "Email send"}
+
 };
