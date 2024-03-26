@@ -1,0 +1,10 @@
+/* custom-styles.css */
+.custom-bg {
+  background-image: radial-gradient(ellipse at top, var(--tw-color-sky-400), var(--tw-color-blue-800));
+}
+
+@media (min-width: 768px) {
+  .custom-bg {
+    background-image: radial-gradient(ellipse at center, var(--tw-color-sky-400), var(--tw-color-blue-800));
+  }
+}

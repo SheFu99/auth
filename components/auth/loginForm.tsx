@@ -9,7 +9,7 @@ import { PiLockKeyFill } from "react-icons/pi";
 
 import { CardWrapper } from "./card-wraper";
 import { Input } from '../ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Button } from '../ui/button';
 import { useEffect, useState, useTransition } from 'react';
 import { FormError } from '../form-error';
@@ -17,6 +17,7 @@ import { FormSucces } from '../form-succes';
 import { login } from '@/actions/login';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '../ui/input-otp';
 
 interface LoginResponse {
     success?: string;
@@ -30,6 +31,7 @@ const LoginForm = () => {
     const searchParams = useSearchParams();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
     ? "Email already in use with diferent provider" :""
+    const [showTwoFactor , setShowTwoFactor] = useState(false);
     const [error , setError] =useState<string| null>(null)
     const [success , setSuccess] =useState<string| null>("")
     const [isPending, startTransition]= useTransition();
@@ -40,6 +42,7 @@ const LoginForm = () => {
         defaultValues: {
             email: '',
             password: '',
+            code:'',
         },
     });
     
@@ -62,14 +65,21 @@ const LoginForm = () => {
         startTransition(()=>{
             login(data)
             .then((response: any) => { // Explicitly type the response
-                
+               
                 if (response?.error) {
+                    form.reset()
                     setError(response.error);
                 }
                 const successMessage = response?.success;
                 if (successMessage) {
+                    form.reset()
                     setSuccess(successMessage);
-            }
+                 }
+
+                 if(response?.twoFactor){
+                    setShowTwoFactor(true)
+                 }
+
         })
         .catch((error: any) => {
             if (success) {
@@ -96,7 +106,8 @@ const LoginForm = () => {
     return (  
        
         <CardWrapper
-            headerLable="Welcome back" 
+        
+            headerLable={showTwoFactor ?"undefined": "Welcome back" }
             backButtonLabel="Don't have an account?"
             backButtonHref="/auth/register"
             showSocial
@@ -104,9 +115,45 @@ const LoginForm = () => {
             <Form {...form}>
                 <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
                     <div>
+                        {showTwoFactor&&(
+                            <div className='felx justify-center items-center align-middle flex-row'>
+                            <FormField
+                            control={form.control}
+                            name="code"
+                            render={({ field }) => (
+                                <FormItem >
+                                <FormLabel className='flex justify-center mb-5 '>One-Time Password:</FormLabel>
+                                <FormControl>
+                                    <InputOTP className=' ' maxLength={6} {...field}>
+                                    <InputOTPGroup className='w-full flex justify-center'>
+                                        <InputOTPSlot index={0} />
+                                        <InputOTPSlot index={1} />
+                                        <InputOTPSlot index={2} />
+                                        </InputOTPGroup>
+                                        <InputOTPSeparator className='ml-[-10px] mr-[-10px]'/>
+                                        <InputOTPGroup className='w-full flex justify-center'>
+                                        <InputOTPSlot index={3} />
+                                        <InputOTPSlot index={4} />
+                                        <InputOTPSlot index={5} />
+                                    </InputOTPGroup>
+                                    </InputOTP>
+                                </FormControl>
+                                <FormDescription className='w-[95%] justify-center items-center px-10 mt-4 text-center'>
+                                    Please enter the one-time password sent to your email.
+                                </FormDescription>
+                                <FormMessage />
+                                </FormItem>
+                                
+                           )}
+                           
+                       />  
+                       </div>
+                        )}
+                        {!showTwoFactor&&(
+                        <>
                         <FormField
-                            control={control}
                             name="email"
+                            control={control}
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
@@ -155,11 +202,13 @@ const LoginForm = () => {
                                 </FormItem>
                             )}
                         />
+                        </>
+                        )}
                     </div>
                      <FormError message={error || urlError}></FormError>
                     
                     <FormSucces message={success}></FormSucces>
-                    <Button type="submit" className="w-full"  disabled={isPending}>Log In</Button>
+                    <Button type="submit" className="w-full"  disabled={isPending}>{showTwoFactor ? 'Check!' :"Log in"}</Button>
                 </form>
             </Form>
         </CardWrapper>
