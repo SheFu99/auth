@@ -11,7 +11,7 @@ const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
         <SessionProvider session={session}>
         <div className="grid grid-cols-12 grid-rows-12 h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-400 to-blue-800">
         <Navbar/>
-            <div className="col-start-3 col-span-8 row-start-3">
+            <div className="col-start-4 col-span-6 row-start-3">
                 {children} 
             </div>
         </div>

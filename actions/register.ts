@@ -18,7 +18,7 @@ export const register = async (data: z.infer<typeof RegisterSchema>) => {
         console.log("written data in db"); // Check to see if `user` is a property of `db`
 
         const {email, password, name}= validatedFields.data
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 9);
             const existingUser = await getUserByEmail(email)
     
         if(existingUser){
