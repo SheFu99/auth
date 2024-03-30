@@ -12,12 +12,22 @@ import { Button } from "../ui/button"
 import { FiSettings } from "react-icons/fi";
 import { FiServer } from "react-icons/fi";
 import { MdOutlineDevices,MdAdminPanelSettings  } from "react-icons/md";
+import { useCurrentRole } from "@/hooks/use-current-role"
+// import { useEffect } from "react"
 
 
 export const UserButton = ()=>{
     const pathname = usePathname();
+    
     const user = useCurrentUser()
     const userImage = user?.image || ""
+    const role = useCurrentRole()
+
+    // useEffect(()=>{
+    //     // console.log(role)
+    // },[])
+
+
     return(
         <DropdownMenu>
             <DropdownMenuTrigger>
@@ -31,6 +41,8 @@ export const UserButton = ()=>{
 
 
             <DropdownMenuContent className="w-12" align="end">
+{role === 'ADMIN' &&(
+                <>
                 <Button
                     asChild
                     variant={pathname === "/admin" ? "default" : "outline"}
@@ -39,7 +51,9 @@ export const UserButton = ()=>{
                     <Link href="/admin" className="grid grid-cols-6"
                     ><MdAdminPanelSettings  className="col-start-1 h-5 w-5"/><p className="col-start-3">Admin</p></Link>
                 </Button>
-
+                </>
+           )}
+          
                 <Button
                     asChild
                     variant={pathname === "/client" ? "default" : "outline"}
@@ -48,7 +62,8 @@ export const UserButton = ()=>{
                     <Link href="/client" className="grid grid-cols-6"
                     ><MdOutlineDevices className="col-start-1"/><p className="col-start-3">Client</p></Link>
                 </Button>
-
+{role === 'ADMIN' &&(
+                <>
                 <Button
                     asChild
                     variant={pathname === "/server" ? "default" : "outline"}
@@ -59,7 +74,8 @@ export const UserButton = ()=>{
                         <p className="col-start-3">Server</p>
                     </Link>
                 </Button>
-
+                </> 
+                )}
                 <Button
                     asChild
                     variant={pathname === "/settings" ? "default" : "outline"}

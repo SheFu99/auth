@@ -37,13 +37,16 @@ import { FormSucces } from '@/components/form-succes';
 import { FormError } from '@/components/form-error';
 import { UserRole } from '@prisma/client';
 import { Switch } from '@/components/ui/switch';
+import { MdAccountBox, MdElderly, MdFiberNew } from 'react-icons/md';
+import { toast } from 'sonner';
 const SettingPage =  () => {
     const user = useCurrentUser()
     const [error,setError] =useState<string| undefined>()
     const [success, setSuccess] = useState<string|undefined>()
-
+    const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
     const {update} = useSession()
     const [isPending , startTransition] = useTransition()
+
 
 
     const onSubmit = (values: z.infer<typeof SettingsSchema>)=>{
@@ -52,22 +55,31 @@ const SettingPage =  () => {
         .then((data)=>{
             if(data.error){
                 setError(data.error);
+                toast.error(data.error)
             }
 
             if(data.success){
                 update()
                 setSuccess(data.success);
+                toast.success(data.success)
             }
         })
         .catch (()=>setError('Something went wrong!'))
     })
-    return console.log('success')
+    return 
     }
+ 
+//   useEffect(()=>{
+//     const timer = setTimeout(()=>{
+//         setError(undefined)
+//         setSuccess(undefined)
+//     },1000)
 
-    useEffect(()=>{
-    console.log(user?.isOAuth)
-    }
-    ,[])
+//     return()=>clearTimeout(timer)
+//     console.log(success)
+//   },[success,error])
+
+
     const form = useForm<z.infer<typeof SettingsSchema>>({
         resolver: zodResolver(SettingsSchema),
         defaultValues:{
@@ -79,7 +91,27 @@ const SettingPage =  () => {
             isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined
         }
     })
-
+    const { handleSubmit, control, formState: { errors } } = form;
+    
+     // Reset animation state on form change
+     useEffect(() => {
+        
+        if (Object.keys(errors).length>3) {
+            setShouldAnimate(false);
+            console.log("error!")
+        }
+    }, [errors]);
+   
+    
+    const onError = (errors:any) => {
+        console.error(errors);
+        if (Object.keys(errors).length) {
+            setShouldAnimate(true);
+            // Reset the animation after it plays
+            setTimeout(() => setShouldAnimate(false), 1000); // Adjust timing based on animation duration
+        }
+    };
+    
     return (
          
         <Card className='grid grid-cols-12 '>
@@ -88,7 +120,7 @@ const SettingPage =  () => {
             </CardHeader>
             <CardContent className='col-span-12 col-start-1 '>
                 <Form {...form}>
-                    <form className='space-y-6' onSubmit={form.handleSubmit(onSubmit)}>
+                    <form className='space-y-6' onSubmit={form.handleSubmit(onSubmit,onError)}>
                         <div>
                             <FormField
                                 control={form.control}
@@ -100,7 +132,10 @@ const SettingPage =  () => {
                                         <Input 
                                             {...field}
                                             placeholder= "John Doe"
+                                            type='name'
                                             disabled ={isPending}
+                                            className={shouldAnimate && errors.name ? 'animate-shake' : ''}
+                                            Icon={MdAccountBox}
                                             />
                                     </FormControl>
                                     <FormMessage/>
@@ -122,6 +157,8 @@ const SettingPage =  () => {
                                                     {...field}
                                                     placeholder= "JohnDoe@email.com"
                                                     disabled ={isPending}
+                                                    type='email'
+                                                    className={shouldAnimate && errors.email ? 'animate-shake' : ''}
                                                     />
                                             </FormControl>
                                             <FormMessage/>
@@ -140,8 +177,11 @@ const SettingPage =  () => {
                                             <FormControl>
                                                 <Input 
                                                     {...field}
+                                                    type="password"
                                                     placeholder= "******"
                                                     disabled ={isPending}
+                                                    Icon={MdElderly}
+                                                    className={shouldAnimate && errors.password ? 'animate-shake' : ''}
                                                     />
                                             </FormControl>
                                             <FormMessage/>
@@ -160,8 +200,11 @@ const SettingPage =  () => {
                                             <FormControl>
                                                 <Input 
                                                     {...field}
+                                                    type='password'
                                                     placeholder= "******"
                                                     disabled ={isPending}
+                                                    Icon={MdFiberNew}
+                                                    className={shouldAnimate && errors.newPassword ? 'animate-shake' : ''}
                                                     />
                                             </FormControl>
                                             <FormMessage/>
@@ -174,46 +217,7 @@ const SettingPage =  () => {
                             </>
                             )}
                              
-                            <FormField
-                                control={form.control}
-                                name='role'
-                                render ={({field})=>(
-                                <FormItem>
-                                    <FormLabel className='text-xs font-semibold'>Role</FormLabel>
-                                    <FormControl>
-                                       <Select
-                                        disabled={isPending}
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-
-                                                    <SelectValue
-                                                    placeholder="seleact a role"
-                                                        />
-
-                                                        <SelectContent>
-
-                                                            <SelectItem value={UserRole.ADMIN}>
-                                                                Admin
-                                                            </SelectItem>
-                                                            <SelectItem value={UserRole.USER}>
-                                                                User
-                                                            </SelectItem>
-                                                               
-                                                        </SelectContent>
-
-                                                </SelectTrigger>
-                                            </FormControl>
-                                        
-                                            <FormMessage/>
-                                        </Select>
-                                    </FormControl>
-
-                                </FormItem>
-
-                                )}
-                            /> 
+                         
                          {user?.isOAuth === false &&(
                             <>
                          <FormField
@@ -242,8 +246,7 @@ const SettingPage =  () => {
                             />
                          </>)}
                         </div>
-                        <FormSucces message={success}/>
-                        <FormError message={error}/>
+                        
                         <Button disabled={isPending} type='submit' className='w-full'>Save</Button>
                     </form>
                 </Form>

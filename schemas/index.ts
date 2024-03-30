@@ -8,7 +8,8 @@ export const SettingsSchema = z.object({
   role :z.enum([UserRole.ADMIN , UserRole.USER]),
   email: z.optional(z.string().email()) ,
   password: z.optional(z.string().min(6)),
-  newPassword : z.optional(z.string().min(6))
+  newPassword : z.optional(z.string().min(6)),
+  image: z.optional(z.string().min(12))
 })
 .refine((data)=>{
   if (data.password && !data.newPassword){
@@ -60,6 +61,7 @@ export const NewPasswordSchema = z.object({
 
 export const RegisterSchema = z.object({
     email: z.string().email("Email is required"), // Simplified
+    
     password: z.string().min(6, "Password is required and must be at least 6 characters"),
     confirmPassword: z.string().min(1, "Confirm Password is required"),
     name: z.string().min(3, "Name is required and must be at least 3 characters"),
@@ -67,5 +69,15 @@ export const RegisterSchema = z.object({
     message: "Passwords do not match",
     path: ["confirmPassword"], // This attaches the error message to confirmPassword
   });
+
+ export const UserInfoSchema = z.object({
+      id:z.any(),
+      email: z.string().email("Email is required"),
+      name: z.string().min(3, "Name is required and must be at least 3 characters"),
+      role: z.string().min(4, "User role is undefined"),
+      image: z.string().min(11,"Image is undefined"),
+      isTwoFactorEnabled: z.boolean(),
+      password: z.any()
+  })
 
 export type LoginFormDataType = z.infer<typeof LoginSchema>;

@@ -1,18 +1,21 @@
-import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, publicRoutes } from './../routes';
+import { DEFAULT_LOGIN_REDIRECT, adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from './../routes';
 import authConfig from "./auth.config"
 import NextAuth from "next-auth"
+import { currentRole } from './lib/auth';
+
 
 const {auth} =NextAuth(authConfig)
 
-export default auth((req) => {
-const {nextUrl}=req;
+export default auth(async (req) => {
+  const userRole = await currentRole()           
+  const {nextUrl}=req;
 const isLoggedIn = !!req.auth;
 const url = req.nextUrl;
 // const errorRedirect = nextUrl.pathname.includes('?error=')
 const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
 const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
 const isAuthRoute = authRoutes.includes(nextUrl.pathname);
-
+const isAdminRoute = adminRoutes.includes(nextUrl.pathname)
 
 ///cosutom error handler 
 if (url.pathname.startsWith('/auth/login')) {
@@ -39,6 +42,11 @@ if (isAuthRoute){
 if(!isLoggedIn&& !isPublicRoute){
   return Response.redirect(new URL("/auth/login",nextUrl))
 }
+if(userRole !=="ADMIN" && isAdminRoute) {
+  return Response.redirect(new URL('/settings',nextUrl))
+}
+
+
 return null
 })
 
