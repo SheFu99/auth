@@ -15,7 +15,7 @@ const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
             <div className="col-span-9 col-start-2 row-span-2">
                 <div className="grid space-y-10 grid-cols-8">
                     <SideBar className="col-start-1 col-span-2 mt-5"/>
-                        <div className="col-start-3 col-span-7">
+                        <div className="col-start-3 col-span-5">
                             {children} 
                        </div>
 

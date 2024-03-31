@@ -6,6 +6,7 @@ import { getUserByEmail } from "./data/user"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 
+
 export default {
   providers: [
     Google({
@@ -16,6 +17,7 @@ export default {
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
     }),
+    
     Credentials({
       async authorize(credentials){
         const validatedFields = LoginSchema.safeParse(credentials)

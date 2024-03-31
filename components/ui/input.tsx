@@ -4,17 +4,30 @@ import './input.css'
 import { RxEyeClosed, RxEyeOpen } from "react-icons/rx";
 import { MdEmail } from "react-icons/md";
 import { PiLockKeyFill } from "react-icons/pi";
+import { BsPencilSquare } from "react-icons/bs";
+import { Button } from "./button";
+import { TfiSave } from "react-icons/tfi";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  Icon?:React.ElementType
+  Icon?:React.ElementType,
+  disabled?:boolean;
+  editButton?:boolean;
+
   }
 
 
 
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type,Icon ,...props }, ref) => {
+  ({ className, type, Icon,disabled,editButton, ...props }, ref) => {
+
+
+    const [button, setButton] = React.useState<boolean>(false);
+
+    const toggleButton = () => {
+      setButton(!button);
+    };
 
     const [visable,showPassword] = React.useState<boolean>(false)
 
@@ -36,6 +49,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       }
     };
 
+    const renderButtonIcon = () =>{
+    if(editButton ===true){
+      if(button === false){
+        return <Button onClick={toggleButton} type='submit'><BsPencilSquare className="adornment-button"/></Button>
+      }else{
+        return <Button onClick={toggleButton} type="button"><TfiSave className="adornment-button"></TfiSave></Button>
+      }
+    }
+    }
+
     return (
       <div className={cn('input-adornment',className)}>
      
@@ -43,9 +66,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       
       <input
         type={inputType}
+        disabled={disabled ||editButton &&!button}
         className={cn(
-          " flex h-10 w-full rounded-md border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground outline-none focus:outline-none focus:ring-0 border-none disabled:cursor-not-allowed disabled:opacity-50",
-          
+          " flex h-10 w-full rounded-md border border-input bg-background px-4 py-2  ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground outline-none focus:outline-none focus:ring-0 border-none disabled:cursor-not-allowed disabled:opacity-50",
+          className
           )}
           ref={ref}
           {...props}
@@ -62,6 +86,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
            
           </div>
           )}
+
+          {renderButtonIcon()}
 
           </div>
     )

@@ -1,7 +1,7 @@
 "use client"
 
 import * as z from 'zod'
-import { MoreHorizontal } from "lucide-react"
+
  
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { ColumnDef } from "@tanstack/react-table"
-
+import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 import { SettingsSchema, UserInfoSchema } from "@/schemas"
@@ -40,7 +40,17 @@ export const columns: ColumnDef<UserInfo>[] = [
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header:  ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Email
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "role",
@@ -48,7 +58,6 @@ export const columns: ColumnDef<UserInfo>[] = [
     cell:({row})=>{
       
         const [isPending, startTransition]= useTransition()
-        const [staterole , setRole] = useState<string|undefined>()
         const {update} = useSession();
         const form = useForm<z.infer<typeof SettingsSchema>>({
           resolver: zodResolver(SettingsSchema),
@@ -57,8 +66,6 @@ export const columns: ColumnDef<UserInfo>[] = [
           }
         });
        
-        
-
 
         const onSubmit = (values: z.infer<typeof SettingsSchema>)=>{
             const email = row.original.email
@@ -153,7 +160,7 @@ export const columns: ColumnDef<UserInfo>[] = [
           
           
           startTransition(()=>{
-          deleteUser({email})
+          deleteUser(email)
           .then((data)=>{
               if(data?.error){
                

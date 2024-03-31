@@ -2,7 +2,7 @@
 import ImageCropper from "./image-croper";
 import { GrClose } from "react-icons/gr";
 interface ModalProps {
-    updateAvatar: (newAvatarUrl: string) => void;
+    updateAvatar: (newAvatarUrl: Blob) => void;
     closeModal: () => void;
   }
 

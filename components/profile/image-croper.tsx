@@ -13,7 +13,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 
 type ImageCropperProps = {
   closeModal: () => void;
-  updateAvatar: (dataUrl: string) => void;
+  updateAvatar: (dataUrl: Blob) => void;
 };
 
 const ASPECT_RATIO = 1;

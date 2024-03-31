@@ -29,7 +29,23 @@ model User{
   accounts Account[]
   isTwoFactorEnabled Boolean @default(false)
   twoFactorConfirmation TwoFactorConformation?
+  profile Profile?
 }
+
+model Profile {
+  coverImage String?
+  firstName String?
+  lastName String?
+  gender String?
+  age String?
+  phoneNumber String?
+  regionCode String? 
+  adres String? ///Extend this {lat ,lng, zipCode, postService...} 
+  userId String @unique 
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+
+}
+
 
 
 

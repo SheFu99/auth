@@ -35,7 +35,7 @@ const LoginForm = () => {
     const [error , setError] =useState<string| null>(null)
     const [success , setSuccess] =useState<string| null>("")
     const [isPending, startTransition]= useTransition();
-    const [shouldAnimate, setShouldAnimate] = useState(false);
+    const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
     
     const form = useForm({
         resolver: zodResolver(LoginSchema),

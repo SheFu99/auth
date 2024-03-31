@@ -13,6 +13,13 @@
     transform: scale(1.5);
     margin-left: 15px;
   }
+  .input-adornment .adornment-button {
+    /* margin-right: 6px; Space between the icon and the input */
+    color: #757575; /* Icon color */
+    z-index: 1;
+    transform: scale(1.5);
+    /* margin-right: 15px; */
+  }
   
   .input-adornment input {
     border: none; /* Remove default input border */

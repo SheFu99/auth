@@ -31,8 +31,14 @@ export const register = async (data: z.infer<typeof RegisterSchema>) => {
                 name,
                 email,
                 password: hashedPassword,
-                
-            }
+                profile:{
+                    create:{
+                        coverImage: " "
+                    }
+                }
+            },
+           
+            
         });
 
        const vericationToken = await 

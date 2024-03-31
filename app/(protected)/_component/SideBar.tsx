@@ -12,6 +12,8 @@ interface SideBarProps{
     className?:string;
 }
 
+
+
 const SideBar :React.FC<SideBarProps>= ({className}) => {
     const pathname = usePathname();
     const role = useCurrentRole()
@@ -43,16 +45,7 @@ const SideBar :React.FC<SideBarProps>= ({className}) => {
                 </Button>
                 </>
 
-                <>
-                <Button 
-                    asChild
-                    variant={pathname === "/settings/security" ? "default" : "outline"}
-                    className="w-full"
-                > 
-                    <Link href="/settings/security" className="grid grid-cols-6"
-                    ><MdOutlineSecurity  className="col-start-1 h-5 w-5"/><p className="col-start-3">Security</p></Link>
-                </Button>
-                </>
+               
 
                 <>
                 <Button 

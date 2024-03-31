@@ -5,7 +5,7 @@ import * as z from "zod";
 export const SettingsSchema = z.object({
   name: z.optional(z.string()) , ///that schema is for our update clinet-info logic
   isTwoFactorEnabled: z.optional(z.boolean()),
-  role :z.enum([UserRole.ADMIN , UserRole.USER]),
+  role :z.enum([UserRole.ADMIN ,UserRole.EDITOR, UserRole.USER,UserRole.GUEST]),
   email: z.optional(z.string().email()) ,
   password: z.optional(z.string().min(6)),
   newPassword : z.optional(z.string().min(6)),
@@ -61,7 +61,7 @@ export const NewPasswordSchema = z.object({
 
 export const RegisterSchema = z.object({
     email: z.string().email("Email is required"), // Simplified
-    
+    profile: z.any(),
     password: z.string().min(6, "Password is required and must be at least 6 characters"),
     confirmPassword: z.string().min(1, "Confirm Password is required"),
     name: z.string().min(3, "Name is required and must be at least 3 characters"),

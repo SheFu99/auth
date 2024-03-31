@@ -116,58 +116,19 @@ const SettingPage =  () => {
          
         <Card className='grid grid-cols-12 '>
             <CardHeader className='col-span-12'>
-                <p className="text-2xl font-semibold text-center ">⚙️ Settings page</p>
+                <p className="text-2xl font-semibold text-center ">🛡 Security</p>
             </CardHeader>
             <CardContent className='col-span-12 col-start-1 '>
                 <Form {...form}>
                     <form className='space-y-6' onSubmit={form.handleSubmit(onSubmit,onError)}>
                         <div>
-                            <FormField
-                                control={form.control}
-                                name='name'
-                                render ={({field})=>(
-                                <FormItem>
-                                    <FormLabel className='text-xs font-semibold'>Name</FormLabel>
-                                    <FormControl>
-                                        <Input 
-                                            {...field}
-                                            placeholder= "John Doe"
-                                            type='name'
-                                            disabled ={isPending}
-                                            className={shouldAnimate && errors.name ? 'animate-shake' : ''}
-                                            Icon={MdAccountBox}
-                                            />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-
-                                )}
-                            />
+                            
                             {user?.isOAuth === false &&(
                             <>
                                 
-                                    <FormField
-                                        control={form.control}
-                                        name='email'
-                                        render ={({field})=>(
-                                        <FormItem>
-                                            <FormLabel className='text-xs font-semibold'>Email</FormLabel>
-                                            <FormControl>
-                                                <Input 
-                                                    {...field}
-                                                    placeholder= "JohnDoe@email.com"
-                                                    disabled ={isPending}
-                                                    type='email'
-                                                    className={shouldAnimate && errors.email ? 'animate-shake' : ''}
-                                                    />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-
-                                        )}
-                                    />
+                                  
                                 <div className='grid'>
-                                <div className='col-start-1 col-span-4 row-start-1'>
+                                <div className='col-start-1 col-span-4 row-start-1 px-1'>
                                     <FormField
                                         control={form.control}
                                         name='password'
@@ -190,7 +151,7 @@ const SettingPage =  () => {
                                         )}
                                     />
                                     </div>
-                                <div className='col-span-4 col-start-6 row-start-1'>
+                                <div className='col-span-4 col-start-6 row-start-1 px-1'>
                                     <FormField
                                         control={form.control}
                                         name='newPassword'

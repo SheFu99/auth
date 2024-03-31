@@ -30,27 +30,30 @@ const s3Client = new S3Client({
 }
 
 
- const updateImage = async (image:z.infer<typeof UserInfoSchema>)=>{
+ const updateAvatar = async (image:string)=>{
     
    const user= await currentUser()
    console.log('USER:',user)
-   
-   const existedUser = await db.user.findFirst({
-    where:{
-        id:user?.id
-    }
+   if(!user){
+    return {error: "You need to be authorize for this action"}
+   }
 
+    const existedUser = await db.user.findFirst({
+        where:{
+            id:user?.id
+        }
+     })
+     console.log("existing user",existedUser )
     
-   })
-   console.log("existing user",existedUser )
-    if(user || existedUser){
-
+   
+   
+   if(user || existedUser){
         const selectedUser = await db.user.update({
             where:{ 
-                email: user.email
+                id: user?.id
             },
             data:{
-                image:image
+                image: image
             },
         })
         return {success:"Image has changed!"}
@@ -58,22 +61,74 @@ const s3Client = new S3Client({
 return {error:"User dosent exists"}
 }
 
+
+const updateCover = async (image:string)=>{
+  const user= await currentUser()
+  console.log('USER:',user)
+ 
+   const existedUser = await db.user.findFirst({
+       where:{
+           id:user?.id
+       }
+    })
+    console.log("existing user",existedUser )
+   
+  
+  
+  if(user || existedUser){
+       const selectedUser = await db.profile.update({
+           where:{ 
+               userId: user?.id
+           },
+           data:{
+               coverImage: image
+           },
+       })
+       return {success:"Image has changed!"}
+       }
+return {error:"User dosent exists"}
+}
+
 export async function POST(request: Request): Promise<Response> {
+    const user = await currentUser()
+    if(!user){
+      return NextResponse.json({ error: "You need to be authorize for this action"})
+    }
     try {
+      let imageUrl
       const formData = await request.formData();
-      const file = formData.get("file");
-        console.log(file,formData)
-      if (!file || typeof file === "string") {
-        return NextResponse.json({ error: "File is required." }, { status: 400 });
+      const avatar = formData.get("file");
+      const coverImage = formData.get("cover")
+        // console.log(avatar,formData)
+
+      if (!avatar || typeof avatar === "string") {
+        
+
+        if(!coverImage || typeof coverImage ==="string"){
+          return NextResponse.json({ error: "File is required." }, { status: 400 });
+        }
+
+        const buffer = Buffer.from(await coverImage?.arrayBuffer());
+        const imageName = await uploadFileToS3(buffer, coverImage.name);
+         imageUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/${imageName}`;
+       
+        
+      }else{
+        const buffer = Buffer.from(await avatar?.arrayBuffer());
+        const imageName = await uploadFileToS3(buffer, avatar.name);
+         imageUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/${imageName}`;
+       
       }
   
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const fileName = await uploadFileToS3(buffer, file.name);
-      const imageUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/${fileName}`;
-      
+    
      try{
         console.log("updateImageURL",imageUrl)
-        await updateImage(imageUrl)
+        if(avatar){
+          await updateAvatar(imageUrl)
+        }
+        if(coverImage){
+          await updateCover(imageUrl)
+        }
      }catch(error){
         return NextResponse.json({ error: error})
      }

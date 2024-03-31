@@ -31,7 +31,7 @@ export const  userControl = async ({email, role}: z.infer<typeof SettingsSchema>
        return 
     }
 
-    export const deleteUser = async ({email} : z.infer<typeof SettingsSchema>)=>{
+    export const deleteUser = async (email : string)=>{
     const currentSessionRole = await currentRole()
         if(currentSessionRole ==="ADMIN"){
 
