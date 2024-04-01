@@ -5,7 +5,7 @@ import UploadForm from "@/components/profile/s3-Upload-form";
 
 const ProfilePage = () => {
     return ( 
-        <div >
+        <div className="">
            
           <Profile></Profile>
         </div>

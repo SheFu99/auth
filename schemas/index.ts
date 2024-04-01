@@ -76,6 +76,7 @@ export const RegisterSchema = z.object({
       name: z.string().min(3, "Name is required and must be at least 3 characters"),
       role: z.string().min(4, "User role is undefined"),
       image: z.string().min(11,"Image is undefined"),
+      coverImage: z.any(),
       isTwoFactorEnabled: z.boolean(),
       password: z.any()
   })

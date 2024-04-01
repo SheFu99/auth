@@ -10,6 +10,8 @@ import { FaUser } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import AboutUser from "./info-about";
 import { CardHeader } from "../ui/card";
+import Cover from "./Cover";
+import { getUserProfile } from "@/actions/UserProfile";
 
 
 type Response = {
@@ -19,12 +21,19 @@ type Response = {
 }
 
 
-const Profile = () => {
+const  Profile = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const user = useCurrentUser();
+  const [profile , setProfile] = useState<object|null>()
   const [sessionImage, setSessionImage] = useState(user?.image || undefined);
- const {update} = useSession()
+  const {update} = useSession()
   
+
+  // useEffect(()=>{
+  //   console.log(user?.coverImage)
+  // },[])
+
+
  async function updateAvatar(croppedImageBlob: Blob) {
     const formData = new FormData();
     formData.append("file", croppedImageBlob);
@@ -57,36 +66,36 @@ const Profile = () => {
     
   }
 
-  
+ 
 
   return (
     
-    <div className="grid grid-cols-12 grid-row-12">
+    <div className="grid grid-cols-12 grid-row-6 ">
      
-        <div className="col-span-12 flex flex-col items-center pt-12 bg-gray-900 rounded-md row-start-1">
-                <CardHeader className='col-span-12 mt-[-3rem]'>
-                    <p className="text-2xl font-semibold text-center ">📖 Profile edit</p>
-                </CardHeader>
-
-          <div className="relative">
-
-                <Avatar className="w-[100px] h-[100px]">
-                  <AvatarImage src={sessionImage}/>
-                  <AvatarFallback className="bg-sky-500">
-                    <FaUser className="text-white w-20 h-20"/>
-                  </AvatarFallback>
-                </Avatar>
-
-                <button
-                  className="absolute -bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
-                  title="Change photo"
-                  onClick={() => setModalOpen(true)}
-                >
-                  <BsFillPencilFill className="grid scale-100"/>
-                </button>
-
-          </div>
+           
           
+          <Cover url={user?.coverImage} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
+           
+          <div className="flex items-center">
+                <div className="absolute ml-12 mt-10 z-10">
+                <Avatar className="md:w-[100px] md:h-[100px] w-[50px] h-[50px]">
+                    <AvatarImage src={sessionImage}/>
+                    <AvatarFallback className="bg-sky-500">
+                      <FaUser className="text-white w-20 h-20"/>
+                    </AvatarFallback>
+                  </Avatar>
+              
+                
+
+                  <button
+                    className="absolute -bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
+                    title="Change photo"
+                    onClick={() => setModalOpen(true)}
+                  >
+                    <BsFillPencilFill className="grid scale-100"/>
+                  </button>
+            </div>
+          </div>
 
           {modalOpen && (
             <Modal
@@ -96,14 +105,17 @@ const Profile = () => {
           )}
 
 
-        </div>
       
-      <div className="col-span-12 col-start-1 mt-1">
+
+      <div className="col-span-12 col-start-1 mt-1 row-span-1">
         <AboutUser></AboutUser>
       </div>
 
 
     </div>
+
+
+
   );
 };
 

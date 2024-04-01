@@ -6,6 +6,7 @@ import authConfig from "./auth.config"
 import { getUserById } from "./data/user"
 import { getTwoFactorConformationByUserId } from "./data/two-factor-conformation"
 import { getAccountByUserId } from "./data/account"
+import { getUserProfile } from "./actions/UserProfile"
 
 
 
@@ -75,14 +76,18 @@ export const {
           session.user.email = token.email as string      
           session.user.isOAuth = token.isOAuth as boolean 
           session.user.image = token.picture
+          session.user.coverImage = token.coverImage as string // Include coverImage in session
+         
         }
      return session;
+     
     },
-    async  jwt({token}){
+    async jwt({token}){
       // console.log("Called again")
       if(!token.sub) return token
 
       const existingUser = await getUserById(token.sub);
+      
 
       if(!existingUser) return token;
 
@@ -96,6 +101,10 @@ export const {
       token.role = existingUser.role
       token.picture = existingUser.image
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
+      if(existingUser.coverImage) { // Include coverImage in token
+        token.coverImage = existingUser.coverImage;
+      }
+      
        return token
      } ,
     },

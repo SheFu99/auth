@@ -20,7 +20,7 @@ export const updateImage = async ({image}:z.infer<typeof UserInfoSchema>)=>{
 
         const selectedUser = await db.user.update({
             where:{ 
-                email: user.email
+                email: user?.email!
             },
             data:{
                 image:image
@@ -30,3 +30,4 @@ export const updateImage = async ({image}:z.infer<typeof UserInfoSchema>)=>{
         }
 return {error:"User dosent exists"}
 }
+
