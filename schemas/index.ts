@@ -76,9 +76,27 @@ export const RegisterSchema = z.object({
       name: z.string().min(3, "Name is required and must be at least 3 characters"),
       role: z.string().min(4, "User role is undefined"),
       image: z.string().min(11,"Image is undefined"),
-      coverImage: z.any(),
       isTwoFactorEnabled: z.boolean(),
       password: z.any()
   })
+  const phoneNumberRegex = /^\+?\d{10,15}$/;
+  const RegionCode = /^[a-zA-Z0-9]{2,5}$/
+  const Address = /^[a-zA-Z0-9 ,.-]+$/
+  
+  
+export const UserProfile = z.object({
+  userId: z.any().nullable(),
+  firstName: z.string().min(3,"Name is required and must be at least 3 characters").nullable(),
+  lastName: z.string().min(5,"Name is required and must be at least 5 characters").nullable(),
+  coverImage: z.string().min(10, 'Image is undefined').nullable(),
+  gender: z.string().min(3, "must be at least 3 characters").nullable(),
+  age: z.string().nullable(),
+  phoneNumber: z.string().regex(phoneNumberRegex, {
+    message: "Invalid phone number format.",
+  }).nullable(),
+  regionCode: z.string().regex(RegionCode).nullable(),
+  adres: z.string().regex(Address).nullable(),
+});
 
+  
 export type LoginFormDataType = z.infer<typeof LoginSchema>;

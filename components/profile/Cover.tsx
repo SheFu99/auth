@@ -60,10 +60,29 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
 
  
   return (
+    
     <div className={`${className} overflow-hidden flex justify-center items-center relative rounded-xl`}>
-      <div>
-        <img src={url} alt="" className={`${className}  bg-blend-overlay h-[100%]`}/>
-      </div>
+      
+      {url&&(
+        <div>
+          <img src={url} alt="" className={`${className}  bg-blend-overlay h-[100%]`}/> 
+          {/* ///replace on NextImage */}
+        </div>
+      )}
+
+      {!url&&(
+         <div>
+         <svg width="2100" height="150" xmlns="http://www.w3.org/2000/svg">
+
+            <rect width="100%" height="100%" fill="#87CEEB"/>
+            <circle cx="1850" cy="30" r="30" fill="#FFD700"/>
+            <polygon points="300,150 600,50 900,150" fill="#BDB76B"/>
+            <polygon points="1300,150 1600,50 1900,150" fill="#BDB76B"/>
+           
+          </svg>
+
+                  </div>
+      )}
       {isUploading && (
         <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center z-10">
           <div className="inline-block mx-auto">
@@ -71,8 +90,8 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
           </div>
         </div>
       )}
-    
-        <div className="absolute right-0 bottom-0 m-2">
+    {editable &&(
+      <div className="absolute right-0 bottom-0 m-2">
           <label className="flex items-center gap-1 bg-white py-1 px-2 rounded-md shadow-md shadow-black cursor-pointer">
             {/* <input type="file" onChange={updateCover} className="hidden" /> */}
             <button onClick={()=>setModal(!modal)}></button>
@@ -80,11 +99,12 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
             <HiPhotograph fill="black" className="scale-150"/>
             <p className="text-black font-semibold ">Change cover image</p>
           </label>
-          {!modal &&(
+          {modal &&(
               <CoverModal updateCover={updateCover} closeCoverModal={()=>setModal(!modal)} />
-              
             )}
         </div>
+    )}
+        
   
     </div>
   );

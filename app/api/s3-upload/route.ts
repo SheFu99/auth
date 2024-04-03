@@ -66,9 +66,9 @@ const updateCover = async (image:string)=>{
   const user= await currentUser()
   console.log('USER:',user)
  
-   const existedUser = await db.user.findFirst({
+   const existedUser = await db.profile.findFirst({
        where:{
-           id:user?.id
+           userId:user?.id
        }
     })
     console.log("existing user",existedUser )
@@ -76,9 +76,9 @@ const updateCover = async (image:string)=>{
   
   
   if(user || existedUser){
-       const selectedUser = await db.user.update({
+       const selectedUser = await db.profile.update({
            where:{ 
-               id: user?.id
+               userId: user?.id
            },
            data:{
                coverImage: image

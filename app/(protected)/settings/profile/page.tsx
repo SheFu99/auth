@@ -1,14 +1,26 @@
+"use client"
+
+
+import StoreProvider from "@/app/StoreProvider";
 import Profile from "@/components/profile/Profile";
-import UploadForm from "@/components/profile/s3-Upload-form";
+
 
 
 
 const ProfilePage = () => {
+
+ 
     return ( 
+      <StoreProvider>
+      
         <div className="">
-           
-          <Profile></Profile>
+            {/* <CreateProfileButton onCreate={() => createUserProfile(data)} /> */}
+            {/* <ProfileProvider> */}
+            <Profile></Profile>
+            {/* </ProfileProvider> */}
         </div>
+
+      </StoreProvider>
 
      );
 }

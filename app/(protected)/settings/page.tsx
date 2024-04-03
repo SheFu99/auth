@@ -39,6 +39,8 @@ import { UserRole } from '@prisma/client';
 import { Switch } from '@/components/ui/switch';
 import { MdAccountBox, MdElderly, MdFiberNew } from 'react-icons/md';
 import { toast } from 'sonner';
+import AboutUser from '@/components/profile/info-about';
+import StoreProvider from '@/app/StoreProvider';
 const SettingPage =  () => {
     const user = useCurrentUser()
     const [error,setError] =useState<string| undefined>()
@@ -113,17 +115,20 @@ const SettingPage =  () => {
     };
     
     return (
-         
+       
+        
         <Card className='grid grid-cols-12 '>
             <CardHeader className='col-span-12'>
-                <p className="text-2xl font-semibold text-center ">🛡 Security</p>
+                <p className="text-2xl font-semibold text-center ">⚙️ Settings </p>
             </CardHeader>
             <CardContent className='col-span-12 col-start-1 '>
+            <AboutUser></AboutUser>
+            {user?.isOAuth === false &&(
                 <Form {...form}>
                     <form className='space-y-6' onSubmit={form.handleSubmit(onSubmit,onError)}>
                         <div>
                             
-                            {user?.isOAuth === false &&(
+                           
                             <>
                                 
                                   
@@ -176,10 +181,9 @@ const SettingPage =  () => {
                                 </div>
                                 </div>
                             </>
-                            )}
+                          
                              
-                         
-                         {user?.isOAuth === false &&(
+               
                             <>
                          <FormField
                                 control={form.control}
@@ -205,14 +209,17 @@ const SettingPage =  () => {
 
                                 )}
                             />
-                         </>)}
+                         </>
                         </div>
                         
                         <Button disabled={isPending} type='submit' className='w-full'>Save</Button>
                     </form>
                 </Form>
+                  )}
             </CardContent>
         </Card>
+
+     
      );
 }
  

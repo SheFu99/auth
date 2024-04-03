@@ -16,7 +16,7 @@ type ImageCropperProps = {
   updateCover: (dataUrl: Blob) => void;
 };
 
-const ASPECT_RATIO = 36/9;
+const ASPECT_RATIO = 42/9;
 const MIN_WIDTH = 700;
 const MIN_HEIGHT = 200
 

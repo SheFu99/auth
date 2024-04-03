@@ -23,3 +23,20 @@ export const getAllUsers= async () => {
     return allUsers
 }
 ///
+
+export const CurrentProfile = async ()=>{
+    const session = await auth()
+    const profile = await db.profile.findFirst({
+        where:{
+            userId:session?.user.id
+        }
+    })
+
+    return profile
+}
+
+export const getAllProfile = async()=>{
+    const allProfiles = await db.profile.findMany();
+
+    return allProfiles
+}

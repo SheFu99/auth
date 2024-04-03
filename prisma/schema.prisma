@@ -24,18 +24,19 @@ model User{
   email String? @unique
   emailVerified DateTime?
   image String?
-  coverImage String?
+  
   password String?
   role UserRole @default(USER)
   accounts Account[]
   isTwoFactorEnabled Boolean @default(false)
   twoFactorConfirmation TwoFactorConformation?
-  profile Profile?
+  profile Profile? 
 }
 
 model Profile {
   firstName String?
   lastName String?
+  coverImage String? @default("")
   gender String?
   age String?
   phoneNumber String?
