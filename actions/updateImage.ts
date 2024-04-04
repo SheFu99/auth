@@ -16,6 +16,7 @@ export const updateImage = async ({image}:z.infer<typeof UserInfoSchema>)=>{
         email:user?.email
     }
    })
+  
     if(user || existedUser){
 
         const selectedUser = await db.user.update({

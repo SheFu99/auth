@@ -19,18 +19,22 @@ enum UserRole {
 }
 
 model User{
-  id String @id @default(cuid())
-  name String?
+  id    String @id @default(cuid())
+  name  String?
   email String? @unique
-  emailVerified DateTime?
   image String?
-  
+  emailVerified DateTime?
   password String?
   role UserRole @default(USER)
   accounts Account[]
   isTwoFactorEnabled Boolean @default(false)
   twoFactorConfirmation TwoFactorConformation?
-  profile Profile? 
+  profile    Profile? 
+  posts      Post[]
+  comments   Comment[]
+  likes      Like[]
+  gallery    Gallery[]
+  
 }
 
 model Profile {
@@ -45,10 +49,61 @@ model Profile {
   userId String @unique 
   user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 
+
 }
 
+model Post {
+  PostId     String    @id @default(cuid())
+  image      String?
+  text       String?
+  timestamp  DateTime  @default(now())
+  likes      Like[]
+  coments    Comment[]
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+}
 
+model Gallery {
+  imageId     String    @id @default(cuid())
+  image       String
+  text        String?
+  timestamp   DateTime  @default(now())
+  likes       Like[]
+  coments     Comment[]
+  userId      String
+  user        User      @relation(fields: [userId],references: [id])
 
+}
+
+model Comment {
+  CommentId String    @id @default(cuid())
+  image     String?
+  text      String?
+  timestamp DateTime  @default(now())
+  likes     Like[]
+  postId    String?
+  post      Post?     @relation(fields: [postId],references: [PostId])
+  userId    String
+  user      User      @relation(fields: [userId],references: [id])
+  galleryId String?
+  gallery   Gallery?  @relation(fields: [galleryId],references: [imageId])
+}
+
+model Like {
+  likeId    Int       @id @default(autoincrement())
+  postId    String?   
+  commentId String?   
+  userId    String  
+  post      Post?     @relation(fields: [postId],references: [PostId])
+  comment   Comment?  @relation(fields: [commentId],references: [CommentId])
+  user      User      @relation(fields: [userId],references: [id])
+  galleryId String?
+  gallery   Gallery?  @relation(fields: [galleryId],references: [imageId])
+
+  @@unique([postId, userId]) 
+  @@unique([commentId, userId])
+  @@unique([galleryId, userId])
+}
 
 
 model Account {

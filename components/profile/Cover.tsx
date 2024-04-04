@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { BounceLoader } from "react-spinners";
 import { HiPhotograph } from "react-icons/hi";
 import CoverModal from "./Cover-modal";
+import { useCurrentProfile } from "@/hooks/use-current-profile";
 
 type CoverProps = {
     url:string | undefined,
@@ -23,9 +24,10 @@ type Response = {
 
 export default function Cover({url,editable,onChange, className}:CoverProps) {
   const session = useSession();
+  // const {upload,switchUpload} = useCurrentProfile()
   const [isUploading,setIsUploading] = useState(false);
   const [modal ,setModal] = useState<boolean>(false)
-  const {update} = useSession()
+  // const {update} = useSession()
   async function updateCover(croppedImageBlob: Blob) {
     const formData = new FormData();
     formData.append("cover", croppedImageBlob);
@@ -38,22 +40,23 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
 
       const data = await response.json();
       if (!data.success === true ) {
+        // switchUpload(false)
         return {error: "Something wrong!Is no imageURL from server"}
       }else{
 
         const imageUrl = data.imageUrl 
         if (imageUrl) {
            // Assuming the response includes the new URL
-            update()
-          toast.success('Avatar updated successfully.');
+          //  switchUpload(true)
+          toast.success('Cover updated successfully.');
         } else {
-          throw new Error('New avatar URL not provided');
+          throw new Error('New Cover URL not provided');
         }
       }
     
     } catch (error) {
-      console.error('Error updating avatar:', error);
-      toast.error('Failed to update avatar.');
+      console.error('Error updating Cover:', error);
+      toast.error('Failed to update Cover.');
     }
     
   }
@@ -92,12 +95,12 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
       )}
     {editable &&(
       <div className="absolute right-0 bottom-0 m-2">
-          <label className="flex items-center gap-1 bg-white py-1 px-2 rounded-md shadow-md shadow-black cursor-pointer">
+          <label className="flex items-center gap-1 bg-white py-1 px-2 rounded-md shadow-md shadow-black cursor-pointer ">
             {/* <input type="file" onChange={updateCover} className="hidden" /> */}
             <button onClick={()=>setModal(!modal)}></button>
            
             <HiPhotograph fill="black" className="scale-150"/>
-            <p className="text-black font-semibold ">Change cover image</p>
+            <p className="text-black font-semibold xl:text-base md:text-md text-xs">Change cover image</p>
           </label>
           {modal &&(
               <CoverModal updateCover={updateCover} closeCoverModal={()=>setModal(!modal)} />

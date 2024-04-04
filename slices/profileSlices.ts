@@ -11,12 +11,14 @@ interface ProfileState {
   profile: Profile | null;
   loading: boolean;
   error: string | null;
+  upload:boolean;
 }
 
 const initialState: ProfileState = {
   profile: null,
   loading: false,
   error: null,
+  upload:false,
 };
 
 export const profileSlice = createSlice({
@@ -32,9 +34,12 @@ export const profileSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    setUpload:(state, action: PayloadAction<boolean>)=>{
+      state.upload = action.payload;
+    }
   },
 });
 
-export const { setProfile, setLoading, setError } = profileSlice.actions;
+export const { setProfile, setLoading, setError, setUpload } = profileSlice.actions;
 
 export default profileSlice.reducer;

@@ -1,3 +1,4 @@
+import { ProfileData } from './../hooks/use-current-profile';
 "use server"
 import * as z from "zod"
 import { db } from "@/lib/db"
@@ -14,7 +15,7 @@ export const getCurrentProfile = async (userId:string)=>{
       return {error: 'Profile not found'}
     }
     console.log(existingProfile)
-    return existingProfile
+    return existingProfile 
 }
 
 export const createUserProfile = async (values: z.infer<typeof UserProfile>) => {
@@ -49,7 +50,7 @@ export const createUserProfile = async (values: z.infer<typeof UserProfile>) => 
     return profile; 
   } catch (error) {
     console.error('Failed to create user profile:', error);
-    // Return or throw a more generic error to avoid leaking details
+ 
     return { error: 'Failed to create user profile.' };
   }
 };

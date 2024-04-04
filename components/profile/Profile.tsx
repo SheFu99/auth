@@ -10,60 +10,36 @@ import { FaUser } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Cover from "./Cover";
 import { getCurrentProfile } from "@/actions/UserProfile";
-import { useSelector, useDispatch } from 'react-redux';
+import { ProfileData, useCurrentProfile } from "@/hooks/use-current-profile";
 
-import { setProfile } from "@/slices/profileSlices";
-import { RootState } from "@/lib/store";
 
-interface ProfileData {
-  firstName: string | null;
-  lastName: string | null;
-  coverImage: string | null;
-  gender: string | null;
-  age: string | null;
-  phoneNumber: string | null;
-  regionCode: string | null;
-  adres: string | null;
-  userId: string;
-}
 
 const  Profile =  () => {
   const user = useCurrentUser();
-  const profile = useSelector((state: RootState) => state.profile.profile);
-  const dispatch = useDispatch()
-  const [modalOpen, setModalOpen] = useState(false);
-  // const [profile , setProfile] = useState<object|null>()
-  // const { profile, triggerRefetch } = useProfile();
-  const [sessionImage, setSessionImage] = useState(user?.image || undefined);
+  // const {profile , updateProfile, upload , switchUpload} = useCurrentProfile(); //use redux and localstorage for store
+  const [profile, setProfile] = useState<ProfileData>()
   const {update} = useSession()
+  const [modalOpen, setModalOpen] = useState(false);
+  const [sessionImage, setSessionImage] = useState(user?.image || undefined);
   
 
+
+
   useEffect(()=>{
-    
-    const fetchProfile = async () => {
-      console.log(profile)
-      if (user?.id) {
-        if(profile!== null){
-          return 
-        }else{
+    fetchProfile();
+  },[update]) 
+
+  const fetchProfile = async () => {
           try {
-            const profileData = await getCurrentProfile(user?.id);
-            dispatch(setProfile(profileData as ProfileData));
-            console.log(profileData); // Now logging the fetche\d profile data
+            const profileData = await getCurrentProfile(user?.id!);
+            setProfile(profileData as ProfileData);
+            
           } catch (error) {
             console.error('Failed to fetch profile:', error);
           }
-        }
-        
-      }
-    };
-
-    fetchProfile()
+    } 
     
-  },[update])
-
-
- async function updateAvatar(croppedImageBlob: Blob) {
+  const updateAvatar = async(croppedImageBlob: Blob) =>{
     const formData = new FormData();
     formData.append("file", croppedImageBlob);
 
@@ -93,7 +69,7 @@ const  Profile =  () => {
       toast.error('Failed to update avatar.');
     }
     
-  }
+    }
 
  
 
@@ -105,18 +81,19 @@ const  Profile =  () => {
           
           <Cover url={profile?.coverImage!} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
            
-            <div className="flex items-center">
-                  <div className="absolute ml-12 mt-10 z-10">
-                  <Avatar className="md:w-[110px] md:h-[110px] w-[50px] h-[50px]">
+            <div className="flex items-center relative">
+                  <div className="absolute md:left-0 md:-bottom-20 m-auto w-fit md:p-[1rem] z-10 -bottom-15 left-0 p-[1rem] ">
+                    
+                    <Avatar className="md:w-[110px] md:h-[110px] w-[75px] h-[75px]">
                       <AvatarImage src={sessionImage}/>
-                      <AvatarFallback className="bg-sky-500">
-                        <FaUser className="text-white w-20 h-20"/>
+                        <AvatarFallback className="bg-sky-500">
+                          <FaUser className="text-white w-20 h-20"/>
                       </AvatarFallback>
                     </Avatar>
                 
 
                     <button
-                      className="absolute -bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
+                      className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
                       title="Change photo"
                       onClick={() => setModalOpen(true)}
                     >
@@ -137,14 +114,14 @@ const  Profile =  () => {
 
       <div className=" col-start-1 col-span-12 mt-1  bg-white grid grid-cols-12 rounded-md shadow-md">
         
-        <div className="ml-6 mt-1 col-start-3 col-span-4 row-start-1 py-1">
-          <p className=" text-black font-semibold text-2xl">{user?.name}</p>
+        <div className="lg:ml-5 ml-10 w-full m-auto mt-1 col-start-3 col-span-4 row-start-1 py-2">
+          <p className=" text-black font-semibold lg:text-2xl md:text-sm md:ml-5 text-xs ">{user?.name}</p>
         </div>
 
         <div className="ml-5 mt-1 col-start-3 col-span-4 row-start-2">
-            <p className="text-gray-600 font-serif text-1xl">Kyiv,Ukraine</p>
+            <p className="text-gray-600 font-serif text-1xl">{profile?.adres}</p>
         </div>    
-
+            
       </div>
 
 

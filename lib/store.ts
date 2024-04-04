@@ -1,22 +1,37 @@
-// store/store.ts
-
 "use client"
-import { configureStore } from '@reduxjs/toolkit';
-import { createWrapper, HYDRATE } from 'next-redux-wrapper';
-import profileReducer from '../slices/profileSlices'
+import { configureStore, combineReducers ,} from '@reduxjs/toolkit';
+import profileReducer from '../slices/profileSlices';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
-export const Store = () =>
-  configureStore({
-    reducer: {
-      profile: profileReducer,
-    },
-  });
+const rootReducer = combineReducers({
+  profile: profileReducer,
+  // Add other reducers here
+});
 
-  export const useAppDispatch=()=> useDispatch<AppDispatch>();
-  export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+const persistConfig = {
+  key: 'root',
+  storage,
+};
 
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export type AppStore = ReturnType<typeof Store>;
-export type RootState = ReturnType<AppStore['getState']>;
-export type AppDispatch = AppStore['dispatch'];
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+});
+
+export const persistor = persistStore(store);
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+

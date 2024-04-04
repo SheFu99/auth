@@ -22,6 +22,9 @@ const config = {
         'gradient-base': "radial-gradient(ellipse at top, var(--tw-color-sky-400), var(--tw-color-blue-800))",
         // Define other gradients for responsiveness if needed
       },
+      screens: {
+        'g-f': '280px',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -33,7 +33,8 @@ export const register = async (data: z.infer<typeof RegisterSchema>) => {
                 password: hashedPassword,
                 profile:{
                     create:{
-                        coverImage: " "
+                        coverImage: " ",
+                        firstName: name,
                     }
                 }
             },

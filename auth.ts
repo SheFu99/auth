@@ -6,7 +6,7 @@ import authConfig from "./auth.config"
 import { getUserById } from "./data/user"
 import { getTwoFactorConformationByUserId } from "./data/two-factor-conformation"
 import { getAccountByUserId } from "./data/account"
-import { getUserProfile } from "./actions/UserProfile"
+
 
 
 
@@ -59,10 +59,12 @@ export const {
     },
 
     async session({token , session}) {
+    
         if(token.sub&&session.user){
           session.user.id = token.sub
         }
-
+      
+        
         if(token.role && session.user){
           session.user.role= token.role as UserRole
         }
@@ -79,6 +81,10 @@ export const {
           session.user.coverImage = token.coverImage as string // Include coverImage in session
          
         }
+        const existingUser = await getUserById(token?.sub!)
+        if(!existingUser){
+          return null
+        }
      return session;
      
     },
@@ -89,7 +95,7 @@ export const {
       const existingUser = await getUserById(token.sub);
       
 
-      if(!existingUser) return token;
+      if(!existingUser) {return null};
 
       const existingAccount = await getAccountByUserId(
         existingUser.id
