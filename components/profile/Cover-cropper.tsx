@@ -10,6 +10,7 @@ import ReactCrop, {
 import "react-image-crop/dist/ReactCrop.css"; // Don't forget to import the CSS
 import setCanvasPreview from "../setCanvasPreview";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import Image from "next/image";
 
 type ImageCropperProps = {
   closeCoverModal: () => void;
@@ -75,7 +76,8 @@ const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().p
 
     const reader = new FileReader();
     reader.addEventListener("load", () => {
-      const imageElement = new Image();
+      const imageElement = new window.Image();
+
       const imageUrl = reader.result?.toString() || "";
       imageElement.src = imageUrl;
 
@@ -131,7 +133,7 @@ const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().p
             aspect={ASPECT_RATIO}
             minWidth={MIN_WIDTH}
           >
-            <img
+            <Image
               ref={imgRef}
               src={imgSrc}
               alt="Upload"

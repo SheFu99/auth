@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client"
 
 import * as z from 'zod'
@@ -28,9 +29,17 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { deleteUser, userControl } from '@/actions/userControl'
 import { AiFillDelete } from "react-icons/ai";
-export type UserInfo = z.infer<typeof UserInfoSchema>
-
-export const columns: ColumnDef<UserInfo>[] = [
+// export type UserInfo = z.infer<typeof UserInfoSchema>
+interface User {
+  name: string;
+  isTwoFactorEnabled: boolean;
+  role: string;
+  email: string;
+  image: string;
+  id?: any;
+  password?: any;
+}
+export const columns: ColumnDef<User,unknown>[] = [
 
     
   {

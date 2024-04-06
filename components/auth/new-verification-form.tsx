@@ -8,7 +8,7 @@ import { newVerification } from "@/actions/new-verification"
 import { FormSucces } from "../form-succes"
 import { FormError } from "../form-error"
 
-export const NewVerificationForm = ()=>{
+ const NewVerificationForm = ()=>{
     const [error,setError] = useState<string|undefined>()
     const [success,setSuccess] =useState<string|undefined>()
     const searchParams = useSearchParams()
@@ -34,7 +34,7 @@ export const NewVerificationForm = ()=>{
     useEffect(()=>{
         console.log(token)
         onSubmit()
-    },[])
+    },[onSubmit, token])
     return(
         <CardWrapper
            headerLable="Confirming you verification"
@@ -51,3 +51,5 @@ export const NewVerificationForm = ()=>{
       
     )
 }
+
+export default NewVerificationForm

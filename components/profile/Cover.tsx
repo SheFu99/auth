@@ -6,6 +6,7 @@ import { BounceLoader } from "react-spinners";
 import { HiPhotograph } from "react-icons/hi";
 import CoverModal from "./Cover-modal";
 import { useCurrentProfile } from "@/hooks/use-current-profile";
+import Image from "next/image";
 
 type CoverProps = {
     url:string | undefined,
@@ -68,7 +69,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
       
       {url&&(
         <div>
-          <img src={url} alt="" className={`${className}  bg-blend-overlay h-[100%]`}/> 
+          <Image src={url} alt="" className={`${className}  bg-blend-overlay h-[100%]`}/> 
           {/* ///replace on NextImage */}
         </div>
       )}

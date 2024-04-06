@@ -1,4 +1,4 @@
-import { ProfileData } from './../hooks/use-current-profile';
+
 "use server"
 import * as z from "zod"
 import { db } from "@/lib/db"
@@ -37,6 +37,8 @@ export const createUserProfile = async (values: z.infer<typeof UserProfile>) => 
     // This case might indicate a more serious issue: the user is authenticated but not in the DB
     return { error: 'User not found in the database. Authorization mismatch.' };
   }
+
+  console.log(existingUser.role)
 
   try {
     // Proceed to create the profile with values provided and connect to the existing user

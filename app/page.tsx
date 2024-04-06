@@ -5,7 +5,7 @@ import {  cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { LoginButton } from "@/components/auth/loginButton"
 import { createWrapper } from "next-redux-wrapper"
-import { Store } from "@/lib/store"
+
 import ReduxProvider from "./StoreProvider"
 import Profile from "@/components/profile/Profile"
 import StoreProvider from "./StoreProvider"

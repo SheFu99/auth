@@ -1,8 +1,9 @@
 
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
-import { Navbar } from "./_component/navbar";
-import SideBar from "./_component/SideBar";
+// const Navbar =React.lazy(()=>import ('@/components/navbar'))
+// import SideBar from "@/components/SideBar";
+import React from "react";
 
 interface ProtecteedLayoutProps{
     children: React.ReactNode;
@@ -13,13 +14,13 @@ const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
     return ( 
         
         <SessionProvider session={session}>
-        <div className="grid grid-cols-12 grid-rows-12 h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-400 to-blue-800">
-                <Navbar/>
+        
+                {/* <Navbar/> */}
             <div className="col-span-12 col-start-1 row-span-2">
                 <div className="grid space-y-10 grid-cols-12">
 
-                
-                    <SideBar className="md:col-start-1 md:col-span-2 md:mt-5 hidden md:block "/>
+                {/* ///CREATE COMPONENT with {children} And conditional displaing SideBar */}
+                    {/* <SideBar className="md:col-start-1 md:col-span-2 md:mt-5 hidden md:block "/> */}
 
 
                         <div className="md:col-start-3 md:col-span-9 col-start-2 col-span-10 ">
@@ -28,7 +29,7 @@ const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
 
                 </div>
             </div>
-        </div>
+  
         </SessionProvider>
      );
 }

@@ -13,7 +13,7 @@ export const register = async (data: z.infer<typeof RegisterSchema>) => {
     const validatedFields = RegisterSchema.safeParse(data);
     if (!validatedFields.success) {
         return {
-            error: validatedFields.error.toString()
+            error: 'error with zod validate'
         }}
         console.log("written data in db"); // Check to see if `user` is a property of `db`
 

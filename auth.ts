@@ -78,8 +78,8 @@ export const {
           session.user.email = token.email as string      
           session.user.isOAuth = token.isOAuth as boolean 
           session.user.image = token.picture
-          session.user.coverImage = token.coverImage as string // Include coverImage in session
-         
+          
+      
         }
         const existingUser = await getUserById(token?.sub!)
         if(!existingUser){
@@ -95,7 +95,7 @@ export const {
       const existingUser = await getUserById(token.sub);
       
 
-      if(!existingUser) {return null};
+      if(!existingUser) return token;
 
       const existingAccount = await getAccountByUserId(
         existingUser.id
@@ -104,12 +104,10 @@ export const {
       token.isOAuth = !!existingAccount ///return a boolean of value
       token.name = existingUser.name;
       token.email = existingUser.email;
-      token.role = existingUser.role
-      token.picture = existingUser.image
-      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
-      if(existingUser.coverImage) { // Include coverImage in token
-        token.coverImage = existingUser.coverImage;
-      }
+      token.role = existingUser.role;
+      token.picture = existingUser.image;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+    
       
        return token
      } ,

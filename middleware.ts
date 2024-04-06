@@ -7,9 +7,10 @@ import { currentRole } from './lib/auth';
 const {auth} =NextAuth(authConfig)
 
 export default auth(async (req) => {
-  const userRole = await currentRole()           
+  const userRole = await currentRole()  
+  console.log(userRole)         
   const {nextUrl}=req;
-const isLoggedIn = !!req.auth;
+    const isLoggedIn = !!req.auth;
 const url = req.nextUrl;
 // const errorRedirect = nextUrl.pathname.includes('?error=')
 const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);

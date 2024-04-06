@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { SettingsSchema } from "@/schemas"
-import { UserRole } from "@prisma/client"
+import { User, UserRole } from "@prisma/client"
 
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
@@ -20,8 +20,8 @@ import { useCurrentRole } from "@/hooks/use-current-role"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // import { useCurrentRole } from "@/hooks/use-current-role" for clinet component to get userRole
 // import { currentRole } from "@/lib/auth" for server coomponent
-import { DataTable  } from "../_component/userTable/data-table"
-import {columns , UserInfo} from '../_component/userTable/columns'
+import { DataTable  } from "../../../components/userTable/data-table"
+import {columns } from '../../../components/userTable/columns'
 
  const AdminPage= ()=>{
      const onApiRouteRouteClick = ()=> {
@@ -34,21 +34,30 @@ import {columns , UserInfo} from '../_component/userTable/columns'
                  }
              })
      }
-     const [data, setData] = useState<object | undefined>([])
+     const [data, setData] = useState<User[]>([])
      const onServerActionClick=()=>{
-         admin()
-         .then ((data)=>{
-             if (!data){
-                 toast.error("Error data is undefined")
-             }
-
-            //  if(data?.success){
-            //      toast.success(data?.success)
-            //  }
-           
-            setData(data)
-         })
-     }
+        admin()
+        .then((data) => {
+            // Check if data is an array (indicating success)
+            if (Array.isArray(data)) {
+                // Handle the array of user data
+                // For example, updating state with the data
+                setData(data);
+                toast.success("Data loaded successfully");
+            } else if ('error' in data) {
+                // Handle the error case
+                toast.error(data.error);
+            } else {
+                // Handle unexpected data structure
+                toast.error("Unexpected data structure received");
+            }
+        })
+        .catch((error) => {
+            // Handle any errors that occur during the fetch
+            console.error("Error fetching data:", error);
+            toast.error("An error occurred while fetching data");
+        });
+};
 
   
      
@@ -112,7 +121,7 @@ import {columns , UserInfo} from '../_component/userTable/columns'
                     </>
                 
                 <div className="container mx-auto py-10 ">
-                     <DataTable columns={columns} data={data as UserInfo} />
+                     <DataTable columns={columns} data={data} />
                  </div>
                 </CardContent>
                 
