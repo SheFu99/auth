@@ -32,7 +32,7 @@ describe('createUserProfile', () => {
       phoneNumber: '1234567890',
       regionCode: 'US',
       adres: '123 Main St',
-      userId:'clujf70sp00002tfzoxee2kxx'
+      userId:'asdasd'
       // Include other fields as needed for your test
     };
 
