@@ -34,6 +34,15 @@ export const {
         user,
         account,
       })
+      if (account.provider !== "credentials") {
+        await db.profile.create({
+          data: {
+            userId: user.id,
+            firstName: user.name,
+          }
+        });
+      }
+      
 
       if(account?.provider === "credentials")  {
         const userId: string = user.id!
