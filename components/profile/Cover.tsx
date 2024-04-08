@@ -1,5 +1,5 @@
 "use client"
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { BounceLoader } from "react-spinners";
@@ -24,11 +24,10 @@ type Response = {
 
 
 export default function Cover({url,editable,onChange, className}:CoverProps) {
-  const session = useSession();
+  const {update} = useSession()
   // const {upload,switchUpload} = useCurrentProfile()
   const [isUploading,setIsUploading] = useState(false);
   const [modal ,setModal] = useState<boolean>(false)
-  // const {update} = useSession()
   async function updateCover(croppedImageBlob: Blob) {
     const formData = new FormData();
     formData.append("cover", croppedImageBlob);
@@ -49,6 +48,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
         if (imageUrl) {
            // Assuming the response includes the new URL
           //  switchUpload(true)
+          update()
           toast.success('Cover updated successfully.');
         } else {
           throw new Error('New Cover URL not provided');
@@ -62,6 +62,30 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
     
   }
 
+  const [dimensions, setDimensions] = useState({
+    width: 1200, // Default width
+    height: 300, // Default height
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Calculate desired dimensions based on the viewport size
+      // For example, making the image take up half of the viewport width and maintaining a specific aspect ratio
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Update state with new dimensions
+      setDimensions({
+        width: viewportWidth / 4,
+        height: viewportHeight / 3,
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    console.log(dimensions.width/2)
+    return () => window.removeEventListener('resize', handleResize);
+  },[])
+
  
   return (
     
@@ -69,7 +93,11 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
       
       {url&&(
         <div>
-          <Image src={url} alt="Cover" width={200} height={100} className={`${className}  bg-blend-overlay h-[100%]`}/> 
+          <Image src={url} alt="cover"
+          width={1500}
+          height={300}
+          objectFit="fill"
+          layout="responsive" className={`${className}  bg-blend-overlay h-auto  g-f:w-auto`}/> 
           {/* ///replace on NextImage */}
         </div>
       )}

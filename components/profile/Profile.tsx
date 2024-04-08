@@ -81,7 +81,7 @@ const  Profile =  () => {
       {/* <Image src={sessionImage} alt='Avatar' /> */}
            
           
-          <Cover url={profile?.coverImage!} onChange={()=>update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
+          <Cover url={profile?.coverImage!} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
            
             <div className="flex items-center relative ">
                   <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-10 -bottom-15 left-0 p-[1rem] justify-center">

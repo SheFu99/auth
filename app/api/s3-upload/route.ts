@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { PutObjectAclCommand, PutObjectCommand, PutObjectCommandInput, S3Client} from "@aws-sdk/client-s3";
 import { currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { UserInfoSchema } from "@/schemas";
-import * as z from 'zod'
+
 
 const s3Client = new S3Client({
     region: process.env.NEXT_PUBLIC_S3_REGION as string,
@@ -25,8 +24,13 @@ const s3Client = new S3Client({
         ContentType:fileName.endsWith('.svg') ? "image/svg+xml" : "image/jpg"
     }
     const command = new PutObjectCommand(params);
-  await s3Client.send(command);
-  return fileName;
+    try {
+      await s3Client.send(command);
+      return fileName;
+  } catch (error) {
+      console.error("Error uploading to S3:", error);
+      throw new Error("Failed to upload file to S3.");
+  }
 }
 
 

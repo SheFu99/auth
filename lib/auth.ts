@@ -13,11 +13,7 @@ export const currentRole = async () =>{
     console.log("CurrentRole",session?.user.role)
     return session?.user.role
 }
-const logCurrentRole = async () => {
-    const role = await currentRole();
-    console.log("CurrentRole outside function", role);
-};
-logCurrentRole();
+
 
 ///protected ADMIN only 
 export const getAllUsers= async () => {

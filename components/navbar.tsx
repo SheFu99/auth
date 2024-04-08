@@ -7,6 +7,7 @@ import {
   } from "@/components/ui/sheet"
 import SideBar from './SideBar';
 import React from "react";
+import UserButton from "./auth/user-button";
 // const UserButton = React.lazy(()=> import ("./auth/user-button"));
   
 
@@ -22,7 +23,7 @@ import React from "react";
                 </Sheet>
         <div className="col-start-12">
             <div className='flex justify-end g-f:p-4 md:p-4 xl:p-3'>
-                {/* <UserButton /> */}
+                <UserButton />
             </div>
         </div>
     </nav>
