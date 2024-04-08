@@ -38,7 +38,7 @@ export default function Home() {
         </div>
 
         <div className="mt-5">
-          <LoginButton>
+          <LoginButton mode="modal" asChild>
             <Button variant="secondary" size='lg'>
               Login
             </Button>

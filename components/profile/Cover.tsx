@@ -69,7 +69,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
       
       {url&&(
         <div>
-          <Image src={url} alt="" className={`${className}  bg-blend-overlay h-[100%]`}/> 
+          <Image src={url} alt="Cover" width={200} height={100} className={`${className}  bg-blend-overlay h-[100%]`}/> 
           {/* ///replace on NextImage */}
         </div>
       )}

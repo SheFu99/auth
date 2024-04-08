@@ -133,12 +133,13 @@ const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().p
             aspect={ASPECT_RATIO}
             minWidth={MIN_WIDTH}
           >
-            <Image
+            <img
               ref={imgRef}
               src={imgSrc}
               alt="Upload"
               style={{ maxHeight: "70vh" }}
               onLoad={onImageLoad}
+
             />
 
           </ReactCrop>

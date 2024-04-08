@@ -20,9 +20,6 @@ import React from "react";
                 <SideBar className="justify-start "/>
                 </SheetContent>
                 </Sheet>
-                <div className="md:col-start-1 md:col-span-2 md:mt-5 hidden md:block ">
-                <SideBar className="justify-start "/>
-                </div>
         <div className="col-start-12">
             <div className='flex justify-end g-f:p-4 md:p-4 xl:p-3'>
                 {/* <UserButton /> */}

@@ -37,7 +37,7 @@ const  Profile =  () => {
 
   useEffect(()=>{
     fetchProfile();
-  },[update, fetchProfile]) 
+  },[update]) 
 
 
     
@@ -93,7 +93,6 @@ const  Profile =  () => {
                         src={sessionImage}
                         alt='Avatar'
                         // layout="fill"
-                       
                         width={75}
                         height={75}
                         className="rounded-full"
@@ -103,7 +102,7 @@ const  Profile =  () => {
                   )}
                   {!sessionImage&&(
                   <div className="flex h-full w-full items-center justify-center rounded-full bg-muted">
-                    <FaUser className="text-[#3aa29d] "/>
+                    <FaUser className="text-[#3aa29d] w-[75px] h-[75px]"/>
                   </div>
                   )}
                       

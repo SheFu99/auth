@@ -35,6 +35,7 @@ export const CurrentProfile = async ()=>{
             userId:session?.user.id
         }
     })
+    console.log("Profile", profile)
 
     return profile
 }
