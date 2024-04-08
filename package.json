@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "prisma:migrate": "prisma migrate deploy",
+    "build": "npm run prisma:migrate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate && db push"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.5.0",
