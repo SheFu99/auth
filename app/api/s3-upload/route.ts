@@ -3,6 +3,12 @@ import { PutObjectAclCommand, PutObjectCommand, PutObjectCommandInput, S3Client}
 import { currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 
+export interface S3Response {
+  imageUrl?:String;
+  error?:String;
+  success?:boolean;
+}
+
 
 const s3Client = new S3Client({
     region: process.env.NEXT_PUBLIC_S3_REGION as string,
@@ -11,8 +17,6 @@ const s3Client = new S3Client({
         secretAccessKey: process.env.NEXT_PUBLIC_S3_SECRET_KEY as string,
     }
 });
-
-
  const uploadFileToS3 = async (file:Buffer,fileName:string)=>{
     const fileBuffer = file;
     console.log(fileName)
@@ -32,8 +36,6 @@ const s3Client = new S3Client({
       throw new Error("Failed to upload file to S3.");
   }
 }
-
-
  const updateAvatar = async (image:string)=>{
     
    const user= await currentUser()
@@ -134,11 +136,11 @@ export async function POST(request: Request): Promise<Response> {
           await updateCover(imageUrl)
         }
      }catch(error){
-        return NextResponse.json({ error: error})
+        return NextResponse.json<S3Response>({ error: error})
      }
      
-      return NextResponse.json({ success: true, imageUrl });
+      return NextResponse.json<S3Response>({ success: true, imageUrl });
     } catch (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) });
+      return NextResponse.json<S3Response>({ error: error instanceof Error ? error.message : String(error) });
     }
   }

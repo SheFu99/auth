@@ -20,6 +20,7 @@ const config = {
     extend: {
       backgroundImage: {
         'gradient-base': "radial-gradient(ellipse at top, var(--tw-color-sky-400), var(--tw-color-blue-800))",
+        'gray-light-center': 'linear-gradient(to right, #cbd5e1, #e2e8f0, #cbd5e1)',
         // Define other gradients for responsiveness if needed
       },
       screens: {

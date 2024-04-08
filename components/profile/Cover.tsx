@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { BounceLoader } from "react-spinners";
 import { HiPhotograph } from "react-icons/hi";
 import CoverModal from "./Cover-modal";
-import { useCurrentProfile } from "@/hooks/use-current-profile";
 import Image from "next/image";
+import { S3Response } from "@/app/api/s3-upload/route";
 
 type CoverProps = {
     url:string | undefined,
@@ -25,12 +25,15 @@ type Response = {
 
 export default function Cover({url,editable,onChange, className}:CoverProps) {
   const {update} = useSession()
+
   // const {upload,switchUpload} = useCurrentProfile()
+
   const [isUploading,setIsUploading] = useState(false);
   const [modal ,setModal] = useState<boolean>(false)
+
   async function updateCover(croppedImageBlob: Blob) {
     const formData = new FormData();
-    formData.append("cover", croppedImageBlob);
+          formData.append("cover", croppedImageBlob);
 
     try {
       const response = await fetch('/api/s3-upload', {
@@ -38,53 +41,32 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
         body: formData,
       })
 
-      const data = await response.json();
-      if (!data.success === true ) {
-        // switchUpload(false)
-        return {error: "Something wrong!Is no imageURL from server"}
-      }else{
+            const data:S3Response = await response.json();
+            setIsUploading(true)
+            if (!data.success === true ) {
+              // switchUpload(false)
+              return {error: "Something wrong!Is no imageURL from server"}
+            }else{
 
-        const imageUrl = data.imageUrl 
-        if (imageUrl) {
-           // Assuming the response includes the new URL
-          //  switchUpload(true)
-          update()
-          toast.success('Cover updated successfully.');
-        } else {
-          throw new Error('New Cover URL not provided');
-        }
-      }
+              const imageUrl = data.imageUrl 
+              if (imageUrl) {
+                // Assuming the response includes the new URL
+                //  switchUpload(true)
+                update()
+                toast.success('Cover updated successfully.');
+              } else {
+                throw new Error('New Cover URL not provided');
+              }
+            }
     
     } catch (error) {
       console.error('Error updating Cover:', error);
       toast.error('Failed to update Cover.');
+    }finally{
+      setIsUploading(false)
     }
     
   }
-
-  const [dimensions, setDimensions] = useState({
-    width: 1200, // Default width
-    height: 300, // Default height
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      // Calculate desired dimensions based on the viewport size
-      // For example, making the image take up half of the viewport width and maintaining a specific aspect ratio
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      // Update state with new dimensions
-      setDimensions({
-        width: viewportWidth / 4,
-        height: viewportHeight / 3,
-      });
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    console.log(dimensions.width/2)
-    return () => window.removeEventListener('resize', handleResize);
-  },[])
 
  
   return (
@@ -102,7 +84,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
         </div>
       )}
 
-      {!url&&(
+      {!url && !isUploading&&(
          <div>
          <svg width="2100" height="150" xmlns="http://www.w3.org/2000/svg">
 
