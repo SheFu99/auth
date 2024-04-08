@@ -13,7 +13,10 @@ import { sendTwoFactorTokenEmail} from "@/lib/mail";
 import { db } from "@/lib/db";
 import { getTwoFactorConformationByUserId } from "@/data/two-factor-conformation";
 
-export const login = async (values:z.infer<typeof LoginSchema>)=>{
+export const login = async (
+   values:z.infer<typeof LoginSchema>,
+   callbackUrl?:string| null,   
+)=>{
    const validatedField = LoginSchema.safeParse(values);
 
    if(!validatedField.success){
@@ -88,7 +91,7 @@ if (existingUser.isTwoFactorEnabled && existingUser.email){
       await signIn("credentials",{
          email,
          password,
-         redirectTo: DEFAULT_LOGIN_REDIRECT
+         redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
    })
    }catch(error){
       if(error instanceof AuthError){

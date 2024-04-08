@@ -1,4 +1,4 @@
-import { DEFAULT_LOGIN_REDIRECT, adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from './routes';
+import { DEFAULT_LOGIN_REDIRECT, adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from '../routes';
 import authConfig from "./auth.config"
 import NextAuth from "next-auth"
 import { currentRole } from './lib/auth';
@@ -7,8 +7,7 @@ import { currentRole } from './lib/auth';
 const {auth} =NextAuth(authConfig)
 
 export default auth(async (req) => {
-  const userRole = await currentRole()  
-  console.log(userRole)         
+  const userRole = await currentRole()           
   const {nextUrl}=req;
 const isLoggedIn = !!req.auth;
 const url = req.nextUrl;
@@ -41,7 +40,16 @@ if (isAuthRoute){
   return null
 }
 if(!isLoggedIn&& !isPublicRoute){
-  return Response.redirect(new URL("/auth/login",nextUrl))
+  let callbackUrl = nextUrl.pathname
+  if(nextUrl.search){
+    callbackUrl +=nextUrl.search
+  }
+
+  const encodedCallbackUrl = encodeURIComponent(callbackUrl)
+  return Response.redirect(new URL(
+  `/auth/login?callbackUrl=${encodedCallbackUrl}`,
+  nextUrl
+))
 }
 if(userRole !=="ADMIN" && isAdminRoute) {
   return Response.redirect(new URL('/settings',nextUrl))

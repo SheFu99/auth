@@ -2,6 +2,8 @@ import {Resend} from 'resend'
 
 const resend = new Resend (process.env.RESEND_API_KEY);
 
+const domain = process.env.NEXT_PUBLIC_APP_URL
+
 export const sendTwoFactorTokenEmail = async (
     email: string,
     token: string,
@@ -19,7 +21,7 @@ export const sendPasswordResendEmail = async (
     email: string,
     token: string,
 )=>{
-    const resentLink =`http://localhost:3000/auth/new-password?token=${token}`
+    const resentLink =`${domain}/auth/new-password?token=${token}`
 
     await resend.emails.send({
         from:"onboarding@resend.dev",

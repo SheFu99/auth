@@ -29,6 +29,7 @@ interface LoginResponse {
 const LoginForm = () => {
 
     const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl")
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
     ? "Email already in use with diferent provider" :""
     const [showTwoFactor , setShowTwoFactor] = useState(false);
@@ -63,7 +64,7 @@ const LoginForm = () => {
         setSuccess("");
         
         startTransition(()=>{
-            login(data)
+            login(data ,callbackUrl)
             .then((response: any) => { // Explicitly type the response
                
                 if (response?.error) {
