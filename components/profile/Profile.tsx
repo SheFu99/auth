@@ -13,7 +13,7 @@ import { ProfileData } from "@/hooks/use-current-profile";
 import { IoMdAddCircleOutline,IoMdAddCircle } from "react-icons/io";
 import Image from 'next/image';
 import {UserProfile} from '@/schemas/index'
-import AboutUser from './info-about';
+import ContactInformation from './Contact-information';
 import { MdEditNote } from 'react-icons/md';
 import FirstAndLastNameForm from './FirstAndLastName';
 
@@ -32,6 +32,7 @@ const  Profile =  () => {
   const fetchProfile = async () => {
     try {
       const profileData = await getCurrentProfile(user?.id!);
+      console.log('profilefetched',profileData )
       setProfile(profileData as ProfileData);
       
     } catch (error) {
@@ -108,7 +109,7 @@ const  Profile =  () => {
                   )}
 
                     <button
-                      className="absolute bottom-1 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
+                      className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
                       title="Change photo"
                       onClick={() => setModalOpen(true)}
                     >
@@ -126,21 +127,15 @@ const  Profile =  () => {
             />
           )}
 
-              <div className=" col-start-1 col-span-12 mt-1  bg-white grid grid-cols-12 rounded-md shadow-md">
-                <button title='Edit your First and Last name' className=' col-start-12 md:ml-5' onClick={()=>swichEditName(!editName)}>
-                  <MdEditNote color='black' className="scale-150 "/>
-                </button>
+              <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md">
+               
 
-                {editName?(
-                  ///form component with firstName and lastName
+               
+              
                   <div className='col-span-12'>
-                  <FirstAndLastNameForm/>
+                  <FirstAndLastNameForm userName={user.name} editState={true}/>
                   </div>
-                ):(
-                <div className="lg:ml-5 ml-10 w-full m-auto mt-1 col-start-3 col-span-4 row-start-1 py-2">
-                  <h1 className=" text-black font-semibold lg:text-2xl md:-ml-5 md:text-xl sm:-ml-10 -ml-20 text-md g-f:text-nowrap g-f:ml-0 g-f:text-xs">{user?.name}</h1>
-                </div>
-                )}
+               
 
                 
                 
@@ -149,9 +144,9 @@ const  Profile =  () => {
 
       {!profile?.phoneNumber &&(
           <div className='w-full'>
-                <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex flex-wrap">
+                <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
                   <p className="text-black font-semibold text-center w-full g-f:text-sm">Add information about your-self </p>
-                    <button onClick={()=>swichAddInfo(true)} title='add info about yourself' className='w-full '>
+                    <button onClick={()=>swichAddInfo(true)} title='add info about yourself' >
                       <IoMdAddCircleOutline color='black' className=" scale-150 block mb-2 w-full"/>
                     </button>
                 </div>

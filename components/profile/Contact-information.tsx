@@ -16,7 +16,7 @@ import { Button } from '../ui/button';
 
 
 
-const AboutUser = () => {
+const ContactInformation = () => {
 const user = useCurrentUser()
 const [error,setError] =useState<string| undefined>()
     const [success, setSuccess] = useState<string|undefined>()
@@ -149,4 +149,4 @@ const [error,setError] =useState<string| undefined>()
      );
 }
  
-export default AboutUser;
+export default ContactInformation;

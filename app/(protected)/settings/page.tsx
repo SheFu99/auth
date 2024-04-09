@@ -39,7 +39,7 @@ import { UserRole } from '@prisma/client';
 import { Switch } from '@/components/ui/switch';
 import { MdAccountBox, MdElderly, MdFiberNew } from 'react-icons/md';
 import { toast } from 'sonner';
-import AboutUser from '@/components/profile/info-about';
+import ContactInformation from '@/components/profile/Contact-information';
 import StoreProvider from '@/app/StoreProvider';
 const SettingPage =  () => {
     const user = useCurrentUser()
@@ -122,7 +122,7 @@ const SettingPage =  () => {
                 <p className="text-2xl font-semibold text-center ">⚙️ Settings </p>
             </CardHeader>
             <CardContent className='col-span-12 col-start-1 '>
-            <AboutUser></AboutUser>
+            <ContactInformation></ContactInformation>
             {user?.isOAuth === false &&(
                 <Form {...form}>
                     <form className='space-y-6' onSubmit={form.handleSubmit(onSubmit,onError)}>

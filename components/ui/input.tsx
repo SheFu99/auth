@@ -22,15 +22,28 @@ export interface InputProps
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, Icon,disabled,editButton, ...props }, ref) => {
 
+    const AdditionalInputClasses = (type: React.HTMLInputTypeAttribute)=>{
+      switch(type){
+        case 'profile':
+          return "bg-white text-black  text-xl font-bold g-f:text-xs";
+        case 'password':
+          return "bg-background"
+        default:
+          return "file:text-sm file:font-medium placeholder:text-muted-foreground"
+      }
+    }
+    const combinedClassName = cn(
+      "flex h-10 w-full rounded-md border border-input px-4 py-2 ring-offset-background file:border-0 file:bg-transparent  outline-none focus:outline-none focus:ring-0 border-none disabled:cursor-not-allowed disabled:opacity-50",
+      className, // Existing class names passed via props
+     AdditionalInputClasses(type),)
+
 
     const [button, setButton] = React.useState<boolean>(false);
-
     const toggleButton = () => {
       setButton(!button);
     };
 
     const [visable,showPassword] = React.useState<boolean>(false)
-
     const inputType = type ==='password' && visable ? 'text':type;
     
     const renderIcon = () => {
@@ -67,10 +80,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={inputType}
         disabled={disabled ||editButton &&!button}
-        className={cn(
-          " flex h-10 w-full rounded-md border border-input bg-background px-4 py-2  ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground outline-none focus:outline-none focus:ring-0 border-none disabled:cursor-not-allowed disabled:opacity-50",
-          className
-          )}
+        // className={cn(
+        //   "bg-white flex h-10 w-full rounded-md border border-input  px-4 py-2  ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground outline-none focus:outline-none focus:ring-0 border-none disabled:cursor-not-allowed disabled:opacity-50",
+        //   className
+        //   )}
+        className={combinedClassName}
           ref={ref}
           {...props}
           />

@@ -3,9 +3,9 @@ import * as z from "zod";
 
 
 export const SettingsSchema = z.object({
-  name: z.optional(z.string()) , ///that schema is for our update clinet-info logic
+  name: z.optional(z.string().min(5)) , ///that schema is for our update clinet-info logic
   isTwoFactorEnabled: z.optional(z.boolean()),
-  role :z.enum([UserRole.ADMIN ,UserRole.EDITOR, UserRole.USER,UserRole.GUEST]),
+  role :z.enum([UserRole.ADMIN ,UserRole.EDITOR, UserRole.USER,UserRole.GUEST]).optional(),
   email: z.optional(z.string().email()) ,
   password: z.optional(z.string().min(6)),
   newPassword : z.optional(z.string().min(6)),
@@ -85,17 +85,17 @@ export const RegisterSchema = z.object({
   
   
 export const UserProfile = z.object({
-  userId: z.any().nullable(),
-  firstName: z.string().min(3,"Name is required and must be at least 3 characters").nullable(),
-  lastName: z.string().min(5,"Name is required and must be at least 5 characters").nullable(),
-  coverImage: z.string().min(10, 'Image is undefined').nullable(),
-  gender: z.string().min(3, "must be at least 3 characters").nullable(),
-  age: z.string().nullable(),
+  userId: z.string().min(6,'User id is required!').nullable().optional(),
+  firstName: z.string().min(3,"Name is required and must be at least 3 characters"),
+  lastName: z.string().min(5,"Last Name is required and must be at least 3 characters"),
+  coverImage: z.string().min(10, 'Image is undefined').nullable().optional(),
+  gender: z.string().min(3, "must be at least 3 characters").nullable().optional(),
+  age: z.string().nullable().optional(),
   phoneNumber: z.string().regex(phoneNumberRegex, {
     message: "Invalid phone number format.",
-  }).nullable(),
-  regionCode: z.string().regex(RegionCode).nullable(),
-  adres: z.string().regex(Address).nullable(),
+  }).nullable().optional(),
+  regionCode: z.string().regex(RegionCode).nullable().optional(),
+  adres: z.string().regex(Address).nullable().optional(),
 });
 
   

@@ -6,6 +6,13 @@ import { UserProfile } from "@/schemas"
 import { CurrentProfile, currentUser } from "@/lib/auth"
 
 
+type UserProfile = z.infer<typeof UserProfile>
+// const ProfileResponse = UserProfile.extend({
+//   success:z.boolean().nullable(),
+//   error:z.string().nullable()
+// })
+export type Profile = z.infer<typeof UserProfile>
+
 export const getCurrentProfile = async (userId:string)=>{
   if(!userId){
     return {error: 'userId is required'}
@@ -18,7 +25,7 @@ export const getCurrentProfile = async (userId:string)=>{
     return existingProfile 
 }
 
-export const createUserProfile = async (values: z.infer<typeof UserProfile>) => {
+export const createUserProfile = async (values: Profile) => {
 
   const user = await currentUser();
 
@@ -57,3 +64,33 @@ export const createUserProfile = async (values: z.infer<typeof UserProfile>) => 
   }
 };
 
+export const updateUserProfile = async (values: Profile)=>{
+  const user = await currentUser()
+
+  if(!user){return {error: "you need to be authorized"}}
+
+  const existingUser = await db.user.findFirst({
+    where:{
+      id:user.id
+    }
+  })
+
+  if(!existingUser){return {error:"User is not found"}}
+
+  try{
+    const editedProfile = await db.profile.update({
+      where:{userId:existingUser.id},
+      data:{...values}
+    })
+    return {
+      editedProfile:editedProfile,
+      success: true
+    }
+  }catch(error){
+    console.log("Failed updateUserProfile",error)
+    return {error:'Failed to update user profile'}
+  }
+ 
+
+
+}
