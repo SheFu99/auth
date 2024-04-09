@@ -16,6 +16,7 @@ import {UserProfile} from '@/schemas/index'
 import ContactInformation from './Contact-information';
 import { MdEditNote } from 'react-icons/md';
 import FirstAndLastNameForm from './FirstAndLastName';
+import UserProfileForm from './UserProfileForm';
 
 
 const  Profile =  () => {
@@ -128,18 +129,11 @@ const  Profile =  () => {
           )}
 
               <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md">
-               
 
-               
-              
                   <div className='col-span-12'>
-                  <FirstAndLastNameForm userName={user.name} editState={true}/>
+                    <FirstAndLastNameForm userName={user?.name} editState={true}/>
                   </div>
-               
-
-                
-                
-                    
+      
               </div>
 
       {!profile?.phoneNumber &&(
@@ -152,9 +146,11 @@ const  Profile =  () => {
                 </div>
           </div>
        )}
-      {/* {addInfo&&(
-        ///form component with z.infer.UserProfile
-      )} */}
+      {/* {addInfo&&()} */}
+       
+        <UserProfileForm data={profile}/>
+
+      
     </div>
 
 

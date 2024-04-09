@@ -65,6 +65,7 @@ export const createUserProfile = async (values: Profile) => {
 };
 
 export const updateUserProfile = async (values: Profile)=>{
+  console.log("update user profile")
   const user = await currentUser()
 
   if(!user){return {error: "you need to be authorized"}}

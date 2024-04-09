@@ -33,7 +33,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
     return(
         <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger title="User interface">
                 <Avatar>
                     <AvatarImage src={userImage}/>
                     <AvatarFallback className="bg-sky-500">

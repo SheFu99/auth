@@ -18,6 +18,7 @@ enum UserRole {
   GUEST
 }
 
+
 model User{
   id    String @id @default(cuid())
   name  String?
@@ -36,13 +37,17 @@ model User{
   gallery    Gallery[]
   
 }
-
+enum Gender {
+  Male
+  Female
+  Undefined
+}
 model Profile {
   firstName String?
   lastName String?
   coverImage String? @default("")
-  gender String?
-  age String?
+  gender Gender? @map("gender")
+  age Int?
   phoneNumber String?
   regionCode String? 
   adres String? ///Extend this {lat ,lng, zipCode, postService...} 

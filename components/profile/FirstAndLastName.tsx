@@ -1,21 +1,18 @@
 "use client"
 import * as z from 'zod'
 import { useSession } from "next-auth/react";
-import { Button } from "../ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { useEffect, useState, useTransition } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SettingsSchema, UserProfile } from '@/schemas';
+import { SettingsSchema } from '@/schemas';
 import { toast } from 'sonner';
-import { Profile } from '@/actions/UserProfile';
 import { Input } from '../ui/input';
-import { BiRename, BiSolidRename } from 'react-icons/bi';
 import { settings } from '@/actions/settings';
 import { MdEditNote } from 'react-icons/md';
-import { User } from '@prisma/client';
 import { IoIosSave } from 'react-icons/io';
+import { LuTextCursor } from "react-icons/lu";
 
 type FirstAndLastNameProps={
     editState:boolean;
@@ -57,7 +54,7 @@ const FirstAndLastNameForm = ({userName}:FirstAndLastNameProps) => {
     const form = useForm<z.infer<typeof SettingsSchema>>({
         resolver: zodResolver(SettingsSchema),
         defaultValues:{
-            name: user.name || undefined,
+            name: user?.name || undefined,
             // gender : profile.gender||undefined,
             // age: profile.age || undefined,
             // phoneNumber: profile.phoneNumber|| undefined,
@@ -87,7 +84,7 @@ const FirstAndLastNameForm = ({userName}:FirstAndLastNameProps) => {
 
 
     return ( 
-        <div>
+        <div className='ml-10'>
             {editState?(
                   <div className='col-span-12'>
                   <Form {...form}>
@@ -108,7 +105,7 @@ const FirstAndLastNameForm = ({userName}:FirstAndLastNameProps) => {
                                                     type="profile"
                                                     placeholder= "First Name"
                                                     disabled ={isPending}
-                                                   
+                                                    Icon={LuTextCursor}
                                                     className={shouldAnimate && errors.name ? 'animate-shake !border-none' : '!border-none'}
                                                     
                                                     />

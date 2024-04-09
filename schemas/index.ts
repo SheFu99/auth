@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { Gender, UserRole } from "@prisma/client";
 import * as z from "zod";
 
 
@@ -85,12 +85,14 @@ export const RegisterSchema = z.object({
   
   
 export const UserProfile = z.object({
-  userId: z.string().min(6,'User id is required!').nullable().optional(),
-  firstName: z.string().min(3,"Name is required and must be at least 3 characters"),
-  lastName: z.string().min(5,"Last Name is required and must be at least 3 characters"),
+  // userId: z.string().min(6,'User id is required!').nullable().optional(),
+  firstName: z.string().min(3,"Name is required and must be at least 3 characters").optional(),
+  lastName: z.string().min(2,"Last Name is required and must be at least 3 characters").optional(),
   coverImage: z.string().min(10, 'Image is undefined').nullable().optional(),
-  gender: z.string().min(3, "must be at least 3 characters").nullable().optional(),
-  age: z.string().nullable().optional(),
+  gender: z.enum([Gender.Male, Gender.Female, Gender.Undefined]).optional(),
+  age: z.number().min(16).max(120).optional(),
+
+  
   phoneNumber: z.string().regex(phoneNumberRegex, {
     message: "Invalid phone number format.",
   }).nullable().optional(),
