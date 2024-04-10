@@ -136,7 +136,7 @@ const  Profile =  () => {
       
               </div>
 
-      {!addInfo||!profile.phoneNumber &&(
+      {!addInfo ||!profile?.phoneNumber &&(
           <div className='w-full'>
                 <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
                   <p className="text-black font-semibold text-center w-full g-f:text-sm">Add information about your-self </p>
@@ -147,7 +147,7 @@ const  Profile =  () => {
           </div>
        )}
 
-      {profile.phoneNumber&&(
+      {addInfo||profile?.phoneNumber&&(
           <UserProfileForm data={profile} onChange={()=>swichAddInfo(false)}/>
 
       )}

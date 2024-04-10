@@ -26,9 +26,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       switch(type){
         case 'profile':
           return "!bg-white text-black  text-xl font-bold g-f:text-xs";
-        
+        case 'string':
+          return "bg-background"
         default:
-          return "bg-background file:text-sm file:font-medium placeholder:text-muted-foreground"
+          return " file:text-sm file:font-medium placeholder:text-muted-foreground"
       }
     }
     const combinedClassName = cn(
