@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { FaUser } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Cover from "./Cover";
-import { getCurrentProfile } from "@/actions/UserProfile";
+import { getProfileById } from "@/actions/UserProfile";
 import { ProfileData } from "@/hooks/use-current-profile";
 import { IoMdAddCircleOutline,IoMdAddCircle } from "react-icons/io";
 import Image from 'next/image';
@@ -32,7 +32,7 @@ const  Profile =  () => {
 
   const fetchProfile = async () => {
     try {
-      const profileData = await getCurrentProfile(user?.id!);
+      const profileData = await getProfileById(user?.id!);
       console.log('profilefetched',profileData )
       setProfile(profileData as ProfileData);
       
@@ -136,7 +136,7 @@ const  Profile =  () => {
       
               </div>
 
-      {!profile?.phoneNumber &&(
+      {!addInfo||!profile.phoneNumber &&(
           <div className='w-full'>
                 <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
                   <p className="text-black font-semibold text-center w-full g-f:text-sm">Add information about your-self </p>
@@ -146,9 +146,13 @@ const  Profile =  () => {
                 </div>
           </div>
        )}
-      {/* {addInfo&&()} */}
+
+      {profile.phoneNumber&&(
+          <UserProfileForm data={profile} onChange={()=>swichAddInfo(false)}/>
+
+      )}
        
-        <UserProfileForm data={profile}/>
+        
 
       
     </div>

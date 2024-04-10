@@ -13,7 +13,7 @@ type UserProfile = z.infer<typeof UserProfile>
 // })
 export type Profile = z.infer<typeof UserProfile>
 
-export const getCurrentProfile = async (userId:string)=>{
+export const getProfileById = async (userId:string)=>{
   if(!userId){
     return {error: 'userId is required'}
   }

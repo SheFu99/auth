@@ -25,11 +25,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const AdditionalInputClasses = (type: React.HTMLInputTypeAttribute)=>{
       switch(type){
         case 'profile':
-          return "bg-white text-black  text-xl font-bold g-f:text-xs";
-        case 'password':
-          return "bg-background"
+          return "!bg-white text-black  text-xl font-bold g-f:text-xs";
+        
         default:
-          return "file:text-sm file:font-medium placeholder:text-muted-foreground"
+          return "bg-background file:text-sm file:font-medium placeholder:text-muted-foreground"
       }
     }
     const combinedClassName = cn(
