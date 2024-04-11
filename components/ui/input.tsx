@@ -26,8 +26,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       switch(type){
         case 'profile':
           return "!bg-white text-black  text-xl font-bold g-f:text-xs";
-        case 'string':
+        case 'password':
           return "bg-background"
+        case 'string':
+          return "!bg-white text-black  text-xl  g-f:text-xs" 
+        case 'number':
+          return "!bg-white text-black  text-xl  g-f:text-xs"
         default:
           return " file:text-sm file:font-medium placeholder:text-muted-foreground"
       }

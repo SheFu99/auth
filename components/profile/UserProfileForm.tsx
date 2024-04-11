@@ -13,7 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { BiSave } from 'react-icons/bi';
 import { FaEdit, FaGenderless, FaPhone } from 'react-icons/fa';
 import { MdElderly, MdLocationCity } from 'react-icons/md';
-import { Phone } from 'lucide-react';
 import { BsGenderFemale, BsGenderMale } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 
@@ -21,7 +20,7 @@ import { useSession } from 'next-auth/react';
 
 
 const UserProfileForm = (profile:any) => {
-    
+    const [isEditMode,setIsEditMode]=useState<boolean>(false)
     const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
     const [isPending,startTransition]=useTransition()
     const [error,setError] =useState<string| undefined>()
@@ -84,11 +83,11 @@ const UserProfileForm = (profile:any) => {
     const getGenderIcon = (gender:any)=>{
         switch(gender){
             case 'Male':
-                return <BsGenderMale/>
+                return <BsGenderMale color='black'/>
             case 'Female':
-                return <BsGenderFemale/>
+                return <BsGenderFemale color='black'/>
             default:
-                return <FaGenderless/>
+                return <FaGenderless color='black'/>
         }
         
     }
@@ -99,24 +98,24 @@ const UserProfileForm = (profile:any) => {
         {!editProfile?(
             <div className='grid grid-cols-12 p-3 '>
 
-            <div className='g-f:col-span-12 g-f:mt-2 col-start-1 sm:col-span-6 flex space-x-2 border border-white rounded-md p-3'>
-                <Phone/>
-                <p className='text-white col-span-12 text-xl'>{`${profile.data.phoneNumber}`}</p>
+            <div className='g-f:col-span-12 g-f:mt-2 col-start-1 sm:col-span-6 flex space-x-2 border border-black rounded-md p-3'>
+                <FaPhone color='black'/>
+                <p className='text-black col-span-12 md:text-md g-f:text-sm'>{`${profile.data.phoneNumber}`}</p>
             </div>
 
-            <div className='g-f:col-span-12 g-f:mt-2 sm:ml-1 sm:col-span-6 sm:col-start-7 flex items-center p-3 space-x-2 border border-white rounded-md'>
-                <MdLocationCity/>
-                <p className='text-white col-span-12 text-xl'>{`${profile.data.adres}`}</p>
+            <div className='g-f:col-span-12 g-f:mt-2 sm:ml-1 sm:col-span-6 sm:col-start-7 flex items-center p-3 space-x-2 border border-black rounded-md'>
+                <MdLocationCity color='black'/>
+                <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`${profile.data.adres}`}</p>
             </div>
 
-            <div className='g-f:col-span-12  mt-2 sm:col-span-6  col-start-1 flex items-center p-3 space-x-2 col-span-6 border border-white rounded-md'>
-                <MdElderly/>
-                <p className='text-white col-span-12 text-xl'>{`Age: ${profile.data.age}`}</p>    
+            <div className='g-f:col-span-12  mt-2 sm:col-span-6  col-start-1 flex items-center p-3 space-x-2 col-span-6 border border-black rounded-md'>
+                <MdElderly color='black'/>
+                <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Age: ${profile.data.age}`}</p>    
             </div>
 
-            <div className='g-f:col-span-12 sm:ml-1 mt-2 sm:col-start-7 sm:col-span-6   flex items-center p-3 space-x-2 border border-white rounded-md'>
-                <i className='text-white col-span-1 text-xl'>{getGenderIcon(gender)}</i>
-                <p className='text-white col-span-12 text-xl'>{`Gender: ${profile.data.gender}`}</p>
+            <div className='g-f:col-span-12 sm:ml-1 mt-2 sm:col-start-7 sm:col-span-6   flex items-center p-3 space-x-2 border border-black rounded-md'>
+                <i className='text-black col-span-1 md:text-md'>{getGenderIcon(gender)}</i>
+                <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Gender: ${profile.data.gender}`}</p>
             </div>
 
             <Button onClick={()=>swichEditProfile(true)} title='Edit profile information' className='w-full col-span-12 mt-5' >Edit information<FaEdit className='ml-2 scale-150'/></Button>
@@ -138,7 +137,7 @@ const UserProfileForm = (profile:any) => {
                                     type='string'
                                     placeholder='+420'
                                     disabled={isPending}
-                                    Icon={Phone}
+                                    Icon={FaPhone}
                                     className={shouldAnimate && errors.age ? 'animate-shake ' : ''}
                                     />
                             </FormControl>
@@ -193,7 +192,7 @@ const UserProfileForm = (profile:any) => {
                 )}/>
                 </div>
 
-                <div className='sm:col-start-7 sm:col-span-6 ml-1 mt-1 g-f:col-span-12'>
+                <div className='sm:col-start-7 sm:col-span-6  g-f:col-span-12 p-1'>
                 <FormField
                     control={Profileform.control}
                     name='gender'
@@ -202,12 +201,13 @@ const UserProfileForm = (profile:any) => {
                             <FormControl>
                                 <Select 
                                     {...field}
+                                    
                                     disabled={isPending}
                                     onValueChange={(value) => {
                                         field.onChange(value);
                                       }}
                                     defaultValue={field.value}>
-                                <SelectTrigger className="h-[50px]" >
+                                <SelectTrigger className="h-[50px] !bg-white !border-gray-300 !rounded-md !text-black " >
                                     <SelectValue placeholder='Select your gender' />
                                 </SelectTrigger>
                                 <SelectContent >

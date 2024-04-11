@@ -1,13 +1,13 @@
 
-
+"use"
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 // const Navbar =React.lazy(()=>import ('@/components/navbar'))
 // import SideBar from "@/components/SideBar";
-import React, { Suspense } from "react";
+import React from "react";
 import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
-import { GridLoader } from "react-spinners";
+
 
 interface ProtecteedLayoutProps{
     children: React.ReactNode;
@@ -28,9 +28,9 @@ const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
                     <SideBar className="md:col-start-1 md:col-span-2 md:mt-5 hidden md:block "/>
 
                         <div className="md:col-start-3 md:col-span-9 col-start-2 col-span-10 ">
-                            <Suspense fallback={<GridLoader/>}>
+                            
                                     {children} 
-                            </Suspense>
+                           
                        </div>
                 </div>
             </div>

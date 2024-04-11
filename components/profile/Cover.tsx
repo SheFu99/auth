@@ -101,7 +101,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
           width={1500}
           height={300}
           objectFit="fill"
-          layout="responsive" className={`${className}  bg-blend-overlay h-auto  g-f:w-auto`}
+          layout="contain" className={`${className}  bg-blend-overlay h-auto  g-f:w-auto`}
           onLoadStart={()=>setIsUploading(true)}
           onLoadingComplete={()=>setIsUploading(false)}
           

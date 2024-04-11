@@ -18,6 +18,17 @@ import { MdEditNote } from 'react-icons/md';
 import FirstAndLastNameForm from './FirstAndLastName';
 import UserProfileForm from './UserProfileForm';
 
+import { RiGalleryFill, RiProfileLine } from 'react-icons/ri';
+import { ImProfile } from 'react-icons/im';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+
+// const tabsData: TabProps[] = [
+//   { id: "Profile", title: "Profile", content: "Make changes to your account here." ,icon:<ImProfile/>},
+//   { id: "Posts",   title: "Posts",   content: "Posts of users" ,icon:<RiProfileLine/>},
+//   { id: "Gallery", title: "Gallery", content: "Change your password here.",icon:<RiGalleryFill/> },
+//   { id: "Friends", title: "Friends", content: "list of frends",icon:<FaUser/> },
+// ];
 
 const  Profile =  () => {
   const user = useCurrentUser();
@@ -84,7 +95,7 @@ const  Profile =  () => {
   return (
     
     <div className="col-span-12 grid-row-6 ">
-          
+        <div className=''>
           <Cover url={profile?.coverImage!} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
            
             <div className="flex items-center relative ">
@@ -120,7 +131,7 @@ const  Profile =  () => {
 
            
             </div>
-
+        </div>
           {modalOpen && (
             <Modal
               updateAvatar={updateAvatar}
@@ -128,29 +139,61 @@ const  Profile =  () => {
             />
           )}
 
-              <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md">
+            <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md">
 
-                  <div className='col-span-12'>
+                  {/* <div className='col-span-12'>
                     <FirstAndLastNameForm userName={user?.name} editState={true}/>
-                  </div>
-      
+                  </div> */}
+
+              <div className=''>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="item-1">
+                      <AccordionTrigger className='text-black  font-semibold flex justify-between p-1 md:text-xl g-f:text-sm md:ml-0 g-f:ml-2'>{user.name}</AccordionTrigger>
+                      <AccordionContent>
+                          {!addInfo ||!profile?.phoneNumber &&(
+                            <div className='w-full'>
+                                  <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
+                                    <p className="text-black font-semibold text-center w-full g-f:text-sm">Add information about your-self </p>
+                                      <button onClick={()=>swichAddInfo(true)} title='add info about yourself' >
+                                        <IoMdAddCircleOutline color='black' className=" scale-150 block mb-2 w-full"/>
+                                      </button>
+                                  </div>
+                            </div>
+                          )}
+
+                          {addInfo||profile?.phoneNumber&&(
+                              <UserProfileForm data={profile} onChange={()=>swichAddInfo(false)} />
+
+                          )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
               </div>
+                  
+            </div>
 
-      {!addInfo ||!profile?.phoneNumber &&(
-          <div className='w-full'>
-                <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
-                  <p className="text-black font-semibold text-center w-full g-f:text-sm">Add information about your-self </p>
-                    <button onClick={()=>swichAddInfo(true)} title='add info about yourself' >
-                      <IoMdAddCircleOutline color='black' className=" scale-150 block mb-2 w-full"/>
-                    </button>
-                </div>
-          </div>
-       )}
+        <Tabs defaultId="tab1">
+            <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
+                <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/>Posts</TabsTrigger>
+                <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/>Friends</TabsTrigger>
+                <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiGalleryFill/>Gallery</TabsTrigger>
+            </TabsList>
+            <TabsContent id="tab1" className="p-1">
+                
+              <h1>Content for tab one</h1>
 
-      {addInfo||profile?.phoneNumber&&(
-          <UserProfileForm data={profile} onChange={()=>swichAddInfo(false)}/>
+            </TabsContent>
+            <TabsContent id="tab2" className="p-4">
+                <h1>Content for Tab Two</h1>
+                <p>This is the detailed content for Tab Two.</p>
+            </TabsContent>
+            <TabsContent id="tab3" className="p-4">
+                <h1>Content for Tab Three</h1>
+                <p>This is the detailed content for Tab Three.</p>
+            </TabsContent>
+        </Tabs>
 
-      )}
+   
        
         
 
