@@ -100,5 +100,14 @@ export const UserProfile = z.object({
   adres: z.string().regex(Address).nullable().optional(),
 });
 
+export const UserPost = z.object({
+  image: z.string().min(10, 'Image is undefined').nullable().optional(),
+  text:  z.string().min(5, 'Text is undefined').nullable().optional(),
+  timeStamp: z.string().min(5, 'TimeStamp is undefined').nullable().optional(),
+  userId: z.string().min(5, 'User id is undefined').nullable().optional(),
+  PostId:z.string().min(5, 'Post id is undefined').nullable().optional(),
+  like: z.number().min(0).optional(),
+})
+
   
 export type LoginFormDataType = z.infer<typeof LoginSchema>;

@@ -20,7 +20,7 @@ import { useSession } from 'next-auth/react';
 
 
 const UserProfileForm = (profile:any) => {
-    const [isEditMode,setIsEditMode]=useState<boolean>(false)
+ 
     const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
     const [isPending,startTransition]=useTransition()
     const [error,setError] =useState<string| undefined>()
@@ -96,7 +96,7 @@ const UserProfileForm = (profile:any) => {
     return ( 
         <div className="col-span-12">
         {!editProfile?(
-            <div className='grid grid-cols-12 p-3 '>
+            <div className='grid grid-cols-12 -mb-5'>
 
             <div className='g-f:col-span-12 g-f:mt-2 col-start-1 sm:col-span-6 flex space-x-2 border border-black rounded-md p-3'>
                 <FaPhone color='black'/>
@@ -122,7 +122,7 @@ const UserProfileForm = (profile:any) => {
         </div>
         ):(
             <Form {...Profileform}>
-            <form className='space-y-5 p-5' onSubmit={Profileform.handleSubmit(onSubmit,onError)}>
+            <form className=' ' onSubmit={Profileform.handleSubmit(onSubmit,onError)}>
             <div className='grid grid-cols-12 '>
 
                 <div className='sm:"col-start-1 sm:col-span-6 g-f:col-span-12 p-1'>
@@ -224,7 +224,7 @@ const UserProfileForm = (profile:any) => {
             </div>
 
                
-                    <Button type='submit' title='submit form' className='w-full' > Save information<BiSave className='scale-150 ml-2'/></Button>
+                    <Button type='submit' title='submit form' className='w-full -mb-5' > Save information<BiSave className='scale-150 ml-2'/></Button>
             </form>
         </Form>  
         )}

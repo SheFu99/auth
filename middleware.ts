@@ -1,21 +1,33 @@
 import { DEFAULT_LOGIN_REDIRECT, adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from './routes';
 import authConfig from "./auth.config"
 import NextAuth from "next-auth"
-import { currentRole } from './lib/auth';
+import { currentRole, currentUser } from './lib/auth';
+import { NextResponse } from 'next/server';
+import { handler } from './app/api/posts/[userId]';
 
 
 const {auth} =NextAuth(authConfig)
 
 export default auth(async (req) => {
-  const userRole = await currentRole()           
-  const {nextUrl}=req;
+const user = await currentUser()
+const userRole = await currentRole()           
+const {nextUrl}=req;
 const isLoggedIn = !!req.auth;
 const url = req.nextUrl;
 // const errorRedirect = nextUrl.pathname.includes('?error=')
-const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-const isAuthRoute = authRoutes.includes(nextUrl.pathname);
-const isAdminRoute = adminRoutes.includes(nextUrl.pathname)
+const path = nextUrl.pathname;
+
+  // console.log("Request Path:", path);  // Debugging output
+
+  const isApiPostRoute = path.startsWith('/api/posts/');
+  const isApiAuthRoute = path.startsWith(apiAuthPrefix);
+  const isPublicRoute = publicRoutes.includes(path);
+  const isAuthRoute = authRoutes.includes(path);
+  const isAdminRoute = adminRoutes.includes(path);
+
+  if (isApiPostRoute) {
+    return NextResponse.next();  // Allow API posts route
+  }
 
 ///cosutom error handler 
 if (url.pathname.startsWith('/auth/login')) {
@@ -61,5 +73,5 @@ return null
 
 // Optionally, don't invoke Middleware on some paths
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ['/api/posts/:path*', '/api/(.*)', '/((?!.+\\.[\\w]+$|_next).*)'],
 }

@@ -128,7 +128,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
       <div className="absolute right-0 bottom-0 m-2">
           <label className="flex items-center gap-1 bg-white py-1 px-2 rounded-md shadow-md shadow-black cursor-pointer ">
             {/* <input type="file" onChange={updateCover} className="hidden" /> */}
-            <button onClick={()=>setModal(!modal)}></button>
+            <button onClick={()=>setModal(!modal)} title="Change cover image"></button>
            
             <HiPhotograph fill="black" className="scale-150"/>
             <p className="text-black font-semibold xl:text-base md:text-md text-xs">Change cover image</p>

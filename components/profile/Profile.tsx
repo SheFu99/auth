@@ -22,6 +22,8 @@ import { RiGalleryFill, RiProfileLine } from 'react-icons/ri';
 import { ImProfile } from 'react-icons/im';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import UserPostForm from './UserPostForm';
+import UserPostList from './UserPostList';
 
 // const tabsData: TabProps[] = [
 //   { id: "Profile", title: "Profile", content: "Make changes to your account here." ,icon:<ImProfile/>},
@@ -146,43 +148,48 @@ const  Profile =  () => {
                   </div> */}
 
               <div className=''>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
+                  <Accordion type="single" collapsible className='p-2'>
+                    <AccordionItem value="item-1" >
                       <AccordionTrigger className='text-black  font-semibold flex justify-between p-1 md:text-xl g-f:text-sm md:ml-0 g-f:ml-2'>{user.name}</AccordionTrigger>
-                      <AccordionContent>
-                          {!addInfo ||!profile?.phoneNumber &&(
-                            <div className='w-full'>
-                                  <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
-                                    <p className="text-black font-semibold text-center w-full g-f:text-sm">Add information about your-self </p>
-                                      <button onClick={()=>swichAddInfo(true)} title='add info about yourself' >
-                                        <IoMdAddCircleOutline color='black' className=" scale-150 block mb-2 w-full"/>
-                                      </button>
-                                  </div>
-                            </div>
-                          )}
+                        <AccordionContent>
+                            {!addInfo ||!profile?.phoneNumber &&(
+                              <div className='w-full'>
+                                    <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
+                                      <p className="text-black font-semibold text-center w-full g-f:text-sm">Add information about your-self </p>
+                                        <button onClick={()=>swichAddInfo(true)} title='add info about yourself' >
+                                          <IoMdAddCircleOutline color='black' className=" scale-150 block w-full"/>
+                                        </button>
+                                    </div>
+                              </div>
+                            )}
 
-                          {addInfo||profile?.phoneNumber&&(
-                              <UserProfileForm data={profile} onChange={()=>swichAddInfo(false)} />
+                            {addInfo||profile?.phoneNumber&&(
+                                <UserProfileForm data={profile} onChange={()=>swichAddInfo(false)} />
 
-                          )}
-                      </AccordionContent>
+                            )}
+                        </AccordionContent>
                     </AccordionItem>
                   </Accordion>
               </div>
                   
             </div>
 
-        <Tabs defaultId="tab1">
+        <Tabs defaultId="tab1" >
             <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
                 <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/>Posts</TabsTrigger>
                 <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/>Friends</TabsTrigger>
                 <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiGalleryFill/>Gallery</TabsTrigger>
             </TabsList>
-            <TabsContent id="tab1" className="p-1">
-                
-              <h1>Content for tab one</h1>
 
+            <TabsContent id="tab1" className="grid grid-cols-12 ">
+                
+            <div className='col-span-12 space-y-5'>
+                <UserPostForm />
+                <UserPostList/>  
+            </div>
+                    
             </TabsContent>
+
             <TabsContent id="tab2" className="p-4">
                 <h1>Content for Tab Two</h1>
                 <p>This is the detailed content for Tab Two.</p>

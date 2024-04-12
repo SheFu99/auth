@@ -35,7 +35,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
         <DropdownMenu>
             <DropdownMenuTrigger title="User interface">
                 <Avatar>
-                    <AvatarImage src={userImage}/>
+                    <AvatarImage src={userImage} alt="User Menu Button"/>
                     <AvatarFallback className="bg-sky-500">
                         <FaUser className="text-white"/>
                     </AvatarFallback>

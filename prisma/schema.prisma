@@ -60,7 +60,7 @@ model Profile {
 model Post {
   PostId     String    @id @default(cuid())
   image      String?
-  text       String?
+  text       String? @unique
   timestamp  DateTime  @default(now())
   likes      Like[]
   coments    Comment[]

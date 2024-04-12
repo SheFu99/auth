@@ -6,7 +6,8 @@ import { UserProfile } from "@/schemas"
 import { CurrentProfile, currentUser } from "@/lib/auth"
 
 
-type UserProfile = z.infer<typeof UserProfile>
+// type UserProfile = z.infer<typeof UserProfile>
+
 // const ProfileResponse = UserProfile.extend({
 //   success:z.boolean().nullable(),
 //   error:z.string().nullable()
@@ -14,6 +15,7 @@ type UserProfile = z.infer<typeof UserProfile>
 export type Profile = z.infer<typeof UserProfile>
 
 export const getProfileById = async (userId:string)=>{
+  
   if(!userId){
     return {error: 'userId is required'}
   }
@@ -21,8 +23,9 @@ export const getProfileById = async (userId:string)=>{
     if(!existingProfile){
       return {error: 'Profile not found'}
     }
+    
     console.log(existingProfile)
-    return existingProfile 
+    return  existingProfile
 }
 
 export const createUserProfile = async (values: Profile) => {
