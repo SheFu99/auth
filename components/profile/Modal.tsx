@@ -1,5 +1,5 @@
 "use clinet"
-import ImageCropper from "./image-croper";
+import ImageCropper from "./cropper/image-croper";
 import { GrClose } from "react-icons/gr";
 interface ModalProps {
     updateAvatar: (newAvatarUrl: Blob) => void;

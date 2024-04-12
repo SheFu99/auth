@@ -15,24 +15,19 @@ import Image from 'next/image';
 import {UserProfile} from '@/schemas/index'
 import ContactInformation from './Contact-information';
 import { MdEditNote } from 'react-icons/md';
-import FirstAndLastNameForm from './FirstAndLastName';
-import UserProfileForm from './UserProfileForm';
+import FirstAndLastNameForm from './forms/FirstAndLastName';
+import UserProfileForm from './forms/UserProfileForm';
 
 import { RiGalleryFill, RiProfileLine } from 'react-icons/ri';
 import { ImProfile } from 'react-icons/im';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import UserPostForm from './UserPostForm';
-import UserPostList from './UserPostList';
+import UserPostForm from './forms/UserPostForm';
+import UserPostList from './forms/UserPostList';
 
-// const tabsData: TabProps[] = [
-//   { id: "Profile", title: "Profile", content: "Make changes to your account here." ,icon:<ImProfile/>},
-//   { id: "Posts",   title: "Posts",   content: "Posts of users" ,icon:<RiProfileLine/>},
-//   { id: "Gallery", title: "Gallery", content: "Change your password here.",icon:<RiGalleryFill/> },
-//   { id: "Friends", title: "Friends", content: "list of frends",icon:<FaUser/> },
-// ];
 
-const  Profile =  () => {
+const  EditProfile =  () => {
+  
   const user = useCurrentUser();
   // const {profile , updateProfile, upload , switchUpload} = useCurrentProfile(); //use redux and localstorage for store
   const [profile, setProfile] = useState<ProfileData>()
@@ -44,16 +39,15 @@ const  Profile =  () => {
   
 
   const fetchProfile = async () => {
-    try {
-      const profileData = await getProfileById(user?.id!);
-      console.log('profilefetched',profileData )
-      setProfile(profileData as ProfileData);
-      
-    } catch (error) {
-      console.error('Failed to fetch profile:', error);
-    }
-} 
-
+      try {
+        const profileData = await getProfileById(user?.id!);
+        console.log('profilefetched',profileData )
+        setProfile(profileData as ProfileData);
+        
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
+      }
+  } 
   useEffect(()=>{
     fetchProfile();
   },[update]) 
@@ -122,6 +116,7 @@ const  Profile =  () => {
                     </div>
                   )}
 
+
                     <button
                       className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
                       title="Change photo"
@@ -165,7 +160,6 @@ const  Profile =  () => {
 
                             {addInfo||profile?.phoneNumber&&(
                                 <UserProfileForm data={profile} onChange={()=>swichAddInfo(false)} />
-
                             )}
                         </AccordionContent>
                     </AccordionItem>
@@ -212,4 +206,4 @@ const  Profile =  () => {
   );
 };
 
-export default Profile;
+export default EditProfile;

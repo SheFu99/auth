@@ -1,6 +1,6 @@
 "use client";
 import { ChangeEvent, FormEvent, useState } from "react";
-import Profile from "./Profile";
+import EditProfile from "./EditProfile";
 
 const UploadForm = () => {
   const [file, setFile] = useState<File|null>(null);
@@ -46,7 +46,7 @@ const UploadForm = () => {
         </button>
       </form>
 
-      <Profile></Profile>
+      <EditProfile></EditProfile>
     </>
   );
 };

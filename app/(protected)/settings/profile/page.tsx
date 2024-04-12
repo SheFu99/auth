@@ -2,7 +2,7 @@
 
 
 
-import Profile from "@/components/profile/Profile";
+import EditProfile from "@/components/profile/EditProfile";
 
 
 
@@ -16,7 +16,7 @@ const ProfilePage = () => {
         <div className="">
 
        
-            <Profile></Profile>
+            <EditProfile></EditProfile>
 
       
         </div>

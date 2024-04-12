@@ -3,7 +3,6 @@ import authConfig from "./auth.config"
 import NextAuth from "next-auth"
 import { currentRole, currentUser } from './lib/auth';
 import { NextResponse } from 'next/server';
-import { handler } from './app/api/posts/[userId]';
 
 
 const {auth} =NextAuth(authConfig)
@@ -18,7 +17,7 @@ const url = req.nextUrl;
 const path = nextUrl.pathname;
 
   // console.log("Request Path:", path);  // Debugging output
-
+  const isProfileRoute = path.startsWith('/profile');
   const isApiPostRoute = path.startsWith('/api/posts/');
   const isApiAuthRoute = path.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(path);
@@ -28,6 +27,7 @@ const path = nextUrl.pathname;
   if (isApiPostRoute) {
     return NextResponse.next();  // Allow API posts route
   }
+
 
 ///cosutom error handler 
 if (url.pathname.startsWith('/auth/login')) {
@@ -73,5 +73,5 @@ return null
 
 // Optionally, don't invoke Middleware on some paths
 export const config = {
-  matcher: ['/api/posts/:path*', '/api/(.*)', '/((?!.+\\.[\\w]+$|_next).*)'],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 }

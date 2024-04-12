@@ -7,7 +7,7 @@ import { LoginButton } from "@/components/auth/loginButton"
 import { createWrapper } from "next-redux-wrapper"
 
 import ReduxProvider from "./StoreProvider"
-import Profile from "@/components/profile/Profile"
+import EditProfile from "@/components/profile/EditProfile"
 import StoreProvider from "./StoreProvider"
 import { SessionProvider } from "next-auth/react"
 

@@ -1,14 +1,14 @@
 "use client"
 import * as z from 'zod'
 import { useSession } from "next-auth/react";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../ui/form";
 import { useEffect, useState, useTransition } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SettingsSchema } from '@/schemas';
 import { toast } from 'sonner';
-import { Input } from '../ui/input';
+import { Input } from '../../ui/input';
 import { settings } from '@/actions/settings';
 import { MdEditNote } from 'react-icons/md';
 import { IoIosSave } from 'react-icons/io';

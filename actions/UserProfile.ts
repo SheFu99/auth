@@ -98,3 +98,36 @@ export const updateUserProfile = async (values: Profile)=>{
 
 
 }
+
+export const getDynamicProfile = async (userId:string)=>{
+
+  
+    if(!userId){
+      return {error: 'userId is required'}
+    }
+  
+    const user = await db.user.findFirst({
+      where: {
+        id: userId
+      },
+      select: {
+        image: true,  // Assuming the image is stored directly in the user record
+      }
+    });
+  
+    if (!user) {
+      return { error: "User not found" };
+    }
+   
+    const existingProfile = await CurrentProfile()
+      if(!existingProfile){
+        return {error: 'Profile not found'}
+      }
+      
+      console.log(existingProfile)
+       return {
+      profile: existingProfile,
+      userImage: user.image
+    };
+  }
+

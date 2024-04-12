@@ -1,15 +1,15 @@
 "use client"
 import * as z from 'zod'
 import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "../../ui/form";
 import { UserProfile } from '@/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Profile, updateUserProfile } from '@/actions/UserProfile';
 import { startTransition, useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Input } from '../../ui/input';
+import { Button } from '../../ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { BiSave } from 'react-icons/bi';
 import { FaEdit, FaGenderless, FaPhone } from 'react-icons/fa';
 import { MdElderly, MdLocationCity } from 'react-icons/md';

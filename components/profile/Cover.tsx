@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { BounceLoader } from "react-spinners";
 import { HiPhotograph } from "react-icons/hi";
-import CoverModal from "./Cover-modal";
+import CoverModal from "./cropper/Cover-modal";
 import Image from "next/image";
 import { S3Response } from "@/app/api/s3-upload/route";
 

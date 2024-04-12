@@ -8,10 +8,10 @@ import { useSession } from "next-auth/react"
 import { useEffect, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form"
-import { Button } from "../ui/button"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "../../ui/form"
+import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
-import { Textarea } from "../ui/textarea"
+import { Textarea } from "../../ui/textarea"
 import { MdAddPhotoAlternate } from "react-icons/md"
 
 export interface DataResponse{

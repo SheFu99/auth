@@ -2,8 +2,6 @@
 "use server"
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
-// const Navbar =React.lazy(()=>import ('@/components/navbar'))
-// import SideBar from "@/components/SideBar";
 import React from "react";
 import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
@@ -14,7 +12,7 @@ interface ProtecteedLayoutProps{
     profileData: any;
 }
 
-const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
+const PublicProfileLayout = async ({children}:ProtecteedLayoutProps) => {
     const session = await auth()
 
     return ( 
@@ -39,4 +37,4 @@ const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
      );
 }
  
-export default ProtectedLayout;
+export default PublicProfileLayout;
