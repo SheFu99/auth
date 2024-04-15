@@ -13,7 +13,6 @@ import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
 import { Textarea } from "../../ui/textarea"
 import { MdAddPhotoAlternate } from "react-icons/md"
-import PostCropper from "../cropper/Post-croppper"
 
 export interface DataResponse{
     PostId: string,
