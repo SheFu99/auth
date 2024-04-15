@@ -1,4 +1,4 @@
-/* eslint-disable */
+
 "use server"
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
@@ -14,7 +14,7 @@ interface ProtecteedLayoutProps{
     profileData: any;
 }
 
-const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
+const ProtectedLayout = async ({children}:any) => {
     const session = await auth()
 
     return ( 

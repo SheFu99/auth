@@ -1,4 +1,3 @@
-/* eslint-disable */
 
 "use server"
 import { SessionProvider } from "next-auth/react";
@@ -8,13 +7,12 @@ import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
 
 
-interface PublicProfileProps{
-    children: any;
+interface ProtecteedLayoutProps{
+    children: React.ReactNode;
     profileData: any;
-    params:any;
 }
 
-const PublicProfileLayout = async ({children,params}:PublicProfileProps) => {
+const PublicProfileLayout = async ({children}:any) => {
     const session = await auth()
 
     return ( 
