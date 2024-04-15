@@ -5,7 +5,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "../../ui/fo
 import { UserProfile } from '@/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Profile, updateUserProfile } from '@/actions/UserProfile';
-import { startTransition, useEffect, useState, useTransition } from 'react';
+import React, { startTransition, useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
@@ -19,10 +19,11 @@ import { useSession } from 'next-auth/react';
 interface Profileform{
     profile:any,
     editProfileProps:boolean,
+    onChange:(event:React.ChangeEvent<HTMLInputElement>)=>void
 }
 
 
-const UserProfileForm = ({profile,editProfileProps}:Profileform) => {
+const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
  
     const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
     const [isPending,startTransition]=useTransition()
