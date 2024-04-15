@@ -9,7 +9,12 @@ import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
 
 
-const SettingsLayout = async (children:any) => {
+interface ProtecteedLayoutProps{
+    children: any;
+    profileData: any;
+}
+
+const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
     const session = await auth()
 
     return ( 
@@ -34,4 +39,4 @@ const SettingsLayout = async (children:any) => {
      );
 }
  
-export default SettingsLayout;
+export default ProtectedLayout;

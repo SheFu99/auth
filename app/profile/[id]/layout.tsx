@@ -7,12 +7,12 @@ import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
 
 
-interface ProtecteedLayoutProps{
+interface PublicProfileProps{
     children: any;
     profileData: any;
 }
 
-const PublicProfileLayout = async ({children}:ProtecteedLayoutProps) => {
+const PublicProfileLayout = async ({children}:PublicProfileProps) => {
     const session = await auth()
 
     return ( 

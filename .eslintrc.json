@@ -2,10 +2,12 @@
   "extends": "next/core-web-vitals",
   "overrides": [
     {
-      "files": [".@/components/userTable/columns.tsx"],
+      "files": [".@/components/userTable/columns.tsx","app/(protected)/layout.tsx"],
       "rules": {
-        "react-hooks/rules-of-hooks": "off"
+        "react-hooks/rules-of-hooks": "off",
+        "react/prop-types": "off"
       }
+
     }
   ]
 }
