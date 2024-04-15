@@ -24,15 +24,12 @@ type Response = {
 
 
 export default function Cover({url,editable,onChange, className}:CoverProps) {
- 
+  const {update} = useSession()
 
   // const {upload,switchUpload} = useCurrentProfile()
 
   const [isUploading,setIsUploading] = useState(false);
   const [modal ,setModal] = useState<boolean>(false)
-  if(editable){
-    const {update} = useSession()
-  }
 
   async function updateCover(croppedImageBlob: Blob) {
     const formData = new FormData();

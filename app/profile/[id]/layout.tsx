@@ -2,14 +2,17 @@
 "use server"
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
-// const Navbar =React.lazy(()=>import ('@/components/navbar'))
-// import SideBar from "@/components/SideBar";
 import React from "react";
 import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
 
 
-const SettingsLayout = async (children:React.ReactNode) => {
+interface PublicProfileProps{
+    children: React.ReactNode;
+    profileData: any;
+}
+
+const PublicProfileLayout = async ({children}:PublicProfileProps) => {
     const session = await auth()
 
     return ( 
@@ -34,4 +37,4 @@ const SettingsLayout = async (children:React.ReactNode) => {
      );
 }
  
-export default SettingsLayout;
+export default PublicProfileLayout;
