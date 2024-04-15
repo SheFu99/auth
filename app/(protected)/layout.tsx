@@ -10,7 +10,7 @@ import SideBar from "@/components/SideBar";
 
 
 interface ProtecteedLayoutProps{
-    children: any;
+    children: React.ReactNode;
     profileData: any;
 }
 
