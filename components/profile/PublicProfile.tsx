@@ -25,7 +25,7 @@ const  PublicProfile =  ({profile}:profileProps) => {
 
 
 
-  const gender = profile.gender
+  const gender = profile.profile?.gender
   const getGenderIcon = (gender:any)=>{
       switch(gender){
           case 'Male':
@@ -49,14 +49,14 @@ const  PublicProfile =  ({profile}:profileProps) => {
     <div className="col-span-12 grid-row-6 ">
         <div className=''>
         
-        <Suspense fallback={<div>Loading...</div>}>  {/* Fallback while loading the component */}
+        <Suspense fallback={<div>Loading...</div>}> 
                 <Cover 
                     url={profile?.profile?.coverImage} 
                     onChange={() => setUpdate(!updateState)}
                     editable={false} 
                     className="z-1 rounded-md shadow-xs col-span-12"
                 />
-            </Suspense>
+        </Suspense>
             <div className="flex items-center relative ">
                   <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-10 -bottom-15 left-0 p-[1rem] justify-center">
 
@@ -111,7 +111,7 @@ const  PublicProfile =  ({profile}:profileProps) => {
 
                                 <div className='g-f:col-span-12  mt-2 sm:col-span-6  col-start-1 flex items-center p-3 space-x-2 col-span-6 border border-black rounded-md'>
                                     <MdElderly color='black'/>
-                                    <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Age: ${profile?.profile?.age}`}</p>    
+                                    <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Age: ${profile?.profile.age}`}</p>    
                                 </div>
 
                                 <div className='g-f:col-span-12 sm:ml-1 mt-2 sm:col-start-7 sm:col-span-6   flex items-center p-3 space-x-2 border border-black rounded-md'>

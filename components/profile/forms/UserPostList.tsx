@@ -33,7 +33,7 @@ const user = useCurrentUser()
             }
            
         }
-        GetPost().then(posts => setPosts(posts.posts))
+        GetPost().then(posts => setPosts(posts?.posts))
        
     },[update])
 

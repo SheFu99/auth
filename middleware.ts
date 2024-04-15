@@ -16,7 +16,7 @@ const url = req.nextUrl;
 // const errorRedirect = nextUrl.pathname.includes('?error=')
 const path = nextUrl.pathname;
 
-  // console.log("Request Path:", path);  // Debugging output
+  console.log("Request Path:", path);  // Debugging output
   const isProfileRoute = path.startsWith('/profile');
   const isApiPostRoute = path.startsWith('/api/posts/');
   const isApiAuthRoute = path.startsWith(apiAuthPrefix);
@@ -24,7 +24,7 @@ const path = nextUrl.pathname;
   const isAuthRoute = authRoutes.includes(path);
   const isAdminRoute = adminRoutes.includes(path);
 
-  if (isApiPostRoute) {
+  if (isProfileRoute) {
     return NextResponse.next();  // Allow API posts route
   }
 
@@ -39,7 +39,6 @@ if (url.searchParams.get('error') === 'OAuthAccountNotLinked') {
  return Response.redirect(new URL('/auth/login?error=OAuthAccountNotLinked', nextUrl));
 }
 ///cosutom error handler  
-
 
 if(isApiAuthRoute){
   return null

@@ -103,8 +103,8 @@ const config = {
           },
           'shake': {
             '0%, 100%': { transform: 'translateX(0)' },
-            '10%, 30%, 50%, 70%': { transform: 'translateX(-10px)' },
-            '20%, 40%, 60%, 80%': { transform: 'translateX(10px)' },
+            '10%, 30%, 50%, 70%': { transform: 'translateX(-5px)' },
+            '20%, 40%, 60%, 80%': { transform: 'translateX(5px)' },
           },
           "caret-blink": {
             "0%,70%,100%": { opacity: "1" },
@@ -116,7 +116,7 @@ const config = {
         'fade-out': 'fadeOut 0.5s ease-out forwards',
         'slide-in-from-right': 'slideInFromRight 0.5s ease-out forwards',
         'slide-out-to-right': 'slideOutToRight 0.5s ease-out forwards',
-        'slide-in-from-left': 'slideInFromLeft 0.2s ease-out forwards',
+        'slide-in-from-left': 'slideInFromLeft 0.5s ease-out forwards',
         'slide-out-to-left': 'slideOutToLeft 0.5s ease-out forwards',
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",

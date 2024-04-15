@@ -1,5 +1,4 @@
 "use client"
-import * as z from 'zod'
 import { useEffect, useState } from "react";
 import { BsFillPencilFill } from "react-icons/bs";
 import Modal from "./Modal";
@@ -10,16 +9,10 @@ import { useSession } from "next-auth/react";
 import Cover from "./Cover";
 import { getProfileById } from "@/actions/UserProfile";
 import { ProfileData } from "@/hooks/use-current-profile";
-import { IoMdAddCircleOutline,IoMdAddCircle } from "react-icons/io";
+import { IoMdAddCircleOutline } from "react-icons/io";
 import Image from 'next/image';
-import {UserProfile} from '@/schemas/index'
-import ContactInformation from './Contact-information';
-import { MdEditNote } from 'react-icons/md';
-import FirstAndLastNameForm from './forms/FirstAndLastName';
 import UserProfileForm from './forms/UserProfileForm';
-
 import { RiGalleryFill, RiProfileLine } from 'react-icons/ri';
-import { ImProfile } from 'react-icons/im';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import UserPostForm from './forms/UserPostForm';
@@ -36,7 +29,7 @@ const  EditProfile =  () => {
   const [sessionImage, setSessionImage] = useState( user?.image); 
   const [editName , swichEditName] = useState<boolean>(false)
   const [addInfo,swichAddInfo]=useState<boolean>(false)
-  
+  const [userEditState,swichUserEditState]=useState<boolean>(false)
 
   const fetchProfile = async () => {
       try {
@@ -50,6 +43,9 @@ const  EditProfile =  () => {
   } 
   useEffect(()=>{
     fetchProfile();
+    if(!profile?.phoneNumber){
+      swichUserEditState(true)
+    }
   },[update]) 
 
 
@@ -86,7 +82,11 @@ const  EditProfile =  () => {
     
     }
 
- 
+   
+     
+      
+
+    
 
   return (
     
@@ -145,9 +145,10 @@ const  EditProfile =  () => {
               <div className=''>
                   <Accordion type="single" collapsible className='p-2'>
                     <AccordionItem value="item-1" >
-                      <AccordionTrigger className='text-black  font-semibold flex justify-between p-1 md:text-xl g-f:text-sm md:ml-0 g-f:ml-2'>{user.name}</AccordionTrigger>
+                      <AccordionTrigger className='text-black  font-semibold flex justify-between p-1 md:text-xl g-f:text-sm md:ml-0 g-f:ml-2'>{user?.name}</AccordionTrigger>
                         <AccordionContent>
-                            {!addInfo ||!profile?.phoneNumber &&(
+                            {addInfo ||!profile?.phoneNumber &&(
+
                               <div className='w-full'>
                                     <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
                                       <p className="text-black font-semibold text-center w-full g-f:text-sm">Add information about your-self </p>
@@ -158,9 +159,10 @@ const  EditProfile =  () => {
                               </div>
                             )}
 
-                            {addInfo||profile?.phoneNumber&&(
-                                <UserProfileForm data={profile} onChange={()=>swichAddInfo(false)} />
-                            )}
+                           
+                                <UserProfileForm profile={profile} editProfileProps={false}  onChange={()=>swichAddInfo(false)} />
+                           
+
                         </AccordionContent>
                     </AccordionItem>
                   </Accordion>
