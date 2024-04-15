@@ -10,9 +10,10 @@ import SideBar from "@/components/SideBar";
 interface PublicProfileProps{
     children: any;
     profileData: any;
+    params:any;
 }
 
-const PublicProfileLayout = async ({children}:PublicProfileProps) => {
+const PublicProfileLayout = async ({children,params}:PublicProfileProps) => {
     const session = await auth()
 
     return ( 
