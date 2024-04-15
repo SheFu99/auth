@@ -11,7 +11,6 @@ import SideBar from "@/components/SideBar";
 
 interface ProtecteedLayoutProps{
     children: React.ReactNode;
-    profileData: any;
 }
 
 const ProtectedLayout = async ({children}:ProtecteedLayoutProps) => {
