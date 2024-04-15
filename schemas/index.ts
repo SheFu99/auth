@@ -102,7 +102,7 @@ export const UserProfile = z.object({
 
 export const UserPost = z.object({
   image: z.string().min(10, 'Image is undefined').nullable().optional(),
-  text:  z.string().min(5, 'Text is undefined').nullable().optional(),
+  text:  z.string().min(5, 'Text is Required').nullable(),
   timeStamp: z.string().min(5, 'TimeStamp is undefined').nullable().optional(),
   userId: z.string().min(5, 'User id is undefined').nullable().optional(),
   PostId:z.string().min(5, 'Post id is undefined').nullable().optional(),

@@ -16,6 +16,8 @@ import { useCurrentRole } from "@/hooks/use-current-role"
 
 import { ImProfile } from "react-icons/im";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { SlLogin } from "react-icons/sl";
+import { LoginButton } from "./loginButton"
 // import { useEffect } from "react"
 
 
@@ -33,7 +35,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
     return(
         <DropdownMenu>
-            <DropdownMenuTrigger title="User interface">
+            {user ?(
+                <DropdownMenuTrigger title="User interface">
                 <Avatar>
                     <AvatarImage src={userImage} alt="User Menu Button"/>
                     <AvatarFallback className="bg-sky-500">
@@ -41,6 +44,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
                     </AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
+            ):(
+                <div className="p-2 px-5 cursor-pointer">
+                <LoginButton mode="modal" asChild >
+                    <SlLogin className="scale-150 " title="Log in"/>
+                </LoginButton>
+                </div>
+            )}
+            
 
 
             <DropdownMenuContent className="w-12" align="end">

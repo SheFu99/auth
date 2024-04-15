@@ -28,9 +28,7 @@ const ProtectedLayout = async ({children}:any) => {
                     <SideBar className="md:col-start-1 md:col-span-2 md:mt-5 hidden md:block "/>
 
                         <div className="md:col-start-3 md:col-span-9 col-start-2 col-span-10 ">
-                            
-                                    {children} 
-                           
+                            {children} 
                        </div>
                 </div>
             </div>

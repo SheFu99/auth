@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import { BsFillPencilFill } from "react-icons/bs";
-import Modal from "./Modal";
+import AvararModal from "./cropper/Modal";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { toast } from "sonner";
 import { FaUser } from "react-icons/fa";
@@ -130,7 +130,7 @@ const  EditProfile =  () => {
             </div>
         </div>
           {modalOpen && (
-            <Modal
+            <AvararModal
               updateAvatar={updateAvatar}
               closeModal={() => setModalOpen(false)}
             />

@@ -9,9 +9,24 @@ export type userPost = z.infer<typeof UserPost>
 type Post = {
     text?:string,
     image?:string,
+    success?:boolean,
+}
+export type postPromise = {
+    posts?:any[],
+    success?: boolean,
+    error?:string,
+    message?:string,
+    likesCount?:number,
+}
+type responsePromise = {
     success?:string,
+    message?:string,
     error?:string,
 }
+
+
+
+
 export const CreatePost= async(post:Post)=>{
    const user= await currentUser()
 //    console.log("USER created post",user)
@@ -60,32 +75,45 @@ export const CreatePost= async(post:Post)=>{
         
 }
 
-export const GetUserPosts= async(userId:string)=>{
-    const user = await currentUser()
-    if(userId!==user.id){
-        return {error:"You need to be autorize!"}
-        } ///allow only author 
-    
-    if(!user){
-        return {error:"You need to be autorize!"}
-        }
-    const existingUser = await db.user.findFirst({
-        where:{id:user.id}
-    })
-    if(!existingUser){
-        return {error:"User not found"}
-    }
-    const posts = await db.post.findMany({
-        where:{
-            userId:user.id}
-        })
-    if(!posts){
-        return {error:"No posts found"}
-    }
-    return {posts:posts , success:true}
-}
+export const GetUserPostsById = async (userId: string):Promise<postPromise> => {
+ 
 
-export const DeleteUserPosts = async (postId:string)=>{
+    const existingUser = await db.user.findFirst({
+        where: { id: userId }
+    });
+    if (!existingUser) {
+        return { error: "User not found" };
+    }
+
+    const posts = await db.post.findMany({
+        where: {
+            userId: userId
+        },
+        orderBy: [
+            { timestamp: "desc" }  // Assuming 'createdAt' is the correct field for timestamping posts
+        ],
+        include: {
+            likes: {
+                select: { likeId: true }  // Select only the 'id' because we just need to count likes
+            }
+        }
+    });
+
+    if (!posts.length) {
+        return { error: "No posts found" };
+    }
+
+    // Map posts to include like counts
+    const postsWithLikeCounts = posts.map(post => ({
+        ...post,
+        likeCount: post.likes.length  // Each post object will now include a 'likeCount' property
+    }));
+
+    return { posts: postsWithLikeCounts, success: true };
+};
+
+
+export const DeleteUserPosts = async (postId:string):Promise<responsePromise>=>{
     const user = await currentUser()
     if(!user){
         return {error:"You need to be autorize!"}
@@ -148,3 +176,42 @@ export const EditUserPosts = async (postId:string, post:Post)=>{
     }
     return {success:"Post updated"}
 }
+
+
+///TODO: get first 10 post and load next with paginaton
+
+export const LikePost = async (postId: string):Promise<postPromise> => {
+    const user = await currentUser();
+    if (!user) {
+        return { error: "You need to be authorized!" };
+    }
+
+    const existingPost = await db.post.findUnique({
+        where: { PostId: postId },
+        include: { likes: true }  // Assuming 'likes' is the relation field name in your Prisma schema
+    });
+
+    if (!existingPost) {
+        return { error: "Post does not exist" };
+    }
+
+    // Check if the current user has already liked the post
+    const existingLike = existingPost.likes.find(like => like.userId === user.id);
+
+    if (existingLike) {
+        // User has liked this post before, remove the like
+        await db.like.delete({
+            where: { likeId: existingLike.likeId }  // Assuming 'id' is the identifier for likes
+        });
+        return { success: true, message: "Like removed", likesCount: existingPost.likes.length - 1 };
+    } else {
+        // User has not liked this post before, add a new like
+        await db.like.create({
+            data: {
+                userId: user.id,
+                postId: postId
+            }
+        });
+        return { success: true, message: "Post liked", likesCount: existingPost.likes.length + 1 };
+    }
+};

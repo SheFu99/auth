@@ -1,7 +1,7 @@
 
 "use clinet"
 import * as z from "zod"
-import { GetUserPosts, userPost, DeleteUserPosts, EditUserPosts } from "@/actions/UserPosts";
+import { GetUserPostsById, userPost, DeleteUserPosts, EditUserPosts, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
@@ -9,30 +9,54 @@ import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { UserPost } from "@/schemas";
+import { TiDelete } from "react-icons/ti";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { FcLike, FcLikePlaceholder } from "react-icons/fc";
+import { Skeleton } from "@/components/ui/skeleton";
+
+type post ={
+    PostId: string,
+    image?: string,
+    text: string,
+    timestamp?: Date,
+    userId: string,
+    likeCount: number,
+}
 
 
-
-const UserPostList  = () => {
-
+const UserPostList  = (profile:any) => {
 const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
 const [error,setError] =useState<string| undefined>()
 const {update} = useSession()
-const [posts, setPosts]=useState<userPost[]>()
+const [isFirstToggle,setFirstToggle] = useState(true)
+const [posts, setPosts]=useState<post[]>()
 const [isPending,startTransition]=useTransition()
 const [isEditMode,setEditIsMode]=useState<boolean>(false)
 
 const user = useCurrentUser()
 
     useEffect(()=>{
+        console.log(profile.profile)
+        console.log(user)
         async function GetPost() {
             try{
-                const posts = await GetUserPosts(user.id)
-                return posts
-            }catch(err){
-                console.log(err)
-            }
+                if(profile.profile){
+                  
+                    const posts = await GetUserPostsById(profile.profile)
+                    console.log(posts)
+                    return posts
+
+                }else{
+                    console.log("GEt by profile")
+                    const posts = await GetUserPostsById(user.id)
+                    setPosts(posts.posts)
+                    return posts
+                }
+            }catch(error){
+                console.log(error)
+         
            
-        }
+        }}
         GetPost().then(posts => setPosts(posts?.posts))
        
     },[update])
@@ -46,10 +70,10 @@ const user = useCurrentUser()
                     toast.error(data.error)
                 }
     
-                if(!data.error){
-                    // swichEditProfile(false)
+                if(data.success){
+                    
                     update() 
-                    toast.success("Your post has been deleted")
+                    toast.success(data.message)
                 }
             })
             
@@ -58,8 +82,55 @@ const user = useCurrentUser()
     return 
     
     }
+
+    const like = (postId:string)=>{
+
+        ///optimistic UI
+        if(user){
+        const newPost = posts?.map((post)=>{
+            if(post.PostId === postId){
+                if(isFirstToggle){
+                    post.likeCount++
+                }
+                    post.likeCount--
+            }
+            return post
+        })
+       
+
+            setPosts(newPost)
+        }else {
+            toast.error("You must be authorize") 
+            return 
+        }
+        ///optimistic UI
+
+        startTransition(()=>{
+            LikePost(postId)
+            .then((data)=>{
+                setPosts(currentPosts=>
+                    currentPosts.map(post=>
+                        post.PostId === postId?{ ...post,likeCount:data.likesCount}:post
+                    )
+                )
+                if(data.error){
+
+                    toast.error(data.error)
+                }
+
+                if(data.success){
+                    // swichEditProfile(false)
+                    // update()
+                    toast.success(data.message)
+                }
+            })
+        })
+    }
   
-    useEffect(()=>{ console.log(posts)},[posts])
+    // useEffect(()=>{ 
+    //     console.log(posts)
+        
+    //     },[posts])
 
     const PostForm = useForm<z.infer<typeof UserPost>>({
         resolver:zodResolver(UserPost),
@@ -110,20 +181,59 @@ const user = useCurrentUser()
 
 
     return ( 
-        <div className="bg-white h-8">
-            {/* {isEditMode&&(
+        <div className="bg-white rounded-md space-y-1 p-2">
+            {!posts&&(
+                <div className="grid grid-cols-12 p-5 space-y-5">
+                    <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
+                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <div className="space-y-2">
+                        <Skeleton className="h-4 xl:w-[600px] w-[250px]" />
+                        <Skeleton className="h-4 md:w-[400px] w-[200px]" />
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
+                        <Skeleton className="h-12 w-12 rounded-full"  />
+                        <div className="space-y-2">
+                        <Skeleton className="h-4 xl:w-[600px] w-[250px]" />
+                        <Skeleton className="h-4 md:w-[400px] w-[200px]" />
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
+                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <div className="space-y-2">
+                        <Skeleton className="h-4 xl:w-[600px] w-[250px]" />
+                        <Skeleton className="h-4 md:w-[400px] w-[200px]" />
+                    </div>
+                
+            
+               </div>
+               </div>
 
-            )} */}
+            )}
             {posts?.map((post)=>(
-                <div key={post.PostId} className="bg-white">
-                    <p className="text-black">{post.text}</p>
+                <div key={post.PostId} className="grid justify-between border border-gray-500 rounded-md p-2 space-x-1">
+                    <p className="text-black col-span-11">{post.text}</p>
                     {/* <small>{post.timestamp.tolocalString()}</small> */}
-                    <button title="delete post" className="text-black" onClick={(e)=>deletePost(post.PostId)}>Delete</button>
+
+                    {user?.id === post.userId&&(
+                        <button title="delete post" className="text-black col-start-12 row-span-2 px-2" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110 "/> </button>
+                    )}
+                    <div className="flex">
+                        <button title="like" className="text-black" onClick={(e)=>like(post.PostId)}>
+                           {post.likeCount !==0?
+                            <div className="flex align-middle justify-center items-center gap-2">
+                                <FcLike/>
+                                {post.likeCount}
+                            </div>
+                           :
+                           <FcLikePlaceholder/> }
+                        </button>
+                    </div>
                 </div>
             ))}
            
         </div>
-
+        ///Modal to confirm delete 
         // <div>
         //     <p>UserPostList</p></div>
      );

@@ -44,4 +44,4 @@ export const adminRoutes = [
     "/admin",
     "/server",
 ]
-export const DEFAULT_LOGIN_REDIRECT = "/settings";
+export const DEFAULT_LOGIN_REDIRECT = "/settings/profile";

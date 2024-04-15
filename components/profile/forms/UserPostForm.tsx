@@ -13,6 +13,7 @@ import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
 import { Textarea } from "../../ui/textarea"
 import { MdAddPhotoAlternate } from "react-icons/md"
+import PostCropper from "../cropper/Post-croppper"
 
 export interface DataResponse{
     PostId: string,
@@ -105,8 +106,10 @@ const UserPostForm = () => {
 
 
             </div>
-
-                    <div title="addPhoto" className="cursor-pointer max-w-[20px] col-start-11"><MdAddPhotoAlternate className="mt-2 scale-150"/></div>
+                    <div title="addPhoto" className="cursor-pointer max-w-[20px] col-start-11">
+                        <MdAddPhotoAlternate className="mt-2 scale-150"/>
+                        
+                    </div>
                     <Button type='submit' title='submit form' className=' col-start-12 p-1' > Send <IoSendSharp className='scale-150 ml-2'/></Button>
             </form>
         </Form>  

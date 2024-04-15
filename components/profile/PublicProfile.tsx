@@ -10,6 +10,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { MdElderly, MdLocationCity } from "react-icons/md";
 import { FadeLoader } from "react-spinners";
 import { Profile } from "@/actions/UserProfile";
+const UserPostList = React.lazy(()=>import('./forms/UserPostList'))
+// import UserPostList from "./forms/UserPostList";
 
 export interface ProfileData{
     profile:Profile
@@ -18,6 +20,7 @@ export interface ProfileData{
 interface profileProps {
     profile:any;
 }
+
 
 const  PublicProfile =  ({profile}:profileProps) => {
   const [updateState, setUpdate] = useState<boolean>(false)
@@ -136,7 +139,9 @@ const  PublicProfile =  ({profile}:profileProps) => {
             <TabsContent id="tab1" className="grid grid-cols-12 ">
                 
             <div className='col-span-12 space-y-5'>
-                {/* <UserPostList/>   */}
+            <Suspense fallback={<div>Loading...</div>}> 
+                <UserPostList profile={profile.profile?.userId}/>  
+            </Suspense>
             </div>
                     
             </TabsContent>

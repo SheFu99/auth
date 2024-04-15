@@ -1,4 +1,4 @@
-import { DEFAULT_LOGIN_REDIRECT, adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from './routes';
+import {adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from './routes';
 import authConfig from "./auth.config"
 import NextAuth from "next-auth"
 import { currentRole, currentUser } from './lib/auth';
@@ -25,6 +25,7 @@ const path = nextUrl.pathname;
   const isAdminRoute = adminRoutes.includes(path);
 
   if (isProfileRoute) {
+    
     return NextResponse.next();  // Allow API posts route
   }
 
@@ -45,9 +46,14 @@ if(isApiAuthRoute){
 }
 
 if (isAuthRoute){
-  if(isLoggedIn){
-    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
+  if(isLoggedIn ){
+    let callbackUrl = nextUrl.pathname
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl)
+    return Response.redirect(new URL(
+    `/auth/login?callbackUrl=${encodedCallbackUrl}`,
+    nextUrl))
   }
+
   return null
 }
 if(!isLoggedIn&& !isPublicRoute){
@@ -55,7 +61,6 @@ if(!isLoggedIn&& !isPublicRoute){
   if(nextUrl.search){
     callbackUrl +=nextUrl.search
   }
-
   const encodedCallbackUrl = encodeURIComponent(callbackUrl)
   return Response.redirect(new URL(
   `/auth/login?callbackUrl=${encodedCallbackUrl}`,

@@ -1,5 +1,5 @@
 "use clinet"
-import ImageCropper from "./cropper/image-croper";
+import ImageCropper from "./image-croper";
 import { GrClose } from "react-icons/gr";
 interface ModalProps {
     updateAvatar: (newAvatarUrl: Blob) => void;
@@ -7,7 +7,7 @@ interface ModalProps {
   }
 
 
-const Modal: React.FC<ModalProps>  = ({ updateAvatar, closeModal }) => {
+const AvararModal: React.FC<ModalProps>  = ({ updateAvatar, closeModal }) => {
   return (
     <div
       className="relative z-10"
@@ -39,4 +39,4 @@ const Modal: React.FC<ModalProps>  = ({ updateAvatar, closeModal }) => {
     </div>
   );
 };
-export default Modal;
+export default AvararModal;
