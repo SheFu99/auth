@@ -65,7 +65,7 @@ model Post {
   likes      Like[]
   coments    Comment[]
   userId     String
-  user       User      @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id],onDelete: Cascade)
 }
 
 model Gallery {
@@ -76,7 +76,7 @@ model Gallery {
   likes       Like[]
   coments     Comment[]
   userId      String
-  user        User      @relation(fields: [userId],references: [id])
+  user        User      @relation(fields: [userId],references: [id],onDelete: Cascade)
 
 }
 
@@ -99,7 +99,7 @@ model Like {
   postId    String?   
   commentId String?   
   userId    String  
-  post      Post?     @relation(fields: [postId],references: [PostId])
+  post      Post?     @relation(fields: [postId],references: [PostId],onDelete: Cascade)
   comment   Comment?  @relation(fields: [commentId],references: [CommentId])
   user      User      @relation(fields: [userId],references: [id])
   galleryId String?

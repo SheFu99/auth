@@ -119,7 +119,11 @@ export const getDynamicProfile = async (userId:string)=>{
       return { error: "User not found" };
     }
    
-    const existingProfile = await CurrentProfile()
+    const existingProfile = await db.profile.findFirst({
+      where:{
+        userId:userId,
+      }
+    })
       if(!existingProfile){
         return {error: 'Profile not found'}
       }

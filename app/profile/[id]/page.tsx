@@ -35,23 +35,22 @@ interface Props {
 export default  function PublicProfileParams({ params }) {
   const [profile,setProfile]=useState({})
   
-  console.log(params) 
+  
 
   const getProfile= async()=>{
     const profile = await getDynamicProfile(params.id)
-    console.log(profile)
     setProfile(profile)
   }
 
  
  
 useEffect(()=>{
-  console.log(params)
+  
   getProfile()
  
 },[params])
 
-useEffect(()=>{console.log(profile)},[profile])
+// useEffect(()=>{console.log(profile)},[profile])
 
 if(!profile){
   return <FadeLoader color="white"/>

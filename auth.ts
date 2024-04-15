@@ -6,6 +6,7 @@ import authConfig from "./auth.config"
 import { getUserById } from "./data/user"
 import { getTwoFactorConformationByUserId } from "./data/two-factor-conformation"
 import { getAccountByUserId } from "./data/account"
+import { createUserProfile } from "./actions/UserProfile"
 
 
 
@@ -22,11 +23,33 @@ export const {
   },
   events:{
     async linkAccount({user}){
-      await db.user.update({
+       await db.user.update({
         where:{id:user.id},
         data: {emailVerified: new Date()}
       })
-    }
+
+        try{
+          const existedUser= await db.user.findFirst({
+            where:{
+              id: user.id,
+            }
+        
+          })
+          if(!existedUser){
+            return 
+          }
+          await db.profile.create({
+            data: {
+              userId: existedUser.id,
+              firstName: user.name,
+            }
+          });
+        }catch(error){
+          console.log("Auth ERROr!",error)
+        }
+      
+      }
+    
   },
   callbacks:{
     async signIn({user ,account}){
@@ -34,14 +57,7 @@ export const {
         user,
         account,
       })
-      if (account.provider !== "credentials") {
-        await db.profile.create({
-          data: {
-            userId: user.id,
-            firstName: user.name,
-          }
-        });
-      }
+    
       
 
       if(account?.provider === "credentials")  {

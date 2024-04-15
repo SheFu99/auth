@@ -50,6 +50,9 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
         }
 
     },[errors])
+
+    useEffect(()=>{
+        console.log(editProfileProps)},[editProfileProps])
     const onSubmit=(values:z.infer<typeof UserProfile>)=>{
         startTransition(()=>{
             updateUserProfile(values)

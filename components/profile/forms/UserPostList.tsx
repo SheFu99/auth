@@ -36,18 +36,16 @@ const [isEditMode,setEditIsMode]=useState<boolean>(false)
 const user = useCurrentUser()
 
     useEffect(()=>{
-        console.log(profile.profile)
-        console.log(user)
         async function GetPost() {
             try{
                 if(profile.profile){
-                  
+                    console.log("GEt by profile")
                     const posts = await GetUserPostsById(profile.profile)
                     console.log(posts)
                     return posts
 
                 }else{
-                    console.log("GEt by profile")
+                    
                     const posts = await GetUserPostsById(user.id)
                     setPosts(posts.posts)
                     return posts
@@ -182,7 +180,7 @@ const user = useCurrentUser()
 
     return ( 
         <div className="bg-white rounded-md space-y-1 p-2">
-            {!posts&&(
+            {posts?.length<1&&(
                 <div className="grid grid-cols-12 p-5 space-y-5">
                     <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
                         <Skeleton className="h-12 w-12 rounded-full" />
