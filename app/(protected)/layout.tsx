@@ -9,7 +9,7 @@ import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
 
 
-const SettingsLayout = async (children:React.ReactNode) => {
+const SettingsLayout = async (children:any) => {
     const session = await auth()
 
     return ( 
