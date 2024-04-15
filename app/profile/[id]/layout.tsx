@@ -7,12 +7,9 @@ import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
 
 
-interface PublicProfileProps{
-    children: React.ReactNode;
-    profileData: any;
-}
 
-const PublicProfileLayout = async ({children}:PublicProfileProps) => {
+
+const PublicProfileLayout = async (children:any) => {
     const session = await auth()
 
     return ( 
