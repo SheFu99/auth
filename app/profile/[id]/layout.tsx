@@ -13,7 +13,7 @@ interface PublicProfileProps{
     params:any;
 }
 
-const PublicProfileLayout = async ({children,params}:PublicProfileProps) => {
+export const PublicProfileLayout = async ({children,params}:PublicProfileProps) => {
     const session = await auth()
 
     return ( 
@@ -38,4 +38,3 @@ const PublicProfileLayout = async ({children,params}:PublicProfileProps) => {
      );
 }
  
-export default PublicProfileLayout;
