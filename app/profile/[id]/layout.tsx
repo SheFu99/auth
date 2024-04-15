@@ -1,3 +1,4 @@
+/* eslint-disable */
 
 "use server"
 import { SessionProvider } from "next-auth/react";
@@ -13,7 +14,7 @@ interface PublicProfileProps{
     params:any;
 }
 
-export const PublicProfileLayout = async ({children,params}:PublicProfileProps) => {
+const PublicProfileLayout = async ({children,params}:PublicProfileProps) => {
     const session = await auth()
 
     return ( 
@@ -38,3 +39,4 @@ export const PublicProfileLayout = async ({children,params}:PublicProfileProps) 
      );
 }
  
+export default PublicProfileLayout;
