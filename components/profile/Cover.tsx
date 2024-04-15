@@ -24,12 +24,15 @@ type Response = {
 
 
 export default function Cover({url,editable,onChange, className}:CoverProps) {
-  const {update} = useSession()
+ 
 
   // const {upload,switchUpload} = useCurrentProfile()
 
   const [isUploading,setIsUploading] = useState(false);
   const [modal ,setModal] = useState<boolean>(false)
+  if(editable){
+    const {update} = useSession()
+  }
 
   async function updateCover(croppedImageBlob: Blob) {
     const formData = new FormData();
@@ -101,7 +104,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
           width={1500}
           height={300}
           objectFit="fill"
-          layout="contain" className={`${className}  bg-blend-overlay h-auto  g-f:w-auto`}
+          layout="contain" className={`${className}  bg-blend-overlay h-auto g-f:w-auto`}
           onLoadStart={()=>setIsUploading(true)}
           onLoadingComplete={()=>setIsUploading(false)}
           
@@ -118,7 +121,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
                   <polygon points="300,150 600,50 900,150" fill="#BDB76B"/>
                   <polygon points="1300,150 1600,50 1900,150" fill="#BDB76B"/>
                 
-                </svg>
+              </svg>
               
                 
               </div>
