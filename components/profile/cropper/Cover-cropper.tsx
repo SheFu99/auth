@@ -29,61 +29,43 @@ const CoverCropper: React.FC<ImageCropperProps> = ({ closeCoverModal, updateCove
   const [crop, setCrop] = useState<Crop>();
   const [error, setError] = useState<string>("");
 
-  function dataURLtoBlob(dataurl: string): { blob: Blob; extension: string } | null {
-    if (!dataurl) {
-      console.error("Data URL is null or undefined.");
-      return null;
+  function dataURLtoBlob(dataurl: string): { blob: Blob, extension: string } | null {
+    try {
+        const byteString = atob(dataurl.split(',')[1]);
+        const mimeString = dataurl.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        const extension = mimeString.split('/')[1];
+        return { blob: new Blob([ab], {type: mimeString}), extension: extension };
+    } catch (e) {
+        console.error("Could not convert data URL to Blob:", e);
+        return null;
     }
-  
-    const arr = dataurl.split(',');
-    if (arr.length < 2) {
-      console.error("Data URL does not contain expected parts.");
-      return null;
-    }
-  
-    const mimePart = arr[0];
-    const mimeMatch = mimePart.match(/:(.*?);/);
-    if (!mimeMatch || mimeMatch.length < 2) {
-      console.error("MIME type is malformed or missing in Data URL.");
-      return null;
-    }
-  
-    const mime = mimeMatch[1];
-    const extension = mime.split('/')[1];  // Assuming the MIME type is in the format "type/extension"
-    if (!extension) {
-      console.error("Failed to extract file extension from MIME type.");
-      return null;
-    }
-  
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-  
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-  
-    const blob = new Blob([u8arr], {type: mime});
-    return { blob, extension };
-  }
+}
+
   
 const user = useCurrentUser()
 const filename = (user?.name ?? '').replace(/\s+/g, '_');
 
 
 
-function dataURLtoFile(dataurl: string): File {
+function dataURLtoFile(dataurl: string, filename: string = "file"): File {
   const now = new Date();
   const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}`;
   const blobData = dataURLtoBlob(dataurl);
-if (!blobData) {
-  console.error("Failed to convert data URL to blob.");
-  return;
+
+  if (!blobData) {
+      throw new Error("Failed to convert data URL to blob.");
+  }
+
+  const filenameWithDateTime = `${filename}_${dateTimeFormat}.${blobData.extension}`;
+  return new File([blobData.blob], filenameWithDateTime, { type: blobData.blob.type });
 }
-  const { blob, extension } = blobData;
-  const filenameWithDateTime = `${filename}_${dateTimeFormat}.${extension}`;
-  return new File([blob], filenameWithDateTime, { type: blob.type });
-}
+
+
 
   
   const onSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
