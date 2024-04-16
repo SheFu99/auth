@@ -17,9 +17,9 @@ type ImageCropperProps = {
   updateCover: (dataUrl: Blob) => void;
 };
 
-const ASPECT_RATIO = 4/1;
-const MIN_WIDTH = 400;
-const MIN_HEIGHT = 200
+const ASPECT_RATIO = 2/1;
+const MIN_WIDTH = 200;
+const MIN_HEIGHT = 100
 
 const CoverCropper: React.FC<ImageCropperProps> = ({ closeCoverModal, updateCover }) => {
   const imgRef = useRef<HTMLImageElement>(null);
