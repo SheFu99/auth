@@ -147,7 +147,7 @@ function dataURLtoFile(dataurl: string): File {
 
           </ReactCrop>
           <button
-            className="text-white font-mono text-xs py-2 px-4 rounded-2xl mt-4 bg-sky-500 hover:bg-sky-600"
+            className="text-white font-mono text-xs py-2 px-4 rounded-2xl mt-4 bg-sky-500 hover:bg-sky-600 absolute bottom-2 z-30"
             onClick={() => {
               if (imgRef.current && previewCanvasRef.current && crop) {
                 setCanvasPreview(
