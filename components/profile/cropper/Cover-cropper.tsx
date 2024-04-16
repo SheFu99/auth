@@ -30,17 +30,17 @@ const CoverCropper: React.FC<ImageCropperProps> = ({ closeCoverModal, updateCove
   const [error, setError] = useState<string>("");
 
   function dataURLtoBlob(dataurl:any) {
-    console.log(dataurl);  // Check what the data URL actually looks like
     const arr = dataurl.split(',');
-    if (arr.length < 2) {
-        console.error("Invalid data URL");
-        return null;  // or handle this case appropriately
+    if (!arr[0]) {
+      console.error("Data URL is malformed or empty.");
+      return null;
     }
-    const mime = arr[0].match(/:(.*?);/);
-    if (!mime) {
-        console.error("MIME type not found in data URL");
-        return null;  // or handle this case appropriately
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch) {
+      console.error("MIME type is malformed or missing in Data URL.");
+      return null;
     }
+    const mime = mimeMatch[1];
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
