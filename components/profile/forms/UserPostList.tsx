@@ -80,29 +80,7 @@ const user = useCurrentUser()
     return 
     
     }
-
-    const like = (postId:string)=>{
-
-        ///optimistic UI
-        if(user){
-        const newPost = posts?.map((post)=>{
-            if(post.PostId === postId){
-                if(isFirstToggle){
-                    post.likeCount++
-                }
-                    post.likeCount--
-            }
-            return post
-        })
-       
-
-            setPosts(newPost)
-        }else {
-            toast.error("You must be authorize") 
-            return 
-        }
-        ///optimistic UI
-
+    const serverLikeaction = (postId:string)=>{
         startTransition(()=>{
             LikePost(postId)
             .then((data)=>{
@@ -123,6 +101,31 @@ const user = useCurrentUser()
                 }
             })
         })
+    }
+    const like = (postId:string)=>{
+
+        ///optimistic UI
+        if(user){
+            console.log("LIKE")
+        const newPost = posts?.map((post)=>{
+            if(post.PostId === postId){
+                if(isFirstToggle){
+                    post.likeCount++
+                }
+                    post.likeCount--
+            }
+            return post
+        })
+       
+            setPosts(newPost)
+            
+        }else {
+            toast.error("You must be authorize") 
+            return 
+        }
+        ///optimistic UI
+
+        serverLikeaction(postId)
     }
   
     // useEffect(()=>{ 
@@ -180,7 +183,7 @@ const user = useCurrentUser()
 
     return ( 
         <div className="bg-white rounded-md space-y-1 p-2">
-            {posts?.length<1&&(
+            {!posts?.length&&(
                 <div className="grid grid-cols-12 p-5 space-y-5">
                     <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
                         <Skeleton className="h-12 w-12 rounded-full" />

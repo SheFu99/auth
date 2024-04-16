@@ -17,9 +17,9 @@ type ImageCropperProps = {
   updateCover: (dataUrl: Blob) => void;
 };
 
-const ASPECT_RATIO = 2/1;
-const MIN_WIDTH = 200;
-const MIN_HEIGHT = 100
+const ASPECT_RATIO = 5/1;
+const MIN_WIDTH = 800;
+const MIN_HEIGHT = 200
 
 const CoverCropper: React.FC<ImageCropperProps> = ({ closeCoverModal, updateCover }) => {
   const imgRef = useRef<HTMLImageElement>(null);
@@ -140,27 +140,25 @@ function dataURLtoFile(dataurl: string): File {
 
           </ReactCrop>
           <button
-            className="text-white font-mono text-xs py-2 px-4 rounded-2xl mt-4 bg-sky-500 hover:bg-sky-600 absolute bottom-2 z-30"
-            onClick={() => {
-              if (imgRef.current && previewCanvasRef.current && crop) {
-                setCanvasPreview(
-                  imgRef.current,
-                  previewCanvasRef.current,
-                  convertToPixelCrop(
-                    crop,
-                    imgRef.current.width,
-                    imgRef.current.height
-                  ) as PixelCrop
-                );
-                const dataUrl = previewCanvasRef.current.toDataURL();
-                const croppedImageBlob = dataURLtoFile(dataUrl);
-                updateCover(croppedImageBlob);
-                closeCoverModal();
-              }
-            }}
-          >
-            Crop Image
-          </button>
+  className="text-white font-mono text-xs py-2 px-4 rounded-2xl mt-4 bg-sky-500 hover:bg-sky-600"
+  style={{ position: 'absolute', bottom: '20px', zIndex: 1000 }}  // Ensure it is above other elements
+  onClick={() => {
+    if (imgRef.current && previewCanvasRef.current && crop) {
+      setCanvasPreview(
+        imgRef.current,
+        previewCanvasRef.current,
+        convertToPixelCrop(crop, imgRef.current.width, imgRef.current.height) as PixelCrop
+      );
+      const dataUrl = previewCanvasRef.current.toDataURL();
+      const croppedImageBlob = dataURLtoFile(dataUrl);
+      updateCover(croppedImageBlob);
+      closeCoverModal();
+    }
+  }}
+>
+  Crop Image
+</button>
+
         </div>
       )}
       {crop && (
