@@ -26,11 +26,7 @@ const CoverModal: React.FC<ModalProps>  = ({ updateCover, closeCoverModal }) => 
               <button
                 type="button"
                 className="rounded-md p-1 inline-flex items-center justify-center text-gray-400 hover:bg-gray-700 focus:outline-none absolute top-2 right-2"
-                onClick={() => {
-                    
-                        closeCoverModal();
-                    
-                  }}
+                onClick={closeCoverModal}
               >
                 <span className="sr-only">Close menu</span>
                 <GrClose />

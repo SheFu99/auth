@@ -64,11 +64,14 @@ const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().p
 
 
 
-  function dataURLtoFile(dataurl: string): File {
-    const {blob, extension} = dataURLtoBlob(dataurl);
-    const filenameWithDateTime = `${filename}_${dateTimeFormat}.${extension}`;
-    return new File([blob], filenameWithDateTime, { type: blob.type });
+function dataURLtoFile(dataurl: string): File {
+  const now = new Date();
+  const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}`;
+  const { blob, extension } = dataURLtoBlob(dataurl);
+  const filenameWithDateTime = `${filename}_${dateTimeFormat}.${extension}`;
+  return new File([blob], filenameWithDateTime, { type: blob.type });
 }
+
   
   const onSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,7 +90,7 @@ const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().p
         const { naturalWidth, naturalHeight } = e.currentTarget as HTMLImageElement;
 
         if (naturalWidth < MIN_WIDTH || naturalHeight < MIN_HEIGHT) {
-          setError("Image must be at least 400 x 200 pixels.");
+          setError("Image must be at least 800 x 200 pixels.");
           return setImgSrc("");
         }
       });
