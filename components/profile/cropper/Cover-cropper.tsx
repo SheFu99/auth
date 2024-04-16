@@ -29,18 +29,32 @@ const CoverCropper: React.FC<ImageCropperProps> = ({ closeCoverModal, updateCove
   const [crop, setCrop] = useState<Crop>();
   const [error, setError] = useState<string>("");
 
-  function dataURLtoBlob(dataurl:any) {
-    const arr = dataurl.split(',');
-    if (!arr[0]) {
-      console.error("Data URL is malformed or empty.");
+  function dataURLtoBlob(dataurl: string): { blob: Blob; extension: string } | null {
+    if (!dataurl) {
+      console.error("Data URL is null or undefined.");
       return null;
     }
-    const mimeMatch = arr[0].match(/:(.*?);/);
-    if (!mimeMatch) {
+  
+    const arr = dataurl.split(',');
+    if (arr.length < 2) {
+      console.error("Data URL does not contain expected parts.");
+      return null;
+    }
+  
+    const mimePart = arr[0];
+    const mimeMatch = mimePart.match(/:(.*?);/);
+    if (!mimeMatch || mimeMatch.length < 2) {
       console.error("MIME type is malformed or missing in Data URL.");
       return null;
     }
+  
     const mime = mimeMatch[1];
+    const extension = mime.split('/')[1];  // Assuming the MIME type is in the format "type/extension"
+    if (!extension) {
+      console.error("Failed to extract file extension from MIME type.");
+      return null;
+    }
+  
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
@@ -50,17 +64,9 @@ const CoverCropper: React.FC<ImageCropperProps> = ({ closeCoverModal, updateCove
     }
   
     const blob = new Blob([u8arr], {type: mime});
-    const mimeToExtension : any = {
-        'image/jpeg': 'jpg',
-        'image/png': 'png',
-        'application/pdf': 'pdf',
-        // Add more mappings as needed
-      };
-
-      const extension = mimeToExtension[mime] || '';
-
-      return { blob, extension };
+    return { blob, extension };
   }
+  
 const user = useCurrentUser()
 const filename = (user?.name ?? '').replace(/\s+/g, '_');
 
@@ -69,7 +75,12 @@ const filename = (user?.name ?? '').replace(/\s+/g, '_');
 function dataURLtoFile(dataurl: string): File {
   const now = new Date();
   const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}`;
-  const { blob, extension } = dataURLtoBlob(dataurl);
+  const blobData = dataURLtoBlob(dataurl);
+if (!blobData) {
+  console.error("Failed to convert data URL to blob.");
+  return;
+}
+  const { blob, extension } = blobData;
   const filenameWithDateTime = `${filename}_${dateTimeFormat}.${extension}`;
   return new File([blob], filenameWithDateTime, { type: blob.type });
 }
