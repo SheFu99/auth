@@ -148,7 +148,7 @@ const  EditProfile =  () => {
                     <AccordionItem value="item-1" >
                       <AccordionTrigger className='text-black  font-semibold flex justify-between p-1 md:text-xl g-f:text-sm md:ml-0 g-f:ml-2'>{user?.name}</AccordionTrigger>
                         <AccordionContent>
-                            {!addInfo || profile?.phoneNumber===undefined ?(
+                            {!addInfo && profile?.phoneNumber===undefined ?(
 
                               <div className='w-full'>
                                     <div className=" bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 mt-1 rounded-md flex w-full flex-wrap justify-center">
@@ -161,9 +161,7 @@ const  EditProfile =  () => {
                             ):(  <UserProfileForm profile={profile} editProfileProps={true}  onChange={()=>swichAddInfo(false)} />
                           )}
 
-                           {/* {addInfo&&(
-                           
-                           )} */}
+                       
                            
 
                         </AccordionContent>

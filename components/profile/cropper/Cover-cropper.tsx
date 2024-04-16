@@ -54,13 +54,6 @@ const CoverCropper: React.FC<ImageCropperProps> = ({ closeCoverModal, updateCove
   }
 const user = useCurrentUser()
 const filename = (user?.name ?? '').replace(/\s+/g, '_');
-// Get current date and time
-const now = new Date();
-
-// Format date and time: You can adjust the format as needed
-const dateTimeFormat = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}`;
-
-// Append date and time to filename
 
 
 
@@ -101,7 +94,7 @@ function dataURLtoFile(dataurl: string): File {
 
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const { width, height } = e.currentTarget;
-    const cropWidthInPercent = (MIN_HEIGHT / width) * 500;
+    const cropWidthInPercent = (MIN_HEIGHT / width) * 100;
 
     const newCrop = makeAspectCrop(
       {
