@@ -34,25 +34,32 @@ const  EditProfile =  () => {
   const [imageSrc, setImageSrc] = useState<string>(''); // State to hold the source URL of the image to crop
   const [croppedImageUrl, setCroppedImageUrl] = useState<string>(); // State to hold the cropped image URL
   const [cropType, setCropType] = useState<'Avatar' | 'Cover' | 'Post'>('Avatar'); // State to select the crop type
+  const [avatarCropper,setModalAvatarCropper]=useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [blob,setBlob]=useState<Blob>()
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    
       if (event.target.files && event.target.files[0]) {
           const reader = new FileReader();
           reader.onload = (e) => {
               setImageSrc(e.target!.result as string); // Set image source for cropping
+              setModalAvatarCropper(true)
+              event.target.value = ''; ///clear event cash 
+              
           };
           reader.readAsDataURL(event.target.files[0]);
       }
   };
 
   const handleImageCropped = (croppedImage: string) => {
+
     console.log(croppedImage)
       setCroppedImageUrl(croppedImage); 
       // Handle the cropped image URL
       updateAvatar(croppedImage)
+      
   };
 
   const fetchProfile = async () => {
@@ -119,7 +126,16 @@ const  EditProfile =  () => {
     
     }
 
-   
+   const closeAvatarCropper = ()=>{
+    setModalAvatarCropper(false)
+    setImageSrc("")
+   }
+
+   const resetAvatar = ()=>{
+    setImageSrc("")
+    fileInputRef.current?.click()
+
+   }
      
       
 
@@ -131,10 +147,11 @@ const  EditProfile =  () => {
         <div className=''>
           <Cover url={profile?.coverImage!} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
           <div>
-            {imageSrc && (
+            {avatarCropper && (
                 <ImageCropperr
+                    closeCroper={()=>closeAvatarCropper()}
                     image={imageSrc}
-                    type={cropType}
+                    type='Avatar'
                     onImageCropped={handleImageCropped}
                 />
             )}
@@ -166,7 +183,7 @@ const  EditProfile =  () => {
                     <button
                       className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
                       title="Change photo"
-                      onClick={() => fileInputRef.current?.click()} // Use ref to trigger file input click
+                      onClick={() =>resetAvatar() } // Use ref to trigger file input click
                     >
                       <BsFillPencilFill className="grid scale-100"/>
                       <input

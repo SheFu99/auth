@@ -8,11 +8,12 @@ interface ImageCropperrProps {
     image: string;
     type: 'Avatar' | 'Cover' | 'Post';
     onImageCropped: (croppedImage: string) => void;
+    closeCroper?: () => void;
   }
   
 
 
-const ImageCropperr = ({ image, type, onImageCropped }:ImageCropperrProps) => {
+const ImageCropperr = ({ image, type, onImageCropped,closeCroper }:ImageCropperrProps) => {
     const [inputImg, setInputImg] = useState(image);  // Initially set to image passed from parent
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -52,6 +53,13 @@ const ImageCropperr = ({ image, type, onImageCropped }:ImageCropperrProps) => {
         }
     }, [image]);
 
+    const onClose= ()=>{
+        if(closeCroper){
+            closeCroper()
+        }
+        return
+
+    }
     return (
         <div className="">
 
@@ -59,7 +67,7 @@ const ImageCropperr = ({ image, type, onImageCropped }:ImageCropperrProps) => {
                 <div className='absolute w-full h-full bottom-5 -top-5 left-0 py-20 px-5 z-30 bg-gray-950 bg-opacity-90'>
 
                  <div className='relative w-full h-full p-6 border border-gray-950 rounded-lg bg-gray-500 ' >
-                     <button title='close modal' className=' z-30 w-full flex justify-end mb-2 -mt-2' onClick={()=>setModalState(false)}>
+                     <button title='close modal' className=' z-30 w-full flex justify-end mb-2 -mt-2' onClick={()=>onClose()}>
                             <span className="sr-only">Close menu</span>
                             <GrClose color='white'/>
                      </button>
