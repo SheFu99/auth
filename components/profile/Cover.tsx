@@ -32,6 +32,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
   const [modal ,setModal] = useState<boolean>(false)
 
   async function updateCover(croppedImageBlob: Blob) {
+    console.log(croppedImageBlob)
     const formData = new FormData();
           formData.append("cover", croppedImageBlob);
 

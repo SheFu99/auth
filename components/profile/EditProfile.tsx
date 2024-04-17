@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BsFillPencilFill } from "react-icons/bs";
 import AvararModal from "./cropper/Modal";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -17,6 +17,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import UserPostForm from './forms/UserPostForm';
 import UserPostList from './forms/UserPostList';
+import ImageCropper from "./cropper/New-cropper";
+import ImageCropperr from "./cropper/New-cropper";
 
 
 const  EditProfile =  () => {
@@ -29,7 +31,29 @@ const  EditProfile =  () => {
   const [sessionImage, setSessionImage] = useState( user?.image); 
   const [editName , swichEditName] = useState<boolean>(false)
   const [addInfo,swichAddInfo]=useState<boolean>(false)
-  const [userEditState,swichUserEditState]=useState<boolean>(false)
+  const [imageSrc, setImageSrc] = useState<string>(''); // State to hold the source URL of the image to crop
+  const [croppedImageUrl, setCroppedImageUrl] = useState<string>(); // State to hold the cropped image URL
+  const [cropType, setCropType] = useState<'Avatar' | 'Cover' | 'Post'>('Avatar'); // State to select the crop type
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [blob,setBlob]=useState<Blob>()
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files && event.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+              setImageSrc(e.target!.result as string); // Set image source for cropping
+          };
+          reader.readAsDataURL(event.target.files[0]);
+      }
+  };
+
+  const handleImageCropped = (croppedImage: string) => {
+    console.log(croppedImage)
+      setCroppedImageUrl(croppedImage); 
+      // Handle the cropped image URL
+      updateAvatar(croppedImage)
+  };
 
   const fetchProfile = async () => {
       try {
@@ -43,17 +67,28 @@ const  EditProfile =  () => {
   } 
   useEffect(()=>{
     fetchProfile();
-    if(!profile?.phoneNumber){
-      swichUserEditState(true)
-    }
+    // if(!profile?.phoneNumber){
+    //   swichUserEditState(true)
+    // }
   },[update]) 
 
-  useEffect(()=>{
-    console.log(profile?.phoneNumber)
-  },[addInfo])
-  const updateAvatar = async(croppedImageBlob: Blob) =>{
+  // useEffect(()=>{
+  //   console.log(profile?.phoneNumber)
+  // },[addInfo])
+
+  const updateAvatar = async(croppedImageBlob) =>{
+ 
+      const response = await fetch(croppedImageBlob);
+      const blob = await response.blob(); // Convert the image URL to a blob for uploading
+     
+    
+  
     const formData = new FormData();
-    formData.append("file", croppedImageBlob);
+     const now = new Date();
+    const dateTime = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+    const filename = `${user.name.replace(/\s+/g, '_')}_${dateTime}.png`;  // Replace spaces with underscores, add current dateTime, and .png extension
+
+    formData.append("file", blob,filename);
 
     try {
       const response = await fetch('/api/s3-upload', {
@@ -67,10 +102,11 @@ const  EditProfile =  () => {
       }else{
 
         const imageUrl = data.imageUrl 
+        console.log(imageUrl)
         if (imageUrl) {
+          toast.success('Avatar updated successfully.');
           setSessionImage(imageUrl); // Assuming the response includes the new URL
             update()
-          toast.success('Avatar updated successfully.');
         } else {
           throw new Error('New avatar URL not provided');
         }
@@ -94,7 +130,16 @@ const  EditProfile =  () => {
     <div className="col-span-12 grid-row-6 ">
         <div className=''>
           <Cover url={profile?.coverImage!} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
+          <div>
+            {imageSrc && (
+                <ImageCropperr
+                    image={imageSrc}
+                    type={cropType}
+                    onImageCropped={handleImageCropped}
+                />
+            )}
            
+        </div>
             <div className="flex items-center relative ">
                   <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-10 -bottom-15 left-0 p-[1rem] justify-center">
 
@@ -121,10 +166,18 @@ const  EditProfile =  () => {
                     <button
                       className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
                       title="Change photo"
-                      onClick={() => setModalOpen(true)}
+                      onClick={() => fileInputRef.current?.click()} // Use ref to trigger file input click
                     >
                       <BsFillPencilFill className="grid scale-100"/>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={{ display: 'none' }} 
+                      />
                     </button>
+
               </div>
 
            
