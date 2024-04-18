@@ -17,6 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import UserPostForm from './forms/UserPostForm';
 import UserPostList from './forms/UserPostList';
 import ImageCropper from "./cropper/Image-Cropper";
+import { BounceLoader } from "react-spinners";
 
 
 
@@ -26,14 +27,14 @@ const  EditProfile =  () => {
   // const {profile , updateProfile, upload , switchUpload} = useCurrentProfile(); //use redux and localstorage for store
   const [profile, setProfile] = useState<ProfileData>()
   const {update} = useSession()
-  const [modalOpen, setModalOpen] = useState(false);
+  const [avatarUploading, setAvatarUloading] = useState(false);
   const [sessionImage, setSessionImage] = useState( user?.image); 
   const [addInfo,swichAddInfo]=useState<boolean>(false)
   const [imageSrc, setImageSrc] = useState<string>(''); // State to hold the source URL of the image to crop
   const [avatarCropper,setModalAvatarCropper]=useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     
       if (event.target.files && event.target.files[0]) {
           const reader = new FileReader();
@@ -47,10 +48,9 @@ const  EditProfile =  () => {
       }
   };
 
-  const handleImageCropped = (croppedImage: string) => {
-
+  const handleAvatarCropped = (croppedImage: string) => {
+      setAvatarUloading(true)
       updateAvatar(croppedImage)
-      
   };
 
   const fetchProfile = async () => {
@@ -62,15 +62,13 @@ const  EditProfile =  () => {
       } catch (error) {
         console.error('Failed to fetch profile:', error);
       }
-  } 
+  };
   useEffect(()=>{
     fetchProfile();
     // if(!profile?.phoneNumber){
     //   swichUserEditState(true)
     // }
   },[update]) 
-
-  
 
   const updateAvatar = async(croppedImageBlob) =>{
  
@@ -102,8 +100,10 @@ const  EditProfile =  () => {
         if (imageUrl) {
           toast.success('Avatar updated successfully.');
           setSessionImage(imageUrl); // Assuming the response includes the new URL
+          setAvatarUloading(false)
             update()
         } else {
+          setAvatarUloading(false)
           throw new Error('New avatar URL not provided');
         }
       }
@@ -111,24 +111,21 @@ const  EditProfile =  () => {
     } catch (error) {
       console.error('Error updating avatar:', error);
       toast.error('Failed to update avatar.');
+      setAvatarUloading(false)
     }
     
-    }
+  };
 
    const closeAvatarCropper = ()=>{
     setModalAvatarCropper(false)
     setImageSrc("")
-   }
+  };
 
    const resetAvatar = ()=>{
     setImageSrc("")
     fileInputRef.current?.click()
 
-   }
-     
-      
-
-    
+  };
 
   return (
     
@@ -142,7 +139,7 @@ const  EditProfile =  () => {
                     closeCroper={()=>closeAvatarCropper()}
                     image={imageSrc}
                     type='Avatar'
-                    onImageCropped={handleImageCropped}
+                    onImageCropped={handleAvatarCropped}
                 />
             )}
            
@@ -150,24 +147,31 @@ const  EditProfile =  () => {
             <div className="flex items-center relative ">
                   <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-10 -bottom-15 left-0 p-[1rem] justify-center">
 
-                  {sessionImage &&  (
+                  {sessionImage? (
                    <div className="flex justify-center relative rounded-full w-[50px] h-[50px] md:w-[75px] md:h-[75px] ">
+                     
+                     {avatarUploading?(
+                       <BounceLoader color="white"/>
+                      ):(
                       <Image
                         src={sessionImage}
                         alt='Avatar'
                         // layout="fill"
                         width={75}
                         height={75}
-                        className="rounded-full"
+                        className={`rounded-full`}
                         
                       />
-                 </div>
-                  )}
-                  {!sessionImage&&(
-                    <div className="flex h-full w-full items-center justify-center rounded-full bg-muted p-3">
-                      <FaUser className="text-[#3aa29d] w-[50px] h-[50px] md:w-[75px] md:h-[75px] g-f:w-[35px] g-f:h-[35px]"/>
-                    </div>
-                  )}
+                      )}
+                   
+                  </div>
+                    ):(
+                      <div className="flex h-full w-full items-center justify-center rounded-full bg-muted p-3">
+                        <FaUser className="text-[#3aa29d] w-[50px] h-[50px] md:w-[75px] md:h-[75px] g-f:w-[35px] g-f:h-[35px]"/>
+                      </div>
+                    )}
+
+                  
 
 
                     <button
@@ -180,7 +184,7 @@ const  EditProfile =  () => {
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
-                        onChange={handleImageChange}
+                        onChange={handleAvatarChange}
                         style={{ display: 'none' }} 
                       />
                     </button>

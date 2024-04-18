@@ -7,6 +7,7 @@ import { HiPhotograph } from "react-icons/hi";
 import CoverModal from "./cropper/Cover-modal";
 import Image from "next/image";
 import { S3Response } from "@/app/api/s3-upload/route";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 type CoverProps = {
     url:string | undefined,
@@ -30,7 +31,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
 
   const [isUploading,setIsUploading] = useState(false);
   const [modal ,setModal] = useState<boolean>(false)
-
+  const [ratio, setRatio]=useState<number>(4/1)
   async function updateCover(croppedImageBlob: Blob) {
     console.log(croppedImageBlob)
     const formData = new FormData();
@@ -72,10 +73,28 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
   useEffect(()=>{
     setIsUploading(!isUploading)
   },[url]) 
+
+  useEffect(() => {
+    const updateSize = () => {
+        const width = window.innerWidth;
+        if (width < 640) {
+            setRatio(4/1);
+        } else if (width >= 640 && width < 1024) {
+            setRatio(4/1);
+        } else {
+            setRatio(8/1);
+        }
+    };
+
+    window.addEventListener('resize', updateSize);
+    updateSize();  // Initialize size on first render
+
+    return () => window.removeEventListener('resize', updateSize);
+}, []);
  
   return (
     
-    <div className={`${className} overflow-hidden relative rounded-xl w-full`}>
+    <div className={`${className} overflow-hidden relative rounded-xl w-full `}>
       {isUploading && (
        <div className="relative">
           <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center z-10">
@@ -97,7 +116,8 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
           )}
 
       {url&&(
-        <div>
+        <div className="">
+        <AspectRatio ratio={ratio}>
           <Image src={url} alt="cover"
           width={800}
           height={200}
@@ -108,7 +128,9 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
           onLoadingComplete={()=>setIsUploading(false)}
           
           /> 
-          </div>
+          </AspectRatio>
+        </div>
+          
       )}
 
       {!url && !isUploading&&(
