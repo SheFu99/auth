@@ -10,6 +10,7 @@ type Post = {
     text?:string,
     image?:string,
     success?:boolean,
+    likedByUser?:boolean
 }
 export type postPromise = {
     posts?:any[],
@@ -17,6 +18,8 @@ export type postPromise = {
     error?:string,
     message?:string,
     likesCount?:number,
+    hasLike?:boolean,
+   
 }
 type responsePromise = {
     success?:string,
@@ -94,7 +97,7 @@ export const GetUserPostsById = async (userId: string):Promise<postPromise> => {
         ],
         include: {
             likes: {
-                select: { likeId: true }  // Select only the 'id' because we just need to count likes
+                select: { userId: true }  // Select only the 'id' because we just need to count likes
             }
         }
     });
@@ -106,7 +109,8 @@ export const GetUserPostsById = async (userId: string):Promise<postPromise> => {
     // Map posts to include like counts
     const postsWithLikeCounts = posts.map(post => ({
         ...post,
-        likeCount: post.likes.length  // Each post object will now include a 'likeCount' property
+        likeCount: post.likes.length,  // Each post object will now include a 'likeCount' property
+        likedByUser: post.likes.some(like => like.userId === userId)  // Boolean indicating if the user liked the post
     }));
 
     return { posts: postsWithLikeCounts, success: true };
@@ -203,7 +207,7 @@ export const LikePost = async (postId: string):Promise<postPromise> => {
         await db.like.delete({
             where: { likeId: existingLike.likeId }  // Assuming 'id' is the identifier for likes
         });
-        return { success: true, message: "Like removed", likesCount: existingPost.likes.length - 1 };
+        return { success: true, message: "Like removed", likesCount: existingPost.likes.length - 1,hasLike:false };
     } else {
         // User has not liked this post before, add a new like
         await db.like.create({
@@ -212,6 +216,7 @@ export const LikePost = async (postId: string):Promise<postPromise> => {
                 postId: postId
             }
         });
-        return { success: true, message: "Post liked", likesCount: existingPost.likes.length + 1 };
+        return { success: true, message: "Post liked", likesCount: existingPost.likes.length + 1,hasLike:true };
+        // return {error:"400"}
     }
 };

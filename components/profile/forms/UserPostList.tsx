@@ -9,7 +9,6 @@ import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { UserPost } from "@/schemas";
-import { TiDelete } from "react-icons/ti";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,6 +20,8 @@ type post ={
     timestamp?: Date,
     userId: string,
     likeCount: number,
+    likes?:any[]
+    likedByUser?:boolean
 }
 
 
@@ -32,6 +33,7 @@ const [isFirstToggle,setFirstToggle] = useState(true)
 const [posts, setPosts]=useState<post[]>()
 const [isPending,startTransition]=useTransition()
 const [isEditMode,setEditIsMode]=useState<boolean>(false)
+const [hasLike,setHasLike]=useState<any|undefined>()
 
 const user = useCurrentUser()
 
@@ -59,6 +61,8 @@ const user = useCurrentUser()
        
     },[update])
 
+
+    useEffect(()=>{console.log(hasLike)},[hasLike])
     const deletePost=(id:string)=>{
         startTransition(()=>{
             DeleteUserPosts(id)
@@ -84,10 +88,13 @@ const user = useCurrentUser()
         startTransition(()=>{
             LikePost(postId)
             .then((data)=>{
+                // setHasLike({hasLike:data.hasLike,postId:postId})
                 setPosts(currentPosts=>
                     currentPosts.map(post=>
                         post.PostId === postId?{ ...post,likeCount:data.likesCount}:post
                     )
+                        
+                   
                 )
                 if(data.error){
 
@@ -102,36 +109,59 @@ const user = useCurrentUser()
             })
         })
     }
-    const like = (postId:string)=>{
-
-        ///optimistic UI
-        if(user){
-            console.log("LIKE")
-        const newPost = posts?.map((post)=>{
-            if(post.PostId === postId){
-                if(isFirstToggle){
-                    post.likeCount++
-                }
-                    post.likeCount--
-            }
-            return post
-        })
-       
-            setPosts(newPost)
-            
-        }else {
-            toast.error("You must be authorize") 
-            return 
+    const like = async (postId: string) => {
+        if (!user) {
+            toast.error("You must be authorized");
+            return;
         }
-        ///optimistic UI
+    
+        // Optimistic UI Update
+        const newPosts = posts?.map(post => {
+            if (post.PostId === postId) {
+                // Toggle like status and adjust like count optimistically
+                if (post.likedByUser) {
+                    return { ...post, likedByUser: false, likeCount: post.likeCount - 1 };
+                } else {
+                    return { ...post, likedByUser: true, likeCount: post.likeCount + 1 };
+                }
+            }
+            return post;
+        });
+    
+        setPosts(newPosts);
+        console.log(newPosts);
+    
+        try {
+            await serverLikeaction(postId);
+        } catch (error) {
+            console.error("Failed to update like status on the server:", error);
+    
+            // Revert Optimistic UI Update on Error
+            const revertedPosts = newPosts?.map(post => {
+                if (post.PostId === postId) {
+                    // Toggle like status and adjust like count to revert changes
+                    if (post.likedByUser) {
+                        return { ...post, likedByUser: false, likeCount: post.likeCount - 1 };
+                    } else {
+                        return { ...post, likedByUser: true, likeCount: post.likeCount + 1 };
+                    }
+                }
+                return post;
+            });
+    
+            setPosts(revertedPosts);
+            console.log(revertedPosts);
+    
+            toast.error("Error updating post like. Please try again.");
+        }
+    };
 
-        serverLikeaction(postId)
-    }
   
-    // useEffect(()=>{ 
-    //     console.log(posts)
+  
+    useEffect(()=>{ 
+        console.log(posts)
         
-    //     },[posts])
+        },[isFirstToggle])
 
     const PostForm = useForm<z.infer<typeof UserPost>>({
         resolver:zodResolver(UserPost),
@@ -220,7 +250,7 @@ const user = useCurrentUser()
                         <button title="delete post" className="text-black col-start-12 row-span-2 px-2" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110 "/> </button>
                     )}
                     <div className="flex">
-                        <button title="like" className="text-black" onClick={(e)=>like(post.PostId)}>
+                        <button title="like" className="text-black" onClick={() => like(post.PostId)} disabled={isPending}>
                            {post.likeCount !==0?
                             <div className="flex align-middle justify-center items-center gap-2">
                                 <FcLike/>
