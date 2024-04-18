@@ -188,19 +188,21 @@ try {
                         <div className="flex align-middle items-center justify-center gap-2">
                         <BiSolidLandscape className="scale-100 "/>
                         <span className="text-xl">Upload new cover</span>
-                        </div>
-                      ):(
-                        <BounceLoader  color="white"/>
-                      )}
-                         
-
-                              <input
+                        <input
                                 ref={fileInputRef}
                                 type="file"
                                 accept="image/*"
                                 onChange={handleImageChange}
                                 style={{ display: 'none' }} 
                               />
+                        </div>
+                        
+                      ):(
+                        <BounceLoader  color="white"/>
+                      )}
+                         
+
+                              
                         </button>
                         </div>
                       <div className="flex justify-center -mb-5">

@@ -82,7 +82,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
         } else if (width >= 640 && width < 1024) {
             setRatio(4/1);
         } else {
-            setRatio(8/1);
+            setRatio(5/1);
         }
     };
 
@@ -116,20 +116,21 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
           )}
 
       {url&&(
-        <div className="">
-        <AspectRatio ratio={ratio}>
+       
+          //  <div className="flex justify-center align-middle items-center">
+        <AspectRatio ratio={ratio} className="w-full h-0 ">
           <Image src={url} alt="cover"
           width={800}
           height={200}
           objectFit="cover"
           layout="responsive" 
-          className={`${className}  bg-blend-overlay h-auto g-f:w-auto ${!isUploading?'block':'hidden'}`}
+          className={`${className} xl:-mt-[2rem] w-full h-full bg-blend-overlay g-f:w-auto ${!isUploading?'block':'hidden'}`}
           onLoadStart={()=>setIsUploading(true)}
           onLoadingComplete={()=>setIsUploading(false)}
           
           /> 
           </AspectRatio>
-        </div>
+        // </div>
           
       )}
 
