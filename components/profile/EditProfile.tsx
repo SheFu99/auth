@@ -1,7 +1,6 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
 import { BsFillPencilFill } from "react-icons/bs";
-import AvararModal from "./cropper/Modal";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { toast } from "sonner";
 import { FaUser } from "react-icons/fa";
@@ -17,8 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import UserPostForm from './forms/UserPostForm';
 import UserPostList from './forms/UserPostList';
-import ImageCropper from "./cropper/New-cropper";
-import ImageCropperr from "./cropper/New-cropper";
+import ImageCropper from "./cropper/Image-Cropper";
+
 
 
 const  EditProfile =  () => {
@@ -29,15 +28,10 @@ const  EditProfile =  () => {
   const {update} = useSession()
   const [modalOpen, setModalOpen] = useState(false);
   const [sessionImage, setSessionImage] = useState( user?.image); 
-  const [editName , swichEditName] = useState<boolean>(false)
   const [addInfo,swichAddInfo]=useState<boolean>(false)
   const [imageSrc, setImageSrc] = useState<string>(''); // State to hold the source URL of the image to crop
-  const [croppedImageUrl, setCroppedImageUrl] = useState<string>(); // State to hold the cropped image URL
-  const [cropType, setCropType] = useState<'Avatar' | 'Cover' | 'Post'>('Avatar'); // State to select the crop type
   const [avatarCropper,setModalAvatarCropper]=useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [blob,setBlob]=useState<Blob>()
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     
@@ -55,9 +49,6 @@ const  EditProfile =  () => {
 
   const handleImageCropped = (croppedImage: string) => {
 
-    console.log(croppedImage)
-      setCroppedImageUrl(croppedImage); 
-      // Handle the cropped image URL
       updateAvatar(croppedImage)
       
   };
@@ -79,9 +70,7 @@ const  EditProfile =  () => {
     // }
   },[update]) 
 
-  // useEffect(()=>{
-  //   console.log(profile?.phoneNumber)
-  // },[addInfo])
+  
 
   const updateAvatar = async(croppedImageBlob) =>{
  
@@ -147,8 +136,9 @@ const  EditProfile =  () => {
         <div className=''>
           <Cover url={profile?.coverImage!} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
           <div>
+
             {avatarCropper && (
-                <ImageCropperr
+                <ImageCropper
                     closeCroper={()=>closeAvatarCropper()}
                     image={imageSrc}
                     type='Avatar'
@@ -200,12 +190,7 @@ const  EditProfile =  () => {
            
             </div>
         </div>
-          {modalOpen && (
-            <AvararModal
-              updateAvatar={updateAvatar}
-              closeModal={() => setModalOpen(false)}
-            />
-          )}
+          
 
             <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md">
 

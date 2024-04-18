@@ -13,7 +13,7 @@ interface ImageCropperrProps {
   
 
 
-const ImageCropperr = ({ image, type, onImageCropped,closeCroper }:ImageCropperrProps) => {
+const ImageCropper = ({ image, type, onImageCropped,closeCroper }:ImageCropperrProps) => {
     const [inputImg, setInputImg] = useState(image);  // Initially set to image passed from parent
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -23,7 +23,7 @@ const ImageCropperr = ({ image, type, onImageCropped,closeCroper }:ImageCropperr
 
     const aspectRatios = {
         Avatar: 1,
-        Cover: 16 / 9,
+        Cover: 4/1,
         Post: 4 / 3,
     };
 
@@ -98,4 +98,4 @@ const ImageCropperr = ({ image, type, onImageCropped,closeCroper }:ImageCropperr
     );
 };
 
-export default ImageCropperr
+export default ImageCropper

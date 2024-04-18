@@ -75,7 +75,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
  
   return (
     
-    <div className={`${className} overflow-hidden flex justify-center items-center relative rounded-xl`}>
+    <div className={`${className} overflow-hidden relative rounded-xl w-full`}>
       {isUploading && (
        <div className="relative">
           <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center z-10">
@@ -99,10 +99,11 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
       {url&&(
         <div>
           <Image src={url} alt="cover"
-          width={1500}
-          height={300}
-          objectFit="fill"
-          layout="contain" className={`${className}  bg-blend-overlay h-auto g-f:w-auto`}
+          width={800}
+          height={200}
+          objectFit="cover"
+          layout="responsive" 
+          className={`${className}  bg-blend-overlay h-auto g-f:w-auto ${!isUploading?'block':'hidden'}`}
           onLoadStart={()=>setIsUploading(true)}
           onLoadingComplete={()=>setIsUploading(false)}
           

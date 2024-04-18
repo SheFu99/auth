@@ -50,7 +50,7 @@ if (isAuthRoute){
     let callbackUrl = nextUrl.pathname
     const encodedCallbackUrl = encodeURIComponent(callbackUrl)
     return Response.redirect(new URL(
-    `/auth/login?callbackUrl=${encodedCallbackUrl}`,
+    `/settings/profile`,
     nextUrl))
   }
 
