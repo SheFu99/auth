@@ -27,13 +27,11 @@ type post ={
 
 const UserPostList  = (profile:any) => {
 const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
-const [error,setError] =useState<string| undefined>()
 const {update} = useSession()
-const [isFirstToggle,setFirstToggle] = useState(true)
 const [posts, setPosts]=useState<post[]>()
 const [isPending,startTransition]=useTransition()
-const [isEditMode,setEditIsMode]=useState<boolean>(false)
-const [hasLike,setHasLike]=useState<any|undefined>()
+
+
 
 const user = useCurrentUser()
 
@@ -62,7 +60,7 @@ const user = useCurrentUser()
     },[update])
 
 
-    useEffect(()=>{console.log(hasLike)},[hasLike])
+    useEffect(()=>{console.log("Render")},[])
     const deletePost=(id:string)=>{
         startTransition(()=>{
             DeleteUserPosts(id)
@@ -101,11 +99,7 @@ const user = useCurrentUser()
                     toast.error(data.error)
                 }
 
-                if(data.success){
-                    // swichEditProfile(false)
-                    // update()
-                    toast.success(data.message)
-                }
+              
             })
         })
     }
@@ -129,7 +123,6 @@ const user = useCurrentUser()
         });
     
         setPosts(newPosts);
-        console.log(newPosts);
     
         try {
             await serverLikeaction(postId);
@@ -157,11 +150,6 @@ const user = useCurrentUser()
     };
 
   
-  
-    useEffect(()=>{ 
-        console.log(posts)
-        
-        },[isFirstToggle])
 
     const PostForm = useForm<z.infer<typeof UserPost>>({
         resolver:zodResolver(UserPost),
@@ -218,22 +206,22 @@ const user = useCurrentUser()
                     <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
                         <Skeleton className="h-12 w-12 rounded-full" />
                         <div className="space-y-2">
-                        <Skeleton className="h-4 xl:w-[600px] w-[250px]" />
-                        <Skeleton className="h-4 md:w-[400px] w-[200px]" />
+                        <Skeleton className="h-4 md:w-[450px] w-[150px]" />
+                        <Skeleton className="h-4 md:w-[400px] w-[100px]" />
                         </div>
                     </div>
                     <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
                         <Skeleton className="h-12 w-12 rounded-full"  />
                         <div className="space-y-2">
-                        <Skeleton className="h-4 xl:w-[600px] w-[250px]" />
-                        <Skeleton className="h-4 md:w-[400px] w-[200px]" />
+                        <Skeleton className="h-4 md:w-[450px] w-[150px]" />
+                        <Skeleton className="h-4 md:w-[400px] w-[100px]" />
                         </div>
                     </div>
                     <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
                         <Skeleton className="h-12 w-12 rounded-full" />
                         <div className="space-y-2">
-                        <Skeleton className="h-4 xl:w-[600px] w-[250px]" />
-                        <Skeleton className="h-4 md:w-[400px] w-[200px]" />
+                        <Skeleton className="h-4 md:w-[450px] w-[150px]" />
+                        <Skeleton className="h-4 md:w-[400px] w-[100px]" />
                     </div>
                 
             

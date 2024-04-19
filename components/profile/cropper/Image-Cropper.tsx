@@ -84,7 +84,7 @@ const ImageCropper = ({ image, type, onImageCropped,closeCroper }:ImageCropperrP
                             onCropComplete={onCropComplete}
                             onZoomChange={setZoom}
                             cropShape={type === 'Avatar' ? 'round' : 'rect'}
-                            showGrid={false}
+                            showGrid={type === 'Avatar' ? false : true}
                             classes={{ containerClassName:'rounded-md mb-5'}}
                         />
                                

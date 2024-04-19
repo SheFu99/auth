@@ -2,7 +2,7 @@
 
 
 import { GrClose } from "react-icons/gr";
-import ImageCropperr from "./Image-Cropper";
+import ImageCropper from "./Image-Cropper";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
@@ -148,7 +148,7 @@ try {
       <div className="fixed z-10 overflow-y-auto left-0 right-0 top-40 bottom-0">
       {visable&&(
         <div className="fixed inset-0 w-full h-full z-50">
-                  <ImageCropperr 
+                  <ImageCropper 
                   image={coverSrc}
                   type="Cover"
                   onImageCropped={handleCoverCropped}
