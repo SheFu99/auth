@@ -8,6 +8,7 @@ export const publicRoutes = [
     "/",
     "/auth/new-verification",
     '/api/s3-upload',
+    "/api/s3-array-upload",
     '/profile/'
 ]
 /**

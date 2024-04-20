@@ -8,7 +8,7 @@ import * as z from "zod"
 export type userPost = z.infer<typeof UserPost>
 type Post = {
     text?:string,
-    image?:string,
+    image?:string[],
     success?:boolean,
     likedByUser?:boolean
 }
@@ -30,7 +30,8 @@ type responsePromise = {
 
 
 
-export const CreatePost= async(post:Post)=>{
+export const CreatePost= async(postCard)=>{
+    console.log("POST", postCard)
    const user= await currentUser()
 //    console.log("USER created post",user)
       if(!user){
@@ -44,25 +45,36 @@ export const CreatePost= async(post:Post)=>{
       if(!existingUser){
             return {error:"User not found"}
         }
-        const existingPost = await db.post.findUnique({
+     
+        const existingPost = await db.post.findFirst({
             where: {
-                text: post.text,
+                text: postCard.text,
+                userId: user.id,
             },
         });
-    
+        console.log(postCard.image)
         if (existingPost) {
-            console.log("error")
+            console.log(existingPost)
             return {error:"A post with this content already exists."}
         }
 
     try{
+        
+    const imagesCopy = [...postCard.image];
+       const Post = {
+            text: postCard.text,
+            userId: user.id,
+            image: imagesCopy
+        };
+        
         const createPost = await db.post.create({
+          
             data:{
-                text:post.text,
-                image:post.image,
-                userId:user?.id,
+                ...Post
                 },
+                
         })
+          console.log("after insert:", [...postCard.image])
         console.log("Post created", createPost)
         return createPost
        

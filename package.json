@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.5.0",
-    "@aws-sdk/client-s3": "^3.540.0",
+    "@aws-sdk/client-s3": "^3.556.0",
     "@hookform/resolvers": "^3.3.4",
     "@next/bundle-analyzer": "^14.1.4",
     "@prisma/client": "^5.10.2",
@@ -56,6 +56,7 @@
     "styled-components": "^6.1.8",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
+    "trix": "^2.1.0",
     "uuid": "^9.0.1",
     "vercel": "^34.0.0",
     "zod": "^3.22.4"

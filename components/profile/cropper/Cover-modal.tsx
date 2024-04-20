@@ -35,6 +35,7 @@ const CoverModal: React.FC<ModalProps>  = ({ closeCoverModal }) => {
  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => { 
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
+      console.log(file)
 
          // Create a URL for the selected file
         const imgURL = URL.createObjectURL(file);
@@ -80,6 +81,7 @@ const CoverModal: React.FC<ModalProps>  = ({ closeCoverModal }) => {
   };
 
  const updateCover = async(croppedImageBlob) =>{
+   console.log(croppedImageBlob)
   setIsUploading(true)
   const response = await fetch(croppedImageBlob);
   const blob = await response.blob(); // Convert the image URL to a blob for uploading
@@ -179,10 +181,10 @@ try {
                         
                     <div className="flex justify-center items-center py-5">
                       
-                        <button
+                        <label
                           className="p-5 col-start-6  rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
                           title="Change photo"
-                          onClick={() =>resetAvatar() } // Use ref to trigger file input click
+                          // Use ref to trigger file input click
                         >
                       {isUploading===false?(
                         <div className="flex align-middle items-center justify-center gap-2">
@@ -203,7 +205,7 @@ try {
                          
 
                               
-                        </button>
+                        </label>
                         </div>
                       <div className="flex justify-center -mb-5">
 

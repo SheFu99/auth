@@ -12,10 +12,11 @@ import { UserPost } from "@/schemas";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 type post ={
     PostId: string,
-    image?: string,
+    image?: string[],
     text: string,
     timestamp?: Date,
     userId: string,
@@ -47,6 +48,7 @@ const user = useCurrentUser()
                 }else{
                     
                     const posts = await GetUserPostsById(user.id)
+                    console.log(posts)
                     setPosts(posts.posts)
                     return posts
                 }
@@ -230,8 +232,23 @@ const user = useCurrentUser()
 
             )}
             {posts?.map((post)=>(
-                <div key={post.PostId} className="grid justify-between border border-gray-500 rounded-md p-2 space-x-1">
+                <div key={post.PostId} className=" justify-between border border-gray-500 rounded-md p-3 space-x-1">
                     <p className="text-black col-span-11">{post.text}</p>
+                    <div className="flex justify-start gap-2 p-2 flex-wrap" >
+                    {post.image.map((image)=>(
+                        <Image 
+                        width={300} 
+                        height={150} 
+                        alt='postImage' 
+                      
+                        className="  rounded-md " 
+                        objectFit="scale-down" 
+                        src={image}
+                        layout="responsive"
+                        />
+                    ))}
+                    </div>
+                    
                     {/* <small>{post.timestamp.tolocalString()}</small> */}
 
                     {user?.id === post.userId&&(

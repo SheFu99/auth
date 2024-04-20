@@ -18,6 +18,7 @@ import UserPostForm from './forms/UserPostForm';
 import UserPostList from './forms/UserPostList';
 import ImageCropper from "./cropper/Image-Cropper";
 import { BounceLoader } from "react-spinners";
+import PostModal from "./cropper/Post-modal";
 
 
 
@@ -121,7 +122,7 @@ const  EditProfile =  () => {
     setImageSrc("")
   };
 
-   const resetAvatar = ()=>{
+   const ChangeAvatar = ()=>{
     setImageSrc("")
     fileInputRef.current?.click()
 
@@ -177,7 +178,7 @@ const  EditProfile =  () => {
                     <button
                       className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
                       title="Change photo"
-                      onClick={() =>resetAvatar() } // Use ref to trigger file input click
+                      onClick={() =>ChangeAvatar() } // Use ref to trigger file input click
                     >
                       <BsFillPencilFill className="grid scale-100"/>
                       <input
@@ -240,7 +241,7 @@ const  EditProfile =  () => {
             <TabsContent id="tab1" className="grid grid-cols-12 ">
                 
             <div className='col-span-12 space-y-5'>
-                <UserPostForm />
+                <PostModal/>
                 <UserPostList/>  
             </div>
                     
