@@ -18,6 +18,12 @@ const config = {
       },
     },
     extend: {
+      aspectRatio: {
+        '4/1': '4 / 1',
+        '8/1': '8 / 1',
+        '2/1': '2 / 1',
+        '1/4': '1 / 4',
+      },
       backgroundImage: {
         'gradient-base': "radial-gradient(ellipse at top, var(--tw-color-sky-400), var(--tw-color-blue-800))",
         'gray-light-center': 'linear-gradient(to right, #cbd5e1, #e2e8f0, #cbd5e1)',
@@ -125,7 +131,10 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require('@tailwindcss/aspect-ratio'),
+  ],
 } satisfies Config
 
 export default config

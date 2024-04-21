@@ -10,20 +10,23 @@ export default  function ImageGrid( {images} ) {
         setSelectedImg(url);
     };
 
-    const getGridClass = (index) => {
+   
+
+    const getGridForImage = (index) => {
         switch (images.length) {
-            case 2: return "w-1/2";
-            case 3: return index === 0 ? "w-full" : "w-1/2";
-            case 4: return "w-1/2";
-            case 5: return (index === 0 || index === 1) ? " aspect-square " : "aspect-video";
-            default: return "w-1/3 h-1/3";
+            case 2: return "col-span-3 aspect-1";
+            case 3: return index === 0 ? "col-span-6" : "aspect-2/1 col-span-3";
+            case 4: return (index===0) ? "col-span-6 aspect-1": "aspect-2/1 col-span-2 ";
+            case 5: 
+                return (index === 0 || index === 1) ? "  col-span-3 aspect-1" : "aspect-2/1 col-span-2";
+            default: return "w-full h-full";
         }
     };
 
     return (
-        <div className={`grid grid-cols-3 gap-2 as  ${images.length === 0 ? 'grid-cols-1' : ''}`}>
+        <div className={`grid grid-cols-6  gap-2  ${images.length === 0 ? 'grid-cols-1' : ''}`}>
             {images?.map((img, index) => (
-                <div key={index} className={`${getGridClass(index)} relative cursor-pointer col-span-1 `} onClick={() => openLightbox(img.url)}>
+                <div key={index} className={`${getGridForImage(index)} relative cursor-pointer col-span-1 `} onClick={() => openLightbox(img.url)}>
                     <Image
                         src={img.url}
                         alt={`Gallery image ${index + 1}`}
