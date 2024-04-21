@@ -15,7 +15,7 @@ import { RiGalleryFill, RiProfileLine } from 'react-icons/ri';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import UserPostForm from './forms/UserPostForm';
-import UserPostList from './forms/UserPostList';
+import UserPostList from './UserPostList';
 import ImageCropper from "./cropper/Image-Cropper";
 import { BounceLoader } from "react-spinners";
 import PostModal from "./cropper/Post-modal";

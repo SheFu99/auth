@@ -59,7 +59,7 @@ model Profile {
 
 model Post {
   PostId     String    @id @default(cuid())
-  image      String[]
+  image      Images[]
   text       String? @unique
   timestamp  DateTime  @default(now())
   likes      Like[]
@@ -68,12 +68,12 @@ model Post {
   user       User      @relation(fields: [userId], references: [id],onDelete: Cascade)
 }
 
-// model Image {
-//   id     String    @id @default(cuid())
-//   url    String
-//   postId String     
-//   Post   Post   @relation(fields: [postId], references: [PostId])
-// }
+model Images {
+  id     Int    @id @default(autoincrement())
+  url    String
+  postId String     
+  Post   Post   @relation(fields: [postId], references: [PostId])
+}
 
 model Gallery {
   imageId     String    @id @default(cuid())

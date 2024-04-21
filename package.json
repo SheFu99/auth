@@ -29,6 +29,7 @@
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-tabs": "^1.0.4",
     "@reduxjs/toolkit": "^2.2.3",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tanstack/react-table": "^8.15.0",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^2.4.3",

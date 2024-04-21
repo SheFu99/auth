@@ -1,7 +1,7 @@
 
 "use clinet"
 import * as z from "zod"
-import { GetUserPostsById, userPost, DeleteUserPosts, EditUserPosts, LikePost } from "@/actions/UserPosts";
+import { GetUserPostsById, DeleteUserPosts, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
@@ -13,16 +13,23 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import ImageGrid from "./post/Image-grid";
+
 
 type post ={
     PostId: string,
-    image?: string[],
+    image?: image[],
     text: string,
     timestamp?: Date,
     userId: string,
     likeCount: number,
     likes?:any[]
     likedByUser?:boolean
+}
+type image ={
+    url:string
+    inedx:number
 }
 
 
@@ -201,6 +208,7 @@ const user = useCurrentUser()
     }
 
 
+
     return ( 
         <div className="bg-white rounded-md space-y-1 p-2">
             {!posts?.length&&(
@@ -232,28 +240,22 @@ const user = useCurrentUser()
 
             )}
             {posts?.map((post)=>(
-                <div key={post.PostId} className=" justify-between border border-gray-500 rounded-md p-3 space-x-1">
+                <div key={post.PostId} className=" justify-between border border-gray-500 rounded-md p-3 space-x-1 relative">
                     <p className="text-black col-span-11">{post.text}</p>
-                    <div className="flex justify-start gap-2 p-2 flex-wrap" >
-                    {post.image.map((image)=>(
-                        <Image 
-                        width={300} 
-                        height={150} 
-                        alt='postImage' 
-                      
-                        className="  rounded-md " 
-                        objectFit="scale-down" 
-                        src={image}
-                        layout="responsive"
-                        />
-                    ))}
+                    {user?.id === post.userId&&(
+                        <button title="delete post" className="text-black" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110  absolute top-2 right-2"/> </button>
+                    )}
+                    {/* <ImageCarousel images={post.image} /> */}
+                     <ImageGrid images={post.image} />
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                     <div className="flex max-h-[400px]">
+           
+                    </div>
                     </div>
                     
                     {/* <small>{post.timestamp.tolocalString()}</small> */}
 
-                    {user?.id === post.userId&&(
-                        <button title="delete post" className="text-black col-start-12 row-span-2 px-2" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110 "/> </button>
-                    )}
+                  
                     <div className="flex">
                         <button title="like" className="text-black" onClick={() => like(post.PostId)} disabled={isPending}>
                            {post.likeCount !==0?

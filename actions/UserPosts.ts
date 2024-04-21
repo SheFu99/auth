@@ -67,13 +67,15 @@ export const CreatePost= async(postCard)=>{
             image: imagesCopy
         };
         
-        const createPost = await db.post.create({
-          
-            data:{
-                ...Post
-                },
-                
-        })
+        const createPost = await prisma.post.create({
+            data: {
+              text: postCard.text,
+              userId: user.id,
+              image: {
+                create: imagesCopy.map(url => ({ url })),  // Assumes 'postCard.images' is an array of image URLs
+              },
+            },
+          });
           console.log("after insert:", [...postCard.image])
         console.log("Post created", createPost)
         return createPost
@@ -90,8 +92,10 @@ export const CreatePost= async(postCard)=>{
         
 }
 
-export const GetUserPostsById = async (userId: string):Promise<postPromise> => {
- 
+export const GetUserPostsById = async (userId: string,):Promise<postPromise> => {
+    const page=1
+    const pageSize = 10;
+    const skip = (page - 1) * pageSize; 
 
     const existingUser = await db.user.findFirst({
         where: { id: userId }
@@ -99,7 +103,7 @@ export const GetUserPostsById = async (userId: string):Promise<postPromise> => {
     if (!existingUser) {
         return { error: "User not found" };
     }
-
+    const user = await currentUser()
     const posts = await db.post.findMany({
         where: {
             userId: userId
@@ -107,9 +111,28 @@ export const GetUserPostsById = async (userId: string):Promise<postPromise> => {
         orderBy: [
             { timestamp: "desc" }  // Assuming 'createdAt' is the correct field for timestamping posts
         ],
+        skip: skip,  // Skip the previous pages
+        take: pageSize,  // Limit the number of posts
+
         include: {
+            _count: {
+                select: {
+                    likes: true,  // This will count the likes
+                }
+            },
             likes: {
-                select: { userId: true }  // Select only the 'id' because we just need to count likes
+                where: { 
+                    userId: user.id 
+                    }   ,
+                select: { userId: true } ,
+                
+            },
+            image:{
+                select:{url:true},
+                take:5,
+            },
+            coments:{
+                take:5,
             }
         }
     });
@@ -118,11 +141,12 @@ export const GetUserPostsById = async (userId: string):Promise<postPromise> => {
         return { error: "No posts found" };
     }
 
+    console.log("posts", posts)
     // Map posts to include like counts
     const postsWithLikeCounts = posts.map(post => ({
         ...post,
-        likeCount: post.likes.length,  // Each post object will now include a 'likeCount' property
-        likedByUser: post.likes.some(like => like.userId === userId)  // Boolean indicating if the user liked the post
+        likeCount: post._count.likes,  // Each post object will now include a 'likeCount' property
+        likedByUser: post.likes.some(like => like.userId === user.id)  // Boolean indicating if the user liked the post
     }));
 
     return { posts: postsWithLikeCounts, success: true };

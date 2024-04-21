@@ -10,7 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { MdElderly, MdLocationCity } from "react-icons/md";
 import { FadeLoader } from "react-spinners";
 import { Profile } from "@/actions/UserProfile";
-const UserPostList = React.lazy(()=>import('./forms/UserPostList'))
+const UserPostList = React.lazy(()=>import('./UserPostList'))
 // import UserPostList from "./forms/UserPostList";
 
 export interface ProfileData{
