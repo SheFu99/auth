@@ -241,18 +241,13 @@ const user = useCurrentUser()
             )}
             {posts?.map((post)=>(
                 <div key={post.PostId} className=" justify-between border border-gray-500 rounded-md p-3 space-x-1 relative">
-                    <p className="text-black col-span-11">{post.text}</p>
+                    <p className="text-black col-span-11" key={post.PostId}>{post.text}</p>
                     {user?.id === post.userId&&(
-                        <button title="delete post" className="text-black" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110  absolute top-2 right-2"/> </button>
+                        <button title="delete post" key={post.PostId} className="text-black" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110  absolute top-2 right-2"/> </button>
                     )}
                     {/* <ImageCarousel images={post.image} /> */}
                      <ImageGrid images={post.image} />
-                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                     <div className="flex max-h-[400px]">
-           
-                    </div>
-                    </div>
-                    
+              
                     {/* <small>{post.timestamp.tolocalString()}</small> */}
 
                   

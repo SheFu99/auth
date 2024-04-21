@@ -14,6 +14,7 @@ export default  function ImageGrid( {images} ) {
 
     const getGridForImage = (index) => {
         switch (images.length) {
+            case 1: return "col-span-6 aspect-1" ;
             case 2: return "col-span-3 aspect-1";
             case 3: return index === 0 ? "col-span-6" : "aspect-2/1 col-span-3";
             case 4: return (index===0) ? "col-span-6 aspect-1": "aspect-2/1 col-span-2 ";
