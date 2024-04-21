@@ -29,6 +29,7 @@ export default  function ImageGrid( {images} ) {
             {images?.map((img, index) => (
                 <div key={index} className={`${getGridForImage(index)} relative cursor-pointer col-span-1 `} onClick={() => openLightbox(img.url)}>
                     <Image
+                        key={index}
                         src={img.url}
                         alt={`Gallery image ${index + 1}`}
                         width={500}
