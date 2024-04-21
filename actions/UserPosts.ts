@@ -8,7 +8,7 @@ import * as z from "zod"
 export type userPost = z.infer<typeof UserPost>
 type Post = {
     text?:string,
-    image?:string[],
+    image?:any[],
     success?:boolean,
     likedByUser?:boolean
 }
@@ -181,44 +181,6 @@ export const DeleteUserPosts = async (postId:string):Promise<responsePromise>=>{
     return {success:"Post deleted"}
 }
 
-export const EditUserPosts = async (postId:string, post:Post)=>{
-    const user = await currentUser()
-    if(!user){
-        return {error:"You need to be autorize!"}
-        }
-    const existingUser = await db.user.findFirst({
-        where:{id:user.id}
-    })
-    if(!existingUser){
-        return {error:"User not found"}
-    }
-    const existingPost = await db.post.findFirst({
-        where:{PostId:postId}
-    })
-
-    if(!existingPost){
-        return {error:"Post does not exist"}
-    }
-
-    if(existingPost.userId!==existingUser.id){
-        return {error:"You need to be author of this post!"}
-    }
-
-    const updatedPost = await db.post.update({
-        where:{PostId:postId},
-        data:{
-            text:post.text,
-            image:post.image,
-        }
-    })
-    if(!updatedPost){
-        return {error:"Post not found"}
-    }
-    return {success:"Post updated"}
-}
-
-
-///TODO: get first 10 post and load next with paginaton
 
 export const LikePost = async (postId: string):Promise<postPromise> => {
     const user = await currentUser();
