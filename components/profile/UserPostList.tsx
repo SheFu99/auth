@@ -245,9 +245,9 @@ const user = useCurrentUser()
                     {user?.id === post.userId&&(
                         <button title="delete post" key={index} className="text-black" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110  absolute top-2 right-2"/> </button>
                     )}
-                        <div key={index}>
+                        {/* <div key={index}>
                             <ImageGrid images={post.image} />
-                        </div>
+                        </div> */}
                     {/* <small>{post.timestamp.tolocalString()}</small> */}
                     <div className="flex">
                         <button title="like" className="text-black" onClick={() => like(post.PostId)} disabled={isPending}>
