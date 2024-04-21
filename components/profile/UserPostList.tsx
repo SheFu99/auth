@@ -239,12 +239,7 @@ const user = useCurrentUser()
                </div>
 
             )}
-            {posts?.map((post,index)=>(
-                <div key={index} className=" justify-between border border-gray-500 rounded-md p-3 space-x-1 relative">
-                    <p className="text-black col-span-11" key={index}>{post.text}</p>
-                 
-                </div>
-            ))}
+         
            
         </div>
         ///Modal to confirm delete 
