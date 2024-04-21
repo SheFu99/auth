@@ -239,7 +239,29 @@ const user = useCurrentUser()
                </div>
 
             )}
-         
+            {posts?.map((post,index)=>(
+                <div key={index} className=" justify-between border border-gray-500 rounded-md p-3 space-x-1 relative">
+                    <p className="text-black col-span-11" key={index}>{post.text}</p>
+                    {user?.id === post.userId&&(
+                        <button title="delete post" key={index} className="text-black" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110  absolute top-2 right-2"/> </button>
+                    )}
+                        <div key={index}>
+                            <ImageGrid images={post.image} />
+                        </div>
+                    {/* <small>{post.timestamp.tolocalString()}</small> */}
+                    <div className="flex">
+                        <button title="like" className="text-black" onClick={() => like(post.PostId)} disabled={isPending}>
+                           {post.likeCount !==0?
+                            <div key={index}  className="flex align-middle justify-center items-center gap-2">
+                                <FcLike/>
+                                {post.likeCount}
+                            </div>
+                           :
+                           <FcLikePlaceholder/> }
+                        </button>
+                    </div>
+                </div>
+            ))}
            
         </div>
         ///Modal to confirm delete 

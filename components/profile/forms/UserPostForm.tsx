@@ -204,7 +204,7 @@ const UserPostForm = () => {
                    
                     <div className="flex relative p-1 mt-2 flex-wrap gap-5">
                         {imagesBlobUrl.map((image,index)=>(
-                            <div>
+                            <div key={index}>
                                 <div className="relative" title="remove image">
                                     <button 
                                         onClick={()=>setImagesBlobUrl(prevImagesUrl=>prevImagesUrl.filter(img=>img!==image))} 
