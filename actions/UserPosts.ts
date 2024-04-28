@@ -1,8 +1,10 @@
 "use server"
 
+import { s3Client } from "@/app/api/s3-upload/route"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { UserPost } from "@/schemas"
+import { DeleteObjectsCommand } from "@aws-sdk/client-s3"
 import * as z from "zod"
 
 export type userPost = z.infer<typeof UserPost>
@@ -26,7 +28,11 @@ type responsePromise = {
     message?:string,
     error?:string,
 }
-
+type deleteS3promise = {
+    success?:boolean,
+    result?:any,
+    error?:string,
+}
 
 
 
@@ -93,6 +99,7 @@ export const CreatePost= async(postCard)=>{
 }
 
 export const GetUserPostsById = async (userId: string,):Promise<postPromise> => {
+    console.log(userId)
     const page=1
     const pageSize = 10;
     const skip = (page - 1) * pageSize; 
@@ -141,7 +148,7 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
         return { error: "No posts found" };
     }
 
-    console.log("posts", posts)
+  
     // Map posts to include like counts
     const postsWithLikeCounts = posts.map(post => ({
         ...post,
@@ -153,7 +160,8 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
 };
 
 
-export const DeleteUserPosts = async (postId:string):Promise<responsePromise>=>{
+export const DeleteUserPosts = async (postId:string,keys:string):Promise<responsePromise>=>{
+    console.log(postId)
     const user = await currentUser()
     if(!user){
         return {error:"You need to be autorize!"}
@@ -164,21 +172,40 @@ export const DeleteUserPosts = async (postId:string):Promise<responsePromise>=>{
     if(!existingUser){
         return {error:"User not found"}
     }
-    const existingPost = await db.post.findFirst({
-        where:{PostId:postId}
-    })
-
-    if(!existingPost){
-        return {error:"Post does not exist"}
-    }
+    const result = await deleteImagefromS3(keys)
 
     const post = await db.post.delete({
         where:{PostId:postId}
     })
+    console.log(result)
     if(!post){
         return {error:"Post not found"}
     }
     return {success:"Post deleted"}
+};
+
+ const deleteImagefromS3 = async(keys : any):Promise<deleteS3promise>=>{
+    if(!keys||keys.lenght ===0){
+        return {error:'Key is require'}
+    };
+
+   
+    const deleteParams = {
+        Bucket:process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+            Delete:{
+                    Objects:keys.map((key:string)=>({Key:key})),
+                    Quiet:false,
+            },
+        };
+
+    try {
+        const deleteCommand = new DeleteObjectsCommand(deleteParams);
+        const deleteResult = await s3Client.send(deleteCommand);
+        return {success:true,result:deleteResult}
+    } catch (error) {
+        console.log('Error',error)
+        return {error:'Something was wrong!'}
+    }
 }
 
 

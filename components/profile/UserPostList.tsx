@@ -1,7 +1,7 @@
 
 "use clinet"
 import * as z from "zod"
-import { GetUserPostsById, DeleteUserPosts, LikePost } from "@/actions/UserPosts";
+import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import ImageGrid from "./post/Image-grid";
+import { microserviceEndpoint } from "@/lib/utils";
 
 
 type post ={
@@ -43,6 +44,7 @@ const [isPending,startTransition]=useTransition()
 
 const user = useCurrentUser()
 
+///load user post from server 
     useEffect(()=>{
         async function GetPost() {
             try{
@@ -67,30 +69,11 @@ const user = useCurrentUser()
         GetPost().then(posts => setPosts(posts?.posts))
        
     },[update])
-
+///
 
     useEffect(()=>{console.log("Render")},[])
-    const deletePost=(id:string)=>{
-        startTransition(()=>{
-            DeleteUserPosts(id)
-            .then((data)=>{
-                if(data.error){
-                  
-                    toast.error(data.error)
-                }
     
-                if(data.success){
-                    
-                    update() 
-                    toast.success(data.message)
-                }
-            })
-            
-        })
-    
-    return 
-    
-    }
+  
     const serverLikeaction = (postId:string)=>{
         startTransition(()=>{
             LikePost(postId)
@@ -158,6 +141,76 @@ const user = useCurrentUser()
         }
     };
 
+    const deletePost=(post:any)=>{
+        
+        const keys = post.image.map(item => {
+            console.log(item.url)
+            const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
+            const result = item.url.split(splitUrl)[1];
+            return result
+          });
+          
+        
+            
+            startTransition(()=>{
+    
+                DeleteUserPosts(post.PostId,keys)
+                .then((data)=>{
+                    if(data.error){
+                      
+                        toast.error(data.error)
+                    }
+        
+                    if(data.success){
+                        
+                        update() 
+                        toast.success(data.message)
+                    }
+                })
+                
+            });
+            // startTransition(()=>{
+            //     fetchDelete(keys)
+            //         .then((data)=>{
+            //             if(!data.error){
+            //                 toast.success('Transition is OK')
+            //             }
+            //         })
+            //         .catch((error)=>{
+            //             toast.error('Error delete Image from storage',error)
+            //         })
+            // })
+        
+        return 
+        
+        }
+    const fetchDelete = async (keys:string)=>{
+        console.log('Start delete from S3', keys)
+        const endpoint = (`${microserviceEndpoint}/api/s3-delete`);
+        try {
+            const response = await fetch (endpoint,{
+                method:'DELETE',
+                headers:{
+                        'Content-Type': 'application/json',
+                        ///authToken
+                },
+                body:
+                    keys ,
+                
+            });
+
+            if(!response.ok){
+                return {error:`HTTP error! Status: ${response.status}`}
+            }
+
+                const data= await response.json()
+                console.log('Succes',data)
+
+            return data
+        } catch (error) {
+            return {error:'Failed to delete S3 data'}
+        }
+    }
   
 
     const PostForm = useForm<z.infer<typeof UserPost>>({
@@ -168,6 +221,8 @@ const user = useCurrentUser()
         }
     })
     const {handleSubmit,control,formState:{errors}} = PostForm
+    
+    
     useEffect(()=>{
       
         if(Object.keys(errors).length>3){
@@ -241,18 +296,18 @@ const user = useCurrentUser()
             )}
             {posts?.map((post,index)=>(
                 <div key={index} className=" justify-between border border-gray-500 rounded-md p-3 space-x-1 relative">
-                    <p className="text-black col-span-11" key={index}>{post.text}</p>
+                    <p className="text-black col-span-11" >{post.text}</p>
                     {user?.id === post.userId&&(
-                        <button title="delete post" key={index} className="text-black" onClick={(e)=>deletePost(post.PostId)}><RiDeleteBin5Line color="black" className="scale-110  absolute top-2 right-2"/> </button>
+                        <button title="delete post"className="text-black" onClick={(e)=>deletePost(post)}><RiDeleteBin5Line color="black" className="scale-110  absolute top-2 right-2"/> </button>
                     )}
-                        <div key={index}>
+                        <div>
                             <ImageGrid images={post.image} />
                         </div>
                     {/* <small>{post.timestamp.tolocalString()}</small> */}
                     <div className="flex">
                         <button title="like" className="text-black" onClick={() => like(post.PostId)} disabled={isPending}>
                            {post.likeCount !==0?
-                            <div key={index}  className="flex align-middle justify-center items-center gap-2">
+                            <div   className="flex align-middle justify-center items-center gap-2">
                                 <FcLike/>
                                 {post.likeCount}
                             </div>

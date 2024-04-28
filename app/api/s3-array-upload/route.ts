@@ -38,6 +38,7 @@ const uploadFilesToS3 = async (files: FileUpload[]): Promise<string[]> => {
 
 
 export async function POST(request: Request): Promise<Response> {
+    console.log(request.body)
     const user = await currentUser();
     if (!user) {
         return NextResponse.json({ error: "You need to be authorized for this action" });
@@ -82,5 +83,8 @@ export async function POST(request: Request): Promise<Response> {
         return NextResponse.json({ error: error instanceof Error ? error.message : String(error) });
     }
 }
+
+
+
 
 

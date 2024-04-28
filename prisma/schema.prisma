@@ -1,14 +1,152 @@
-
-// prisma/schema.prisma
-datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
-  // uncomment next line if you use Prisma <5.10
-  // directUrl = env("DATABASE_URL_UNPOOLED")
-}
-
 generator client {
   provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  name                  String?
+  email                 String?                @unique
+  emailVerified         DateTime?
+  image                 String?
+  password              String?
+  role                  UserRole               @default(USER)
+  isTwoFactorEnabled    Boolean                @default(false)
+  accounts              Account[]
+  comments              Comment[]
+  gallery               Gallery[]
+  likes                 Like[]
+  posts                 Post[]
+  profile               Profile?
+  twoFactorConfirmation TwoFactorConformation?
+}
+
+model Profile {
+  firstName   String?
+  lastName    String?
+  coverImage  String? @default("")
+  gender      Gender? @map("gender")
+  age         Int?
+  phoneNumber String?
+  regionCode  String?
+  /// Extend this {lat ,lng, zipCode, postService...} 
+  adres       String?
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  PostId    String    @id @default(cuid())
+  text      String?   @unique
+  timestamp DateTime  @default(now())
+  userId    String
+  coments   Comment[]
+  image     Images[]
+  likes     Like[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Images {
+  url    String
+  postId String
+  id     Int    @id @default(autoincrement())
+  Post   Post   @relation(fields: [postId], references: [PostId],onDelete: Cascade)
+}
+
+model Gallery {
+  imageId   String    @id @default(cuid())
+  image     String
+  text      String?
+  timestamp DateTime  @default(now())
+  userId    String
+  coments   Comment[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes     Like[]
+}
+
+model Comment {
+  CommentId String   @id @default(cuid())
+  image     String?
+  text      String?
+  timestamp DateTime @default(now())
+  postId    String?
+  userId    String
+  galleryId String?
+  gallery   Gallery? @relation(fields: [galleryId], references: [imageId])
+  post      Post?    @relation(fields: [postId], references: [PostId])
+  user      User     @relation(fields: [userId], references: [id])
+  likes     Like[]
+}
+
+model Like {
+  likeId    Int      @id @default(autoincrement())
+  postId    String?
+  commentId String?
+  userId    String
+  galleryId String?
+  comment   Comment? @relation(fields: [commentId], references: [CommentId])
+  gallery   Gallery? @relation(fields: [galleryId], references: [imageId])
+  post      Post?    @relation(fields: [postId], references: [PostId], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+  @@unique([commentId, userId])
+  @@unique([galleryId, userId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorConformation {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum UserRole {
@@ -18,157 +156,8 @@ enum UserRole {
   GUEST
 }
 
-
-model User{
-  id    String @id @default(cuid())
-  name  String?
-  email String? @unique
-  image String?
-  emailVerified DateTime?
-  password String?
-  role UserRole @default(USER)
-  accounts Account[]
-  isTwoFactorEnabled Boolean @default(false)
-  twoFactorConfirmation TwoFactorConformation?
-  profile    Profile? 
-  posts      Post[]
-  comments   Comment[]
-  likes      Like[]
-  gallery    Gallery[]
-  
-}
 enum Gender {
   Male
   Female
   Undefined
-}
-model Profile {
-  firstName String?
-  lastName String?
-  coverImage String? @default("")
-  gender Gender? @map("gender")
-  age Int?
-  phoneNumber String?
-  regionCode String? 
-  adres String? ///Extend this {lat ,lng, zipCode, postService...} 
-  userId String @unique 
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
-
-
-}
-
-model Post {
-  PostId     String    @id @default(cuid())
-  image      Images[]
-  text       String? @unique
-  timestamp  DateTime  @default(now())
-  likes      Like[]
-  coments    Comment[]
-  userId     String
-  user       User      @relation(fields: [userId], references: [id],onDelete: Cascade)
-}
-
-model Images {
-  id     Int    @id @default(autoincrement())
-  url    String
-  postId String     
-  Post   Post   @relation(fields: [postId], references: [PostId])
-}
-
-model Gallery {
-  imageId     String    @id @default(cuid())
-  image       String
-  text        String?
-  timestamp   DateTime  @default(now())
-  likes       Like[]
-  coments     Comment[]
-  userId      String
-  user        User      @relation(fields: [userId],references: [id],onDelete: Cascade)
-
-}
-
-model Comment {
-  CommentId String    @id @default(cuid())
-  image     String?
-  text      String?
-  timestamp DateTime  @default(now())
-  likes     Like[]
-  postId    String?
-  post      Post?     @relation(fields: [postId],references: [PostId])
-  userId    String
-  user      User      @relation(fields: [userId],references: [id])
-  galleryId String?
-  gallery   Gallery?  @relation(fields: [galleryId],references: [imageId])
-}
-
-model Like {
-  likeId    Int       @id @default(autoincrement())
-  postId    String?   
-  commentId String?   
-  userId    String  
-  post      Post?     @relation(fields: [postId],references: [PostId],onDelete: Cascade)
-  comment   Comment?  @relation(fields: [commentId],references: [CommentId])
-  user      User      @relation(fields: [userId],references: [id])
-  galleryId String?
-  gallery   Gallery?  @relation(fields: [galleryId],references: [imageId])
-
-  @@unique([postId, userId]) 
-  @@unique([commentId, userId])
-  @@unique([galleryId, userId])
-}
-
-
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-
-  @@unique([provider, providerAccountId])
-}
-
-model VerificationToken {
-  id String @id @default(cuid())
-  email String
-  token String @unique
-  expires DateTime
-
-  @@unique([email,token])
-}
-
-model PasswordResetToken {
-  id String @id @default(cuid())
-  email String
-  token String @unique
-  expires DateTime
-
-  @@unique([email,token])
-}
-
-model TwoFactorToken{
-  id String @id @default(cuid())
-  email String
-  token String
-  expires DateTime
-
-  @@unique([email,token])
-}
-
-model TwoFactorConformation {
-  id String @id @default( cuid())
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId])
 }

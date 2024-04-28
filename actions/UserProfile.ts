@@ -24,7 +24,7 @@ export const getProfileById = async (userId:string)=>{
       return {error: 'Profile not found'}
     }
     
-    console.log(existingProfile)
+    // console.log(existingProfile)
     return  existingProfile
 }
 
