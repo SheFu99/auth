@@ -33,12 +33,17 @@ type deleteS3promise = {
     result?:any,
     error?:string,
 };
+type PostCard = {
+    text:string,
+    image:string[],
+    userId:string,
+}
 
 
 
-export const CreatePost= async(postCard)=>{
+export const CreatePost= async(postCard:PostCard)=>{
     console.log("POST", postCard)
-   const user= await currentUser()
+    const user= await currentUser()
 //    console.log("USER created post",user)
       if(!user){
         return {error:"You need to be autorize!"}
@@ -58,7 +63,7 @@ export const CreatePost= async(postCard)=>{
                 userId: user.id,
             },
         });
-        console.log(postCard.image)
+        
         if (existingPost) {
             console.log(existingPost)
             return {error:"A post with this content already exists."}
@@ -67,11 +72,7 @@ export const CreatePost= async(postCard)=>{
     try{
         
     const imagesCopy = [...postCard.image];
-       const Post = {
-            text: postCard.text,
-            userId: user.id,
-            image: imagesCopy
-        };
+
         
         const createPost = await prisma.post.create({
             data: {
@@ -82,8 +83,8 @@ export const CreatePost= async(postCard)=>{
               },
             },
           });
-          console.log("after insert:", [...postCard.image])
-        console.log("Post created", createPost)
+        //   console.log("after insert:", [...postCard.image])
+        // console.log("Post created", createPost)
         return createPost
        
     }catch(error){
@@ -176,7 +177,7 @@ export const DeleteUserPosts = async (postId:string,keys:string):Promise<respons
     const post = await db.post.delete({
         where:{PostId:postId}
     })
-    console.log(result)
+    // console.log(result)
     if(!post){
         return {error:"Post not found"}
     }

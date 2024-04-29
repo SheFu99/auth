@@ -38,9 +38,7 @@ const UserPostForm = () => {
 
     const [images,setImageFiles]= useState<File[]|undefined>()
     const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([])
-    const [awsImagesUrl,setAwsImagesUrl]=useState<string[]>()
     const [textState,setTextState]=useState<string>('')
-    const [sendPost,setSendPost]=useState<any|undefined>()
 
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [error,setError] =useState<string| undefined>()
@@ -54,7 +52,6 @@ const UserPostForm = () => {
 
     const Submit = (post)=>{
                  startTransition(()=>{
-                    console.log("start transition",post);
                     CreatePost(post)
                     .then((data:DataResponse)=>{
                         if(data.error){
@@ -66,7 +63,7 @@ const UserPostForm = () => {
                             // swichEditProfile(false)
                             update() 
                             toast.success("Your post has been send")
-                            setAwsImagesUrl([])
+                           
                         }
                     })
                     
@@ -77,7 +74,7 @@ const UserPostForm = () => {
 
     const submitPost= async()=>{
         setIsUploading(true)
-
+        let post
          startTransition(()=>{
             uploadImages(images)
            .then((data)=>{
@@ -85,21 +82,20 @@ const UserPostForm = () => {
                     return {error:"Error uploading image transition"}
                 }
                 if(data.success){
-                    console.log('mutate state')
-                    const post = ({
+                     post = ({
                         text: textState,
                         image: data.imageUrls,
                         userId: user.id
                     })
-                    console.log(post)
-                    Submit(post)
+                   
+                    
                 }
                
       
             })
             .finally(()=>{
                 setIsUploading(false)
-                
+                Submit(post)
               
             }) 
         }) 
@@ -180,7 +176,6 @@ const UserPostForm = () => {
                 localImageUrls.push(data.imageUrls); // Collect URLs in a local array
             }));
             
-            setAwsImagesUrl(localImageUrls.flat());
 
             return { success: true, imageUrls: localImageUrls.flat() };
         
