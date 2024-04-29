@@ -74,7 +74,7 @@ export const CreatePost= async(postCard:PostCard)=>{
     const imagesCopy = [...postCard.image];
 
         
-        const createPost = await prisma.post.create({
+        const createPost = await db.post.create({
             data: {
               text: postCard.text,
               userId: user.id,
