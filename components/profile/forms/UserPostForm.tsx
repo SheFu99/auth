@@ -42,7 +42,6 @@ const UserPostForm = () => {
 
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [error,setError] =useState<string| undefined>()
-    const [success, setSuccess] = useState<string|undefined>()
     // const [editProfile, swichEditProfile]=useState<boolean>(false)
 
     const {update} = useSession()
@@ -87,16 +86,17 @@ const UserPostForm = () => {
                         image: data.imageUrls,
                         userId: user.id
                     })
-                   
-                    
                 }
                
       
             })
             .finally(()=>{
                 setIsUploading(false)
-                Submit(post)
-              
+                if(post){
+                    Submit(post)
+                }else{
+                    return {error:'post is empty'}
+                }
             }) 
         }) 
     
