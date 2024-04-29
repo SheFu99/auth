@@ -1,44 +1,61 @@
-import { PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post'; 
 import { NextResponse } from "next/server";
 import { s3Client } from "../s3-upload/route";
 import { currentUser } from '@/lib/auth';
+import { Readable } from "stream";
+import { Upload } from '@aws-sdk/lib-storage'
 
 interface FileUpload {
     buffer: Buffer;
     name: string;
 }
+function bufferToStream(buffer) {
+    let stream = new Readable();
+    stream.push(buffer);
+    stream.push(null); // No more data to write
+    return stream;
+}
 
-const uploadFilesToS3 = async (files: FileUpload[]): Promise<string[]> => {
-    const uploadPromises = files.map(async (file) => {
-        const fileBuffer = file.buffer;
-        const fileName = file.name;
-        const contentType = fileName.endsWith('.svg') ? "image/svg+xml" : "image/jpeg"; // Corrected "image/jpg" to "image/jpeg"
 
-        const params: PutObjectCommandInput = {
-            Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
-            Key: fileName,
-            Body: fileBuffer,
-            ContentType: contentType,
-        };
 
-        const command = new PutObjectCommand(params);
+async function uploadFileToS3(file) {
+    const { buffer, name } = file;
+    const fileName = `uploads/${Date.now()}_${name}`;
+    const contentType = name.endsWith('.svg') ? "image/svg+xml" : (name.endsWith('.png') ? "image/png" : "image/jpeg");
 
-        try {
-            await s3Client.send(command);
-            return `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/${fileName}`;
-        } catch (error) {
-            console.error("Error uploading to S3:", error);
-            throw new Error("Failed to upload file to S3.");
-        }
-    });
+    const params = {
+        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+        Key: fileName,
+        Body: bufferToStream(buffer),
+        ContentType: contentType
+    };
 
+    try {
+        const uploader = new Upload({
+            client: s3Client,
+            params: params
+        });
+
+        // uploader.on('httpUploadProgress', (progress) => {
+        //     console.log(`Upload progress: ${progress.loaded} of ${progress.total} bytes`);
+        // });
+
+        const result = await uploader.done();
+        console.log("Upload complete:", result);
+        return `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/${fileName}`;
+    } catch (error) {
+        console.log("Error uploading to S3:", error.stack);
+        throw new Error("Failed to upload file to S3.");
+    }
+};
+
+const uploadFilesToS3 = async (files) => {
+    const uploadPromises = files.map(uploadFileToS3);
     return Promise.all(uploadPromises);
 };
 
-
 export async function POST(request: Request): Promise<Response> {
-    console.log(request.body)
     const user = await currentUser();
     if (!user) {
         return NextResponse.json({ error: "You need to be authorized for this action" });
@@ -46,7 +63,7 @@ export async function POST(request: Request): Promise<Response> {
 
     try {
         const formData = await request.formData();
-        const files: FileUpload[] = [];
+        const files = [];
 
         const entries = Array.from(formData.entries());
         for (const [key, value] of entries) {
@@ -58,29 +75,16 @@ export async function POST(request: Request): Promise<Response> {
             }
         }
 
-
         if (files.length === 0) {
             return NextResponse.json({ error: "File is required." }, { status: 400 });
         }
 
-        const imageUrls = await uploadFilesToS3(files)
-       
-        
+        const imageUrls = await uploadFilesToS3(files);
 
-        // Update avatar or cover images based on the form data keys
-        // await Promise.all(
-        //     imageUrls.map((url, index) => {
-        //         if (formData.get("avatar")) {
-        //             return updateAvatar(url);
-        //         } else if (formData.get("cover")) {
-        //             return updateCover(url);
-        //         }
-        //     })
-        // );
-        console.log(imageUrls);
         return NextResponse.json({ success: true, imageUrls });
     } catch (error) {
-        return NextResponse.json({ error: error instanceof Error ? error.message : String(error) });
+        console.log(error)
+        return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
     }
 }
 

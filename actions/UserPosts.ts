@@ -13,7 +13,7 @@ type Post = {
     image?:any[],
     success?:boolean,
     likedByUser?:boolean
-}
+};
 export type postPromise = {
     posts?:any[],
     success?: boolean,
@@ -22,17 +22,17 @@ export type postPromise = {
     likesCount?:number,
     hasLike?:boolean,
    
-}
+};
 type responsePromise = {
     success?:string,
     message?:string,
     error?:string,
-}
+};
 type deleteS3promise = {
     success?:boolean,
     result?:any,
     error?:string,
-}
+};
 
 
 
@@ -96,7 +96,7 @@ export const CreatePost= async(postCard)=>{
     }
         
         
-}
+};
 
 export const GetUserPostsById = async (userId: string,):Promise<postPromise> => {
     console.log(userId)
@@ -159,7 +159,6 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
     return { posts: postsWithLikeCounts, success: true };
 };
 
-
 export const DeleteUserPosts = async (postId:string,keys:string):Promise<responsePromise>=>{
     console.log(postId)
     const user = await currentUser()
@@ -184,30 +183,29 @@ export const DeleteUserPosts = async (postId:string,keys:string):Promise<respons
     return {success:"Post deleted"}
 };
 
- const deleteImagefromS3 = async(keys : any):Promise<deleteS3promise>=>{
-    if(!keys||keys.lenght ===0){
-        return {error:'Key is require'}
-    };
-
-   
-    const deleteParams = {
-        Bucket:process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-            Delete:{
-                    Objects:keys.map((key:string)=>({Key:key})),
-                    Quiet:false,
-            },
+    const deleteImagefromS3 = async(keys : any):Promise<deleteS3promise>=>{
+        if(!keys||keys.lenght ===0){
+            return {error:'Key is require'}
         };
 
-    try {
-        const deleteCommand = new DeleteObjectsCommand(deleteParams);
-        const deleteResult = await s3Client.send(deleteCommand);
-        return {success:true,result:deleteResult}
-    } catch (error) {
-        console.log('Error',error)
-        return {error:'Something was wrong!'}
-    }
-}
+    
+        const deleteParams = {
+            Bucket:process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+                Delete:{
+                        Objects:keys.map((key:string)=>({Key:key})),
+                        Quiet:false,
+                },
+            };
 
+        try {
+            const deleteCommand = new DeleteObjectsCommand(deleteParams);
+            const deleteResult = await s3Client.send(deleteCommand);
+            return {success:true,result:deleteResult}
+        } catch (error) {
+            console.log('Error',error)
+            return {error:'Something was wrong!'}
+        }
+    };
 
 export const LikePost = async (postId: string):Promise<postPromise> => {
     const user = await currentUser();

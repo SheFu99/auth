@@ -10,6 +10,7 @@ import { BiSolidLandscape } from "react-icons/bi";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { BounceLoader } from "react-spinners";
+import { microserviceEndpoint } from "@/lib/utils";
 interface ModalProps {
     updateCover: (newAvatarUrl: Blob) => void;
     closeCoverModal: () => void;
@@ -95,8 +96,10 @@ const CoverModal: React.FC<ModalProps>  = ({ closeCoverModal }) => {
 
 formData.append("cover", blob,filename);
 
+// const endpoint = microserviceEndpoint  //coustom api endpoint from .env
+
 try {
-  const response = await fetch('/api/s3-upload', {
+  const response = await fetch(`${microserviceEndpoint}/api/s3-upload`, {
     method: 'POST',
     body: formData,
   })
@@ -113,7 +116,6 @@ try {
       toast.success('Cover updated successfully.');
       closeCoverModal()
       setIsUploading(false)
-      // setImage(imageUrl); // Assuming the response includes the new URL
         update()
     } else {
       setIsUploading(false)
@@ -143,10 +145,9 @@ try {
       role="dialog"
       aria-modal="true"
     >
-        <>
+  <>
         
-      <div className="fixed inset-0  bg-gray-900 bg-opacity-75 transition-all backdrop-blur-sm"></div>
-        
+      <div className="fixed inset-0  bg-gray-900 bg-opacity-75 transition-all backdrop-blur-sm"></div>  
       <div className="fixed z-10 overflow-y-auto left-0 right-0 top-40 bottom-0">
       {visable&&(
         <div className="fixed inset-0 w-full h-full z-50">
@@ -159,6 +160,8 @@ try {
                   />
                   </div>
               )}
+
+        
         <div className="grid grid-col-span-12  min-w-full justify-center px-2 py-12 text-center ">
           <div className="relative  rounded-2xl bg-gray-800 text-slate-100 text-left shadow-xl transition-all">
             <div className="p-10 ">
@@ -180,41 +183,41 @@ try {
                 
                         
                     <div className="flex justify-center items-center py-5">
-                      
-                        <label
-                          className="p-5 col-start-6  rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
-                          title="Change photo"
-                          // Use ref to trigger file input click
-                        >
-                      {isUploading===false?(
-                        <div className="flex align-middle items-center justify-center gap-2">
-                        <BiSolidLandscape className="scale-100 "/>
-                        <span className="text-xl">Upload new cover</span>
-                        <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                style={{ display: 'none' }} 
-                              />
-                        </div>
-                        
-                      ):(
-                        <BounceLoader  color="white"/>
-                      )}
-                         
+                          <label
+                            className="p-5 col-start-6  rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
+                            title="Change photo"
+                            // Use ref to trigger file input click
+                          >
 
-                              
-                        </label>
+                                  {isUploading===false?(
+                                    <div className="flex align-middle items-center justify-center gap-2">
+                                    <BiSolidLandscape className="scale-100 "/>
+                                    <span className="text-xl">Upload new cover</span>
+                                    <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            style={{ display: 'none' }} 
+                                          />
+                                    </div>
+                                    
+                                  ):(
+                                    <BounceLoader  color="white"/>
+                                  )}
+
+                          </label>
                         </div>
+
                       <div className="flex justify-center -mb-5">
-
+                        
                         <div className={`w-full flex justify-center items-center gap-2   ${uploadError ? 'animate-shake bg-red-800  p-2  rounded-full' : ''}`}>
                           <ExclamationTriangleIcon className= {`text-destructive text-white ${uploadError ? 'block' : 'hidden'}`} />
                           <span className="text-xs text-white ">
                               Minimum image dimensions  is 800 X 200px
                           </span>
-                      </div>
+                          </div>
+
                       </div>
                   {/* <CoverCropper
                     updateCover={updateCover}
@@ -226,7 +229,7 @@ try {
           </div>
         </div>
       </div>
-      </>
+  </>
     </div>
   );
 };
