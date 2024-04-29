@@ -195,13 +195,19 @@ const UserPostForm = () => {
 
     function useFormState(uploadImages, initialState) {
         const [images,setImagestate]= useState()
-        console.log(imagesBlobUrl)
+       
 
         const formAction = (action) => {
+           
             switch (action.type) {
                 case 'updateFiles':
                     // Here, we update the state with file data
                     setImagestate( action.payload );
+                    break;
+                case 'delete':
+                    const image = action.payload
+                    setImagestate(prevImagesUrl=>prevImagesUrl.filter(img=>img!==image))
+                    console.log(state)
                     break;
                 default:
                     console.log(action.type)
@@ -215,9 +221,15 @@ const UserPostForm = () => {
 
     const AddImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files); // Convert FileList to Array
-        formAction({ type: 'updateFiles', payload: files });
+
+            if(files.length>imagesBlobUrl.length){
+                formAction({ type: 'updateFiles', payload: files });
+            }
+
         const imageBlobUrls = [];
-      
+
+      setImagesBlobUrl([])
+      console.log(imagesBlobUrl)
         for(let i=0; i<files.length; i++){
             const file = files[i];
             const reader = new FileReader();
@@ -242,6 +254,10 @@ const UserPostForm = () => {
         }
     };
 
+    const deleteFromBlob = (image) =>{
+        setImagesBlobUrl(prevImagesUrl=>prevImagesUrl.filter(img=>img!==image))
+        formAction({ type: 'delete', payload: image });
+    }
  
 
     return (
@@ -276,7 +292,7 @@ const UserPostForm = () => {
                             <div key={index}>
                                 <div className="relative" title="remove image">
                                     <button 
-                                        onClick={()=>setImagesBlobUrl(prevImagesUrl=>prevImagesUrl.filter(img=>img!==image))} 
+                                        onClick={()=>deleteFromBlob(image)} 
                                         title="Delete image" 
                                         type="submit"
                                         className="text-white absolute right-0" >
@@ -285,7 +301,7 @@ const UserPostForm = () => {
                                 </div>
                              <img key={index} src={image} alt=""className="h-[100px] w-auto rounded-sm" />
                             </div>
-                            ))}
+                        ))}
                     </div>
                  
                     <Button disabled={isPending} type="submit" className="w-full mt-2" onClick={()=>submitPost()}>

@@ -5,4 +5,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const microserviceEndpoint = `${process.env.S3_MICRO_SERVICE_DOMAIN||'http://localhost:3000'}` as string
+export const microserviceEndpoint = `${process.env.S3_MICRO_SERVICE_DOMAIN||''}` as string
