@@ -30,36 +30,32 @@ export interface DataResponse{
     success:string,
 } 
 
-const initialstate = {message:null};
+
 const UserPostForm = () => {
 
     const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
     const [isPending,startTransition]=useTransition()
-  
-    const [error,setError] =useState<string| undefined>()
-    const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [success, setSuccess] = useState<string|undefined>()
-    const [textState,setTextState]=useState<string>('')
+
+    const [images,setImageFiles]= useState<File[]|undefined>()
     const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([])
     const [awsImagesUrl,setAwsImagesUrl]=useState<string[]>()
+    const [textState,setTextState]=useState<string>('')
     const [sendPost,setSendPost]=useState<any|undefined>()
-    const AddImageRef = useRef(null)
+
+    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [error,setError] =useState<string| undefined>()
+    const [success, setSuccess] = useState<string|undefined>()
     // const [editProfile, swichEditProfile]=useState<boolean>(false)
+
     const {update} = useSession()
     const user=useCurrentUser()
 
-    useEffect(()=>{
-        if(sendPost){
-            Submit()
-            console.log(isUploading)
-        }
-    },[sendPost])
 
-    const Submit = ()=>{
+
+    const Submit = (post)=>{
                  startTransition(()=>{
-                    console.log("start transition",sendPost);
-                    
-                    CreatePost(sendPost)
+                    console.log("start transition",post);
+                    CreatePost(post)
                     .then((data:DataResponse)=>{
                         if(data.error){
                             setError(error);
@@ -70,38 +66,40 @@ const UserPostForm = () => {
                             // swichEditProfile(false)
                             update() 
                             toast.success("Your post has been send")
-            setAwsImagesUrl([])
+                            setAwsImagesUrl([])
                         }
                     })
                     
                 })
     }
-    useEffect(()=>{
 
-        if(awsImagesUrl?.length>0){
-             setSendPost ( {
-                                text: textState,
-                                image: awsImagesUrl,
-                                userId: user.id
-                            })
-
-        }
-    },[awsImagesUrl])
  
 
     const submitPost= async()=>{
         setIsUploading(true)
 
          startTransition(()=>{
-            uploadImages(state)
+            uploadImages(images)
            .then((data)=>{
                 if(data.error){
                     return {error:"Error uploading image transition"}
                 }
+                if(data.success){
+                    console.log('mutate state')
+                    const post = ({
+                        text: textState,
+                        image: data.imageUrls,
+                        userId: user.id
+                    })
+                    console.log(post)
+                    Submit(post)
+                }
+               
       
             })
             .finally(()=>{
                 setIsUploading(false)
+                
               
             }) 
         }) 
@@ -156,7 +154,6 @@ const UserPostForm = () => {
        
         setIsUploading(true);
         let localImageUrls = [];
-       
         try {
             const imageUrls = await Promise.all(files.map(async (file, index) => {
                 const now = new Date();
@@ -193,42 +190,21 @@ const UserPostForm = () => {
         }
     };
 
-    function useFormState(uploadImages, initialState) {
-        const [images,setImagestate]= useState()
-       
+  
+     
 
-        const formAction = (action) => {
-           
-            switch (action.type) {
-                case 'updateFiles':
-                    // Here, we update the state with file data
-                    setImagestate( action.payload );
-                    break;
-                case 'delete':
-                    const image = action.payload
-                    setImagestate(prevImagesUrl=>prevImagesUrl.filter(img=>img!==image))
-                    console.log(state)
-                    break;
-                default:
-                    console.log(action.type)
-                    break;
-            }
-        };
-    
-        return [images, formAction];
-    };
-     const [state,formAction] =useFormState(uploadImages,initialstate);
-
+ 
     const AddImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+      
         const files = Array.from(event.target.files); // Convert FileList to Array
 
             if(files.length>imagesBlobUrl.length){
-                formAction({ type: 'updateFiles', payload: files });
+                setImageFiles(files)
             }
 
         const imageBlobUrls = [];
 
-      setImagesBlobUrl([])
+    
       console.log(imagesBlobUrl)
         for(let i=0; i<files.length; i++){
             const file = files[i];
@@ -246,7 +222,6 @@ const UserPostForm = () => {
     }
     };
 
-    
     const onError =(errors:any)=>{
         if(Object.keys(errors).length){
             setShouldAnimate(true)
@@ -254,14 +229,22 @@ const UserPostForm = () => {
         }
     };
 
-    const deleteFromBlob = (image) =>{
+    const deleteImage = (image,index) =>{
+        console.log("TRIGGERED")
         setImagesBlobUrl(prevImagesUrl=>prevImagesUrl.filter(img=>img!==image))
-        formAction({ type: 'delete', payload: image });
+        // formAction({ type: 'delete', payload: index });
+        const newImageState = images.filter((file,id)=>id !== index)
+        console.log(newImageState)
+        setImageFiles(newImageState)
+
     }
  
+    // useEffect(()=>{
+    //     console.log(images)
+    // },[images])
 
     return (
-     <form  onSubmit={uploadImages} className="p-2  border border-white rounded-md">
+     <form  onSubmit={submitPost} className="p-2  border border-white rounded-md">
                    <div  className=" md:col-start-11 md:col-span-1 col-span-11 col-start-1  flex justify-around align-middle items-center p-1 mb-2">
                         <label title="Add image"  >
                             <MdAddPhotoAlternate className="scale-150 cursor-pointer "  />
@@ -292,9 +275,9 @@ const UserPostForm = () => {
                             <div key={index}>
                                 <div className="relative" title="remove image">
                                     <button 
-                                        onClick={()=>deleteFromBlob(image)} 
+                                        onClick={()=>deleteImage(image,index)} 
                                         title="Delete image" 
-                                        type="submit"
+                                        type="button"
                                         className="text-white absolute right-0" >
                                         <IoMdClose className="bg-red-600 bg-opacity-50 rounded-full"/>
                                     </button>
@@ -304,7 +287,7 @@ const UserPostForm = () => {
                         ))}
                     </div>
                  
-                    <Button disabled={isPending} type="submit" className="w-full mt-2" onClick={()=>submitPost()}>
+                    <Button disabled={isPending} onClick={submitPost} className="w-full mt-2" >
                         <IoSendSharp className="scale-150 mr-2"/>
                         Send
                     </Button>
