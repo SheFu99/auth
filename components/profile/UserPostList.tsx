@@ -12,7 +12,6 @@ import { UserPost } from "@/schemas";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
 import ImageGrid from "./post/Image-grid";
 import { microserviceEndpoint } from "@/lib/utils";
 
@@ -66,7 +65,7 @@ const user = useCurrentUser()
         }}
         GetPost().then(posts => setPosts(posts?.posts))
        
-    },[update])
+    },[update,profile])
 ///
 
     
