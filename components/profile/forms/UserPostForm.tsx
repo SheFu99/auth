@@ -78,7 +78,10 @@ const UserPostForm = () => {
             uploadImages(images)
            .then((data)=>{
                 if(data.error){
-                    return {error:"Error uploading image transition"}
+                    post = ({
+                        text: textState,
+                        userId: user.id
+                    })
                 }
                 if(data.success){
                      post = ({
@@ -92,14 +95,13 @@ const UserPostForm = () => {
             })
             .finally(()=>{
                 setIsUploading(false)
-                if(post){
-                    Submit(post)
-                }else{
-                    return {error:'post is empty'}
-                }
+                console.log(post)
+                Submit(post)
             }) 
         }) 
-    
+      
+        
+        
     return 
     
     };

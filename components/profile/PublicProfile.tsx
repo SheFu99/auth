@@ -8,7 +8,7 @@ import { RiGalleryFill, RiProfileLine } from 'react-icons/ri';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { MdElderly, MdLocationCity } from "react-icons/md";
-import { FadeLoader } from "react-spinners";
+import { BounceLoader, FadeLoader } from "react-spinners";
 import { Profile } from "@/actions/UserProfile";
 const UserPostList = React.lazy(()=>import('./UserPostList'))
 // import UserPostList from "./forms/UserPostList";
@@ -24,7 +24,7 @@ interface profileProps {
 
 const  PublicProfile =  ({profile}:profileProps) => {
   const [updateState, setUpdate] = useState<boolean>(false)
-
+const [isLoading, setIsLoading]=useState<boolean>(true)
 
 
 
@@ -52,28 +52,37 @@ const  PublicProfile =  ({profile}:profileProps) => {
     <div className="col-span-12 grid-row-6 ">
         <div className=''>
         
-        <Suspense fallback={<div>Loading...</div>}> 
+        <div>
+
+        
                 <Cover 
                     url={profile?.profile?.coverImage} 
                     onChange={() => setUpdate(!updateState)}
                     editable={false} 
                     className="z-1 rounded-md shadow-xs col-span-12"
                 />
-        </Suspense>
+   
+        </div>
             <div className="flex items-center relative ">
-                  <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-10 -bottom-15 left-0 p-[1rem] justify-center">
+                        {!isLoading&&(<div className="absolute left-4 md:mt-0 mt-[2px] rounded-full w-[60px] h-[60px] md:w-[110px] md:h-[110px] bg-black -ml-1 z-10 shadow-md"></div>)}
+                  <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-30 -bottom-15 left-0 p-[1rem] justify-center ">
 
                 
-                   <div className="flex justify-center relative rounded-full w-[50px] h-[50px] md:w-[75px] md:h-[75px] ">
+                   <div className="flex justify-center relative rounded-full w-[52px] h-[50px] md:w-[102px] md:h-[100px] z-30">
+                    {isLoading &&(
+                        <BounceLoader className="z-1 rounded-md shadow-xs col-span-12" color="white"/>  
+                    )}
                       <Image
                         src={profile.userImage}
                         alt='Avatar'
                         // layout="fill"
-                        width={75}
-                        height={75}
-                        className="rounded-full"
+                        width={100}
+                        height={100}
+                        onLoadingComplete={()=>setIsLoading(false)}
+                        className={`rounded-full ${isLoading  ? 'hidden':'block'} `}
                         
                       />
+                    
                  </div>
                   
               
@@ -93,14 +102,14 @@ const  PublicProfile =  ({profile}:profileProps) => {
         </div>
           
 
-            <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md">
+            <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md relative z-20 p-1">
 
               <div className=''>
                   <Accordion type="single" collapsible className='p-2'>
                     <AccordionItem value="item-1" >
                       <AccordionTrigger className='text-black  font-semibold flex justify-between p-1 md:text-xl g-f:text-sm md:ml-0 g-f:ml-2'>{profile?.profile?.firstName}</AccordionTrigger>
                         <AccordionContent>
-                            <div className='grid grid-cols-12 -mb-5'>
+                            <div className='grid grid-cols-12 '>
 
                                 <div className='g-f:col-span-12 g-f:mt-2 col-start-1 sm:col-span-6 flex space-x-2 border border-black rounded-md p-3'>
                                     <FaPhone color='black'/>

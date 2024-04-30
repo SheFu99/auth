@@ -13,7 +13,6 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import ImageGrid from "./post/Image-grid";
 import { microserviceEndpoint } from "@/lib/utils";
 
@@ -49,15 +48,16 @@ const user = useCurrentUser()
         async function GetPost() {
             try{
                 if(profile.profile){
-                    console.log("GEt by profile")
+                    console.log("GEt by profile",profile.profile)
                     const posts = await GetUserPostsById(profile.profile)
                     console.log(posts)
+                   
                     return posts
 
                 }else{
-                    
+                    console.log("TRIGGERED")
                     const posts = await GetUserPostsById(user.id)
-                    console.log(posts)
+                    
                     setPosts(posts.posts)
                     return posts
                 }
@@ -105,7 +105,7 @@ const user = useCurrentUser()
         const newPosts = posts?.map(post => {
             if (post.PostId === postId) {
                 // Toggle like status and adjust like count optimistically
-                if (post.likedByUser) {
+                if (post?.likedByUser) {
                     return { ...post, likedByUser: false, likeCount: post.likeCount - 1 };
                 } else {
                     return { ...post, likedByUser: true, likeCount: post.likeCount + 1 };
@@ -183,34 +183,34 @@ const user = useCurrentUser()
         
         return 
         
-        }
-    const fetchDelete = async (keys:string)=>{
-        console.log('Start delete from S3', keys)
-        const endpoint = (`${microserviceEndpoint}/api/s3-delete`);
-        try {
-            const response = await fetch (endpoint,{
-                method:'DELETE',
-                headers:{
-                        'Content-Type': 'application/json',
-                        ///authToken
-                },
-                body:
-                    keys ,
-                
-            });
+        };
+            const fetchDelete = async (keys:string)=>{
+                console.log('Start delete from S3', keys)
+                const endpoint = (`${microserviceEndpoint}/api/s3-delete`);
+                try {
+                    const response = await fetch (endpoint,{
+                        method:'DELETE',
+                        headers:{
+                                'Content-Type': 'application/json',
+                                ///authToken
+                        },
+                        body:
+                            keys ,
+                        
+                    });
 
-            if(!response.ok){
-                return {error:`HTTP error! Status: ${response.status}`}
-            }
+                    if(!response.ok){
+                        return {error:`HTTP error! Status: ${response.status}`}
+                    }
 
-                const data= await response.json()
-                console.log('Succes',data)
+                        const data= await response.json()
+                        console.log('Succes',data)
 
-            return data
-        } catch (error) {
-            return {error:'Failed to delete S3 data'}
-        }
-    }
+                    return data
+                } catch (error) {
+                    return {error:'Failed to delete S3 data'}
+                }
+            };
   
 
     const PostForm = useForm<z.infer<typeof UserPost>>({
@@ -230,31 +230,7 @@ const user = useCurrentUser()
         }
 
     },[])
-    // const editPost=(values:z.infer<typeof UserPost>)=>{
-    //     startTransition(()=>{
-    //         EditUserPosts(values)
-    //         .then((data)=>{
-    //             if(data.error){
-    //                 setError(error);
-    //                 toast.error(data.error)
-    //             }
-    
-    //             if(!data.error){
-    //                 // swichEditProfile(false)
-    //                 update() 
-    //                 toast.success("Your post has been send")
-    //             }
-    //         })
-            
-    //     })
-    
-    // return 
-    
-    // }
-
-    // const onSubmit=(values)=>{
-    //     console.log(PostForm.getValues())
-    // }
+  
     const onError =(errors:any)=>{
         if(Object.keys(errors).length){
             setShouldAnimate(true)

@@ -146,10 +146,11 @@ const  EditProfile =  () => {
            
         </div>
             <div className="flex items-center relative ">
-                  <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-10 -bottom-15 left-0 p-[1rem] justify-center">
+            <div className="absolute left-4 md:mt-0 mt-[2px] rounded-full w-[60px] h-[60px] md:w-[110px] md:h-[110px] bg-black -ml-1 z-10 shadow-md"></div>
+                  <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem]  -bottom-15 left-0 p-[1rem] justify-center ">
 
                   {sessionImage? (
-                   <div className="flex justify-center relative rounded-full w-[50px] h-[50px] md:w-[75px] md:h-[75px] ">
+                    <div className="flex justify-center relative rounded-full w-[52px] h-[50px] md:w-[102px] md:h-[100px] z-30">
                      
                      {avatarUploading?(
                        <BounceLoader color="white"/>
@@ -158,9 +159,9 @@ const  EditProfile =  () => {
                         src={sessionImage}
                         alt='Avatar'
                         // layout="fill"
-                        width={75}
-                        height={75}
-                        className={`rounded-full`}
+                        width={100}
+                        height={100}
+                        className={`rounded-full z-30`}
                         
                       />
                       )}
@@ -176,7 +177,7 @@ const  EditProfile =  () => {
 
 
                     <button
-                      className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
+                      className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75 z-40"
                       title="Change photo"
                       onClick={() =>ChangeAvatar() } // Use ref to trigger file input click
                     >
@@ -197,16 +198,16 @@ const  EditProfile =  () => {
         </div>
           
 
-            <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md">
+            <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md relative z-20 p-2">
 
                   {/* <div className='col-span-12'>
                     <FirstAndLastNameForm userName={user?.name} editState={true}/>
                   </div> */}
 
               <div className=''>
-                  <Accordion type="single" collapsible className='p-2'>
+                  <Accordion type="single" collapsible className='p-1'>
                     <AccordionItem value="item-1" >
-                      <AccordionTrigger className='text-black  font-semibold flex justify-between p-1 md:text-xl g-f:text-sm md:ml-0 g-f:ml-2'>{user?.name}</AccordionTrigger>
+                      <AccordionTrigger className='text-black  font-semibold flex justify-between mb-1 p-1 md:text-xl g-f:text-sm md:ml-0 g-f:ml-2'>{user?.name}</AccordionTrigger>
                         <AccordionContent>
                             {!addInfo && profile?.phoneNumber===undefined ?(
 

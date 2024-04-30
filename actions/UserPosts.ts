@@ -8,12 +8,7 @@ import { DeleteObjectsCommand } from "@aws-sdk/client-s3"
 import * as z from "zod"
 
 export type userPost = z.infer<typeof UserPost>
-type Post = {
-    text?:string,
-    image?:any[],
-    success?:boolean,
-    likedByUser?:boolean
-};
+
 export type postPromise = {
     posts?:any[],
     success?: boolean,
@@ -42,7 +37,6 @@ type PostCard = {
 
 
 export const CreatePost= async(postCard:PostCard)=>{
-    console.log("POST", postCard)
     const user= await currentUser()
 //    console.log("USER created post",user)
       if(!user){
@@ -72,16 +66,18 @@ export const CreatePost= async(postCard:PostCard)=>{
     try{
         
     const imagesCopy = [...postCard.image];
+    const postData = {
+        text:postCard.text,
+        userId:user.id,
+    } as any
+
+    if(imagesCopy.length>0){
+        postData.image = {create:imagesCopy.map(url=>({url}))}
+    }
 
         
         const createPost = await db.post.create({
-            data: {
-              text: postCard.text,
-              userId: user.id,
-              image: {
-                create: imagesCopy.map(url => ({ url })),  // Assumes 'postCard.images' is an array of image URLs
-              },
-            },
+            data: postData,
           });
         //   console.log("after insert:", [...postCard.image])
         // console.log("Post created", createPost)
@@ -112,56 +108,62 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
         return { error: "User not found" };
     }
     const user = await currentUser()
-    const posts = await db.post.findMany({
+    const postsQuery={
         where: {
-            userId: userId
-        },
-        orderBy: [
-            { timestamp: "desc" }  // Assuming 'createdAt' is the correct field for timestamping posts
-        ],
-        skip: skip,  // Skip the previous pages
-        take: pageSize,  // Limit the number of posts
+        userId: userId
+    },
+    orderBy: [
+        { timestamp: "desc" }  // Assuming 'createdAt' is the correct field for timestamping posts
+    ],
+    skip: skip,  // Skip the previous pages
+    take: pageSize,  // Limit the number of posts
 
-        include: {
-            _count: {
-                select: {
-                    likes: true,  // This will count the likes
-                }
-            },
-            likes: {
-                where: { 
-                    userId: user.id 
-                    }   ,
-                select: { userId: true } ,
-                
-            },
-            image:{
-                select:{url:true},
-                take:5,
-            },
-            coments:{
-                take:5,
+    include: {
+        _count: {
+            select: {
+                likes: true,  // This will count the likes
             }
+        },
+        image:{
+            select:{url:true},
+            take:5,
+        },
+        coments:{
+            take:5,
         }
-    });
-
+    }
+        
+    } as any
+    if (user) {
+        postsQuery.include.likes = {
+            where: { 
+                userId: user.id
+            },
+            select: { userId: true }
+        };
+    }
+    const posts = await db.post.findMany(postsQuery) as any
+    console.log(posts)
     if (!posts.length) {
         return { error: "No posts found" };
     }
 
   
     // Map posts to include like counts
-    const postsWithLikeCounts = posts.map(post => ({
-        ...post,
-        likeCount: post._count.likes,  // Each post object will now include a 'likeCount' property
-        likedByUser: post.likes.some(like => like.userId === user.id)  // Boolean indicating if the user liked the post
-    }));
+    const postsWithLikeCounts = posts.map(post => {
+        const likedByUser = user && post.likes && post.likes.some(like => like.userId === user.id);
+        return {
+            ...post,
+            likeCount: post._count.likes,
+            likedByUser: likedByUser ?? false 
+        };
+    });
+    console.log(postsWithLikeCounts)
 
     return { posts: postsWithLikeCounts, success: true };
 };
 
 export const DeleteUserPosts = async (postId:string,keys:string):Promise<responsePromise>=>{
-    console.log(postId)
     const user = await currentUser()
     if(!user){
         return {error:"You need to be autorize!"}
@@ -183,30 +185,29 @@ export const DeleteUserPosts = async (postId:string,keys:string):Promise<respons
     }
     return {success:"Post deleted"}
 };
-
-    const deleteImagefromS3 = async(keys : any):Promise<deleteS3promise>=>{
-        if(!keys||keys.lenght ===0){
-            return {error:'Key is require'}
-        };
-
-    
-        const deleteParams = {
-            Bucket:process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-                Delete:{
-                        Objects:keys.map((key:string)=>({Key:key})),
-                        Quiet:false,
-                },
+        const deleteImagefromS3 = async(keys : any):Promise<deleteS3promise>=>{
+            if(!keys||keys.lenght ===0){
+                return {error:'Key is require'}
             };
 
-        try {
-            const deleteCommand = new DeleteObjectsCommand(deleteParams);
-            const deleteResult = await s3Client.send(deleteCommand);
-            return {success:true,result:deleteResult}
-        } catch (error) {
-            console.log('Error',error)
-            return {error:'Something was wrong!'}
-        }
-    };
+        
+            const deleteParams = {
+                Bucket:process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+                    Delete:{
+                            Objects:keys.map((key:string)=>({Key:key})),
+                            Quiet:false,
+                    },
+                };
+
+            try {
+                const deleteCommand = new DeleteObjectsCommand(deleteParams);
+                const deleteResult = await s3Client.send(deleteCommand);
+                return {success:true,result:deleteResult}
+            } catch (error) {
+                console.log('Error',error)
+                return {error:'Something was wrong!'}
+            }
+        };
 
 export const LikePost = async (postId: string):Promise<postPromise> => {
     const user = await currentUser();
