@@ -32,7 +32,7 @@ export default  function ImageGrid( {images} ) {
                         key={index}
                         src={img.url}
                         alt={`Gallery image ${index + 1}`}
-                        width={500}
+                        width={400}
                         height={150}
                         className="w-full h-full object-cover rounded-md"
                         priority
@@ -40,7 +40,7 @@ export default  function ImageGrid( {images} ) {
                 </div>
             ))}
             {isOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50" onClick={() => setIsOpen(false)}>
+                <div className=" inset-0 absolute bg-black bg-opacity-75 flex justify-center items-center z-50" onClick={() => setIsOpen(false)}>
                     <img src={selectedImg} alt="Lightbox img" className="max-h-full max-w-full" />
                 </div>
             )}

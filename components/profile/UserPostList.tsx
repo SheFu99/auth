@@ -228,24 +228,24 @@ const user = useCurrentUser()
                     
                     <PostHeader author={post.author} timestamp={post.timestamp}/>
 
-                <div >
-                    <p className="text-white col-span-10 col-start-2 ml-[3rem] ">{post.text}</p>
+                <div className="ml-[4rem] mr-[1rem]">
+                    <p className="text-white col-span-10 col-start-2 ">{post.text}</p>
                         {user?.id === post.userId&&(
                             <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                         )}
-                        <div className="ml-[3rem]">
+                        <div className="">
                             <ImageGrid images={post.image} />
                         </div>
 
                     {/* <small className="text-black">{post.timestamp.getDay()}</small> */}
-                    <div className="flex gap-5 justify-normal ml-[3rem]">
+                    <div className="flex gap-5 justify-between ">
                        
-                        <LikeButton post={post} onLike={()=>like(post.PostId)} isPending={isPending}/>
+                        <LikeButton className=" bg-neutral-900" post={post} onLike={()=>like(post.PostId)} isPending={isPending}/>
 
-                        <button title="coment" onClick={()=>setComentState(!addComent)} className="text-white  bg-gray-900 rounded-md p-2 mt-5 px-5">
+                        <button title="coment" onClick={()=>setComentState(!addComent)} className="text-white  bg-neutral-900 rounded-md p-2 mt-5 ">
                             <FaCommentDots/>
                         </button>
-                        <button title= 'repost' className="text-white bg-gray-900 rounded-md p-2 mt-5 px-5">
+                        <button title= 'repost' className="text-white bg-neutral-900 rounded-md p-2 mt-5  ">
                             <BiRepost className="scale-150"/>
                         </button>
                         </div>

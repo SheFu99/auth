@@ -14,7 +14,7 @@ import UserButton from "./auth/user-button";
  const Navbar = ()=>{
   
     return(
-        <nav className="bg-secondary col-start-1 col-span-12 row-span-1  rounded-xs md:w-full h-auto grid grid-cols-12">
+        <nav className=" bg-opacity-30 bg-neutral-900  col-start-1 col-span-12 row-span-1  rounded-xs md:w-full h-auto grid grid-cols-12">
             <Sheet>
                 <SheetTrigger title="Humburger Menu" className="md:hidden xs:block p-2 ml-4 "><GiHamburgerMenu/></SheetTrigger>
                 <SheetContent className="g-f:w-[200px] sm:w-[225px] md:w-[225px] flex">

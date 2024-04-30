@@ -45,9 +45,9 @@ import { LoginButton } from "./loginButton"
                 </Avatar>
             </DropdownMenuTrigger>
             ):(
-                <div className="p-2 px-5 cursor-pointer">
+                <div className="p-2 px-5 cursor-pointer" >
                 <LoginButton mode="modal" asChild >
-                    <SlLogin className="scale-150 " title="Log in"/>
+                    <SlLogin className="scale-150 " title="Log in" role="button"/>
                 </LoginButton>
                 </div>
             )}

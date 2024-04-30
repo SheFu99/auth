@@ -170,7 +170,7 @@ const  EditProfile =  () => {
                   </div>
                     ):(
                       <div className="flex h-full w-full items-center justify-center rounded-full bg-muted p-3">
-                        <FaUser className="text-[#3aa29d] w-[50px] h-[50px] md:w-[75px] md:h-[75px] g-f:w-[35px] g-f:h-[35px]"/>
+                        <FaUser className="text-[#000000] w-[50px] h-[50px] md:w-[75px] md:h-[75px] g-f:w-[35px] g-f:h-[35px]"/>
                       </div>
                     )}
 

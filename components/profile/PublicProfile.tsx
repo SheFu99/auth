@@ -86,7 +86,7 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
                             
                           />
                         ):(
-                         <IoPersonCircleSharp className="w-[60px] h-[60px] md:w-[102px] md:h-[100px] bg-black rounded-full -mt-1 "/>
+                         <IoPersonCircleSharp className="w-[70px] h-[55px] md:w-[102px] md:h-[100px] bg-black rounded-full -mt-1 mr-[1px]"/>
                         )}
                         
                     
