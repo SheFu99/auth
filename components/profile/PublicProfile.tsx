@@ -10,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { MdElderly, MdLocationCity } from "react-icons/md";
 import { BounceLoader, FadeLoader } from "react-spinners";
 import { Profile } from "@/actions/UserProfile";
+import { IoPersonCircle } from "react-icons/io5";
 const UserPostList = React.lazy(()=>import('./UserPostList'))
 // import UserPostList from "./forms/UserPostList";
 
@@ -41,7 +42,7 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
       
   }
   
-  useEffect(()=>{console.log(profile)},[profile])
+  useEffect(()=>{console.log(profile.userImage)},[profile])
 //   useEffect(()=>{console.log(avatar)},[avatar])
  if(!profile){
     return <FadeLoader/>
@@ -64,26 +65,35 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
    
         </div>
             <div className="flex items-center relative ">
-                        {!isLoading&&(<div className="absolute left-4 md:mt-0 mt-[2px] rounded-full w-[60px] h-[60px] md:w-[110px] md:h-[110px] bg-black -ml-1 z-10 shadow-md"></div>)}
+                        <div className="absolute left-4 md:mt-0 mt-[2px] rounded-full w-[60px] h-[60px] md:w-[110px] md:h-[110px] bg-black -ml-1 z-10 shadow-md">
+                        {!isLoading &&(
+                            <BounceLoader className="w-[55px] h-[55px] md:w-[102px] md:h-[100px] z-20 rounded-md shadow-xs col-span-12 absolute" color="white"/>   
+                        )}
+                        </div>
                   <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-30 -bottom-15 left-0 p-[1rem] justify-center ">
 
                 
                    <div className="flex justify-center relative rounded-full w-[52px] h-[50px] md:w-[102px] md:h-[100px] z-30">
-                    {isLoading &&(
-                        <BounceLoader className="z-1 rounded-md shadow-xs col-span-12" color="white"/>  
-                    )}
-                      <Image
-                        src={profile.userImage}
-                        alt='Avatar'
-                        // layout="fill"
-                        width={100}
-                        height={100}
-                        onLoadingComplete={()=>setIsLoading(false)}
-                        className={`rounded-full ${isLoading  ? 'hidden':'block'} `}
+                    
+                        {profile.userImage !==undefined ?(
+                            <Image
+                            src={profile.userImage}
+                            alt='Avatar'
+                            // layout="fill"
+                            width={100}
+                            height={100}
+                            className={`rounded-full z-30`}
+                            
+                          />
+                        ):(
+                         <IoPersonCircle className="w-[55px] h-[55px] md:w-[102px] md:h-[100px] bg-black rounded-full -mt-1 "/>
+                        )}
                         
-                      />
+                    
+                    
                     
                  </div>
+                
                   
               
 

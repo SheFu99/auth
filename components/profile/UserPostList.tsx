@@ -282,13 +282,17 @@ const user = useCurrentUser()
                     {/* <small>{post.timestamp.tolocalString()}</small> */}
                     <div className="flex">
                         <button title="like" className="text-black" onClick={() => like(post.PostId)} disabled={isPending}>
-                           {post.likeCount !==0?
+                           {post.likedByUser?
                             <div   className="flex align-middle justify-center items-center gap-2">
                                 <FcLike/>
                                 {post.likeCount}
                             </div>
                            :
-                           <FcLikePlaceholder/> }
+                           <div   className="flex align-middle justify-center items-center gap-2">
+                           <FcLikePlaceholder/>
+                           {post.likeCount}
+                       </div>
+                            }
                         </button>
                     </div>
                 </div>

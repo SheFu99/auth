@@ -18,11 +18,11 @@ export const LoginButton = ({children,mode="redirect",asChild}:LoginButtonProps)
 
         if(mode==="modal"){
            return(
-            <Dialog>
+            <Dialog >
                 <DialogTrigger asChild={asChild}>
                     {children}
                 </DialogTrigger>
-                <DialogContent className="p-0 w-auto bg-transparent border-none">
+                <DialogContent className="p-1 w-full bg-transparent border-none">
                     <LoginForm/>
                 </DialogContent>
             </Dialog>

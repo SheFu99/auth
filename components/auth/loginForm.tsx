@@ -107,14 +107,14 @@ const LoginForm = () => {
     return (  
        
         <CardWrapper
-        
             headerLable={showTwoFactor ?"undefined": "Welcome back" }
             backButtonLabel="Don't have an account?"
             backButtonHref="/auth/register"
             showSocial
+            
         >
             <Form {...form}>
-                <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6 p-2">
                     <div>
                         {showTwoFactor&&(
                             <div className='felx justify-center items-center align-middle flex-row'>
