@@ -96,7 +96,7 @@ export const CreatePost= async(postCard:PostCard)=>{
 };
 
 export const GetUserPostsById = async (userId: string,):Promise<postPromise> => {
-    console.log(userId)
+    console.log("GETUSERPOSTBYID",userId)
     const page=1
     const pageSize = 10;
     const skip = (page - 1) * pageSize; 

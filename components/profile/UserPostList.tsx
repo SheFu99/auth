@@ -45,17 +45,15 @@ const user = useCurrentUser()
 
 ///load user post from server 
     useEffect(()=>{
+        console.log(profile)
         async function GetPost() {
             try{
                 if(profile.profile){
-                    console.log("GEt by profile",profile.profile)
                     const posts = await GetUserPostsById(profile.profile)
-                    console.log(posts)
-                   
                     return posts
 
                 }else{
-                    console.log("TRIGGERED")
+                   
                     const posts = await GetUserPostsById(user.id)
                     
                     setPosts(posts.posts)
@@ -71,7 +69,6 @@ const user = useCurrentUser()
     },[update])
 ///
 
-    useEffect(()=>{console.log("Render")},[])
     
   
     const serverLikeaction = (postId:string)=>{
