@@ -14,8 +14,8 @@ const PostHeader = ({author,timestamp}) => {
         <div className="flex item-center space-x-2">
                         <Image
                             src={user.Image}
-                            width={50}
-                            height={50}
+                            width={40}
+                            height={40}
                             alt="AuthorIcon"
                             className="rounded-full"
                             />

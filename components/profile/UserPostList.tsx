@@ -228,7 +228,7 @@ const user = useCurrentUser()
                     
                     <PostHeader author={post.author} timestamp={post.timestamp}/>
 
-                <div className="ml-[4rem] mr-[1rem]">
+                <div className="ml-[3rem] mr-[1rem]">
                     <p className="text-white col-span-10 col-start-2 ">{post.text}</p>
                         {user?.id === post.userId&&(
                             <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
