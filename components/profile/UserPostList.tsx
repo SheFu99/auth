@@ -14,17 +14,26 @@ import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 import { Skeleton } from "@/components/ui/skeleton";
 import ImageGrid from "./post/Image-grid";
 import { microserviceEndpoint } from "@/lib/utils";
+import { FaCommentDots } from "react-icons/fa";
+import { BiRepost } from "react-icons/bi";
+import Image from "next/image";
+import LikeButton from "./post/Like-button";
+import PostHeader from "./post/Post-header";
 
 
 type post ={
     PostId: string,
     image?: image[],
     text: string,
-    timestamp?: Date,
+    timestamp: Date,
     userId: string,
     likeCount: number,
     likes?:any[]
-    likedByUser?:boolean
+    likedByUser?:boolean,
+    author:{
+        Name:string,
+        Image:string,
+    }
 }
 type image ={
     url:string
@@ -33,18 +42,18 @@ type image ={
 
 
 const UserPostList  = (profile:any) => {
-const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
+
 const {update} = useSession()
 const [posts, setPosts]=useState<post[]>()
 const [isPending,startTransition]=useTransition()
-
+const [addComent,setComentState]=useState<boolean>(false)
 
 
 const user = useCurrentUser()
 
 ///load user post from server 
     useEffect(()=>{
-        console.log(profile)
+        
         async function GetPost() {
             try{
                 if(profile.profile){
@@ -180,64 +189,12 @@ const user = useCurrentUser()
         return 
         
         };
-            const fetchDelete = async (keys:string)=>{
-                console.log('Start delete from S3', keys)
-                const endpoint = (`${microserviceEndpoint}/api/s3-delete`);
-                try {
-                    const response = await fetch (endpoint,{
-                        method:'DELETE',
-                        headers:{
-                                'Content-Type': 'application/json',
-                                ///authToken
-                        },
-                        body:
-                            keys ,
-                        
-                    });
-
-                    if(!response.ok){
-                        return {error:`HTTP error! Status: ${response.status}`}
-                    }
-
-                        const data= await response.json()
-                        console.log('Succes',data)
-
-                    return data
-                } catch (error) {
-                    return {error:'Failed to delete S3 data'}
-                }
-            };
-  
-
-    const PostForm = useForm<z.infer<typeof UserPost>>({
-        resolver:zodResolver(UserPost),
-        defaultValues:{
-            text: undefined,
-            image: undefined,
-        }
-    })
-    const {handleSubmit,control,formState:{errors}} = PostForm
-    
-    
-    useEffect(()=>{
-      
-        if(Object.keys(errors).length>3){
-            setShouldAnimate(false)
-        }
-
-    },[])
-  
-    const onError =(errors:any)=>{
-        if(Object.keys(errors).length){
-            setShouldAnimate(true)
-            setTimeout(()=>setShouldAnimate(false),1000)
-        }
-    }
+           
 
 
 
     return ( 
-        <div className="bg-white rounded-md space-y-1 p-2">
+        <div className="bg-opacity-0  space-y-5 p-1">
             {!posts?.length&&(
                 <div className="grid grid-cols-12 p-5 space-y-5">
                     <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
@@ -267,37 +224,36 @@ const user = useCurrentUser()
 
             )}
             {posts?.map((post,index)=>(
-                <div key={index} className=" justify-between border border-gray-500 rounded-md p-3 space-x-1 relative">
-                    <p className="text-black col-span-11" >{post.text}</p>
-                    {user?.id === post.userId&&(
-                        <button title="delete post"className="text-black" onClick={(e)=>deletePost(post)}><RiDeleteBin5Line color="black" className="scale-110  absolute top-2 right-2"/> </button>
-                    )}
-                        <div>
+                <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
+                    
+                    <PostHeader author={post.author} timestamp={post.timestamp}/>
+
+                <div >
+                    <p className="text-white col-span-10 col-start-2 ml-[3rem] ">{post.text}</p>
+                        {user?.id === post.userId&&(
+                            <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
+                        )}
+                        <div className="ml-[3rem]">
                             <ImageGrid images={post.image} />
                         </div>
-                    {/* <small>{post.timestamp.tolocalString()}</small> */}
-                    <div className="flex">
-                        <button title="like" className="text-black" onClick={() => like(post.PostId)} disabled={isPending}>
-                           {post.likedByUser?
-                            <div   className="flex align-middle justify-center items-center gap-2">
-                                <FcLike/>
-                                {post.likeCount}
-                            </div>
-                           :
-                           <div   className="flex align-middle justify-center items-center gap-2">
-                           <FcLikePlaceholder/>
-                           {post.likeCount}
-                       </div>
-                            }
+
+                    {/* <small className="text-black">{post.timestamp.getDay()}</small> */}
+                    <div className="flex gap-5 justify-normal ml-[3rem]">
+                       
+                        <LikeButton post={post} onLike={()=>like(post.PostId)} isPending={isPending}/>
+
+                        <button title="coment" onClick={()=>setComentState(!addComent)} className="text-white  bg-gray-900 rounded-md p-2 mt-5 px-5">
+                            <FaCommentDots/>
                         </button>
-                    </div>
+                        <button title= 'repost' className="text-white bg-gray-900 rounded-md p-2 mt-5 px-5">
+                            <BiRepost className="scale-150"/>
+                        </button>
+                        </div>
+                </div>
                 </div>
             ))}
            
         </div>
-        ///Modal to confirm delete 
-        // <div>
-        //     <p>UserPostList</p></div>
      );
 }
  

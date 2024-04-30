@@ -146,7 +146,8 @@ const  EditProfile =  () => {
            
         </div>
             <div className="flex items-center relative ">
-            <div className="absolute left-4 md:mt-0 mt-[2px] rounded-full w-[60px] h-[60px] md:w-[110px] md:h-[110px] bg-black -ml-1 z-10 shadow-md"></div>
+            <div className="absolute left-4 md:mt-[1px] md:-ml-[6px] mt-[2px] rounded-full w-[60px] h-[60px] md:w-[112px] md:h-[111px] bg-black -ml-[5px] z-10 shadow-md">
+                      </div>
                   <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem]  -bottom-15 left-0 p-[1rem] justify-center ">
 
                   {sessionImage? (
@@ -161,7 +162,7 @@ const  EditProfile =  () => {
                         // layout="fill"
                         width={100}
                         height={100}
-                        className={`rounded-full z-30`}
+                        className={`rounded-full z-30 md:-ml-[2px] mr-[1px]`}
                         
                       />
                       )}

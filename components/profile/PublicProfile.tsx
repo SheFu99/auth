@@ -10,7 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { MdElderly, MdLocationCity } from "react-icons/md";
 import { BounceLoader, FadeLoader } from "react-spinners";
 import { Profile } from "@/actions/UserProfile";
-import { IoPersonCircle } from "react-icons/io5";
+import { IoPersonCircle, IoPersonCircleSharp } from "react-icons/io5";
 const UserPostList = React.lazy(()=>import('./UserPostList'))
 // import UserPostList from "./forms/UserPostList";
 
@@ -65,7 +65,7 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
    
         </div>
             <div className="flex items-center relative ">
-                        <div className="absolute left-4 md:mt-0 mt-[2px] rounded-full w-[60px] h-[60px] md:w-[110px] md:h-[110px] bg-black -ml-1 z-10 shadow-md">
+                        <div className="absolute left-4 md:mt-[1px] md:-ml-[6px] mt-[2px] rounded-full w-[60px] h-[60px] md:w-[112px] md:h-[111px] bg-black -ml-[5px] z-10 shadow-md">
                         {!isLoading &&(
                             <BounceLoader className="w-[55px] h-[55px] md:w-[102px] md:h-[100px] z-20 rounded-md shadow-xs col-span-12 absolute" color="white"/>   
                         )}
@@ -82,29 +82,17 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
                             // layout="fill"
                             width={100}
                             height={100}
-                            className={`rounded-full z-30`}
+                            className={`rounded-full z-30 md:-ml-[2px] mr-[1px]`}
                             
                           />
                         ):(
-                         <IoPersonCircle className="w-[55px] h-[55px] md:w-[102px] md:h-[100px] bg-black rounded-full -mt-1 "/>
+                         <IoPersonCircleSharp className="w-[60px] h-[60px] md:w-[102px] md:h-[100px] bg-black rounded-full -mt-1 "/>
                         )}
                         
                     
                     
                     
                  </div>
-                
-                  
-              
-
-
-                    {/* <button
-                      className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75"
-                      title="Change photo"
-                
-                    >
-                      <BsFillPencilFill className="grid scale-100"/>
-                    </button> */}
               </div>
 
            

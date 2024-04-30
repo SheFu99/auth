@@ -34,7 +34,7 @@ export default  function ImageGrid( {images} ) {
                         alt={`Gallery image ${index + 1}`}
                         width={500}
                         height={150}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-md"
                         priority
                     />
                 </div>

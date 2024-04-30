@@ -102,7 +102,7 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
     const skip = (page - 1) * pageSize; 
 
     const existingUser = await db.user.findFirst({
-        where: { id: userId }
+        where: { id: userId },
     });
     if (!existingUser) {
         return { error: "User not found" };
@@ -143,7 +143,7 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
         };
     }
     const posts = await db.post.findMany(postsQuery) as any
-    console.log(posts)
+    console.log(existingUser.name, existingUser.image)
     if (!posts.length) {
         return { error: "No posts found" };
     }
@@ -154,6 +154,10 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
         const likedByUser = user && post.likes && post.likes.some(like => like.userId === user.id);
         return {
             ...post,
+            author:{
+                Name:existingUser.name,
+                Image:existingUser.image,
+            },
             likeCount: post._count.likes,
             likedByUser: likedByUser ?? false 
         };
