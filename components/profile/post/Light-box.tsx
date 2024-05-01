@@ -1,44 +1,45 @@
-import React, { useState } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import React, { useEffect, useState } from 'react';
+import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
 
-const Lightbox = ({ images, initialIndex = 0, onClose }) => {
-    const [currentIndex, setCurrentIndex] = useState(initialIndex);
+const Lightbox = ({ images, goToNext,goToPrevious, onClose,isOpen, keyLeft,keyRight}) => {
+console.log(images)
 
-    const goToPrevious = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + images.length - 1) % images.length);
-    };
+const handleKeyDown = (event) => {
+    switch (event.key) {
+      case 'ArrowLeft':
+        keyLeft()
+        break;
+      case 'ArrowRight':
+        keyRight()
+        break;
 
-    const goToNext = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    };
+      default:
+        // Handle other keys if needed
+        console.log(`Key pressed: ${event.key}`);
+        break;
+    }
+  };
 
+useEffect(()=>{
+    window.addEventListener('keydown',handleKeyDown)
+    return()=>{
+        window.removeEventListener('keydown',handleKeyDown)
+    }
+},[])
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex justify-center items-center p-4">
-            <div className="relative max-w-3xl max-h-full w-full">
-                <button
-                    onClick={goToPrevious}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-1 rounded-full"
-                >
-                    &#10094;
-                </button>
-                <img
-                    src={images[currentIndex]}
-                    alt="Gallery"
-                    className="block max-h-full max-w-full m-auto"
-                />
-                <button
-                    onClick={goToNext}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-1 rounded-full"
-                >
-                    &#10095;
-                </button>
-                <button
-                    onClick={onClose}
-                    className="absolute top-0 right-0 bg-red-600 text-white p-2"
-                >
-                    X
-                </button>
-            </div>
-        </div>
+        <Dialog open={isOpen} onOpenChange={onClose} >
+            <DialogContent className='max-h-[90vh] flex justify-center p-10 min-w-[50vw]'>
+                        <button onClick={goToPrevious}><MdNavigateBefore color='white'/> </button>
+                        <img
+                            src={images}
+                            alt="Gallery"
+                            className="block  max-h-[80vh] m-auto "
+                        />
+                       <button onClick={goToNext}><MdNavigateNext color='white'/> </button>
+              
+        </DialogContent>
+        </Dialog>
     );
 };
 

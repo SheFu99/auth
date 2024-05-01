@@ -3,7 +3,7 @@
 
 import { GrClose } from "react-icons/gr";
 import ImageCropper from "./Image-Cropper";
-import { useEffect, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { BiSolidLandscape } from "react-icons/bi";
@@ -82,16 +82,14 @@ const CoverModal: React.FC<ModalProps>  = ({ closeCoverModal }) => {
   };
 
  const updateCover = async(croppedImageBlob) =>{
-   console.log(croppedImageBlob)
+  console.log(croppedImageBlob)
   setIsUploading(true)
-  const response = await fetch(croppedImageBlob);
-  const blob = await response.blob(); // Convert the image URL to a blob for uploading
- 
-
-
-  const formData = new FormData();
   const now = new Date();
   const dateTime = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+  
+  const response = await fetch(croppedImageBlob);
+  const blob = await response.blob(); // Convert the image URL to a blob for uploading
+  const formData = new FormData();
   const filename = `cover_${user.id}_${dateTime}.png`;  // Replace spaces with underscores, add current dateTime, and .png extension
 
 formData.append("cover", blob,filename);
@@ -140,7 +138,7 @@ try {
    
   return (
     <div
-      className="relative z-20"
+      className="relative z-50"
       aria-labelledby="crop-cover-dialog"
       role="dialog"
       aria-modal="true"
@@ -210,7 +208,7 @@ try {
                         </div>
 
                       <div className="flex justify-center -mb-5">
-                        
+
                         <div className={`w-full flex justify-center items-center gap-2   ${uploadError ? 'animate-shake bg-red-800  p-2  rounded-full' : ''}`}>
                           <ExclamationTriangleIcon className= {`text-destructive text-white ${uploadError ? 'block' : 'hidden'}`} />
                           <span className="text-xs text-white ">
