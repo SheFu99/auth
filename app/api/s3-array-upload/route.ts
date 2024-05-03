@@ -1,5 +1,5 @@
 
-import { createPresignedPost } from '@aws-sdk/s3-presigned-post'; 
+// import { createPresignedPost } from '@aws-sdk/s3-presigned-post'; 
 import { NextResponse } from "next/server";
 import { s3Client } from "../s3-upload/route";
 import { currentUser } from '@/lib/auth';

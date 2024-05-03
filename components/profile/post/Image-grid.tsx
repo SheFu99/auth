@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Lightbox from './Light-box';
 export default  function ImageGrid( {images} ) {
@@ -8,13 +8,16 @@ export default  function ImageGrid( {images} ) {
 
    
     const openLightbox = (index,img) => {
-        console.log(images.length,imageState)
         setIsOpen(true);
         setImageState(index)
+        console.log(images.length,imageState)
         setSelectedImg(img)
     };
-
+useEffect(()=>{
+console.log(imageState)
+},[imageState])
     const gotoPrevious = () =>{
+        console.log(imageState)
         if(imageState -1 >= 0 ){
             console.log(imageState -1)
         imageState > 0 && setImageState(imageState - 1);
@@ -23,11 +26,11 @@ export default  function ImageGrid( {images} ) {
         const urlInArray = filteredImageByIndex[0].url
         setSelectedImg(urlInArray)
     }
-    console.log('begin')
+    console.log('begin!')
     };
 
     const gotoNext = () =>{
-        console.log('end')
+
           if(imageState  +1< images.length ){
             console.log(imageState +1)
             setImageState(imageState + 1);
@@ -86,8 +89,8 @@ export default  function ImageGrid( {images} ) {
              images={selectedImg} 
              goToNext={gotoNext} 
              goToPrevious={gotoPrevious}
-             keyLeft={()=>gotoPrevious}
-             keyRight={()=>gotoNext}
+             
+           
              />
                 
              

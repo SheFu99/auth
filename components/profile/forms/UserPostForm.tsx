@@ -2,13 +2,9 @@
 
 import * as z from "zod"
 import { CreatePost } from "@/actions/UserPosts"
-import { UserPost } from "@/schemas"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { useSession } from "next-auth/react"
-import { useEffect, useRef, useState, useTransition } from "react"
-import { useForm } from "react-hook-form"
+import { useEffect, useState, useTransition } from "react"
 import { toast } from "sonner"
-import { Form, FormControl, FormField, FormItem, FormMessage } from "../../ui/form"
 import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
 import { Textarea } from "../../ui/textarea"
@@ -16,7 +12,6 @@ import { MdAddPhotoAlternate } from "react-icons/md"
 import { BsEmojiSmile } from "react-icons/bs"
 import { IoMdClose } from "react-icons/io"
 import { useCurrentUser } from "@/hooks/use-current-user"
-import { useFormState } from "react-dom"
 import { microserviceEndpoint } from "@/lib/utils"
 
 
@@ -77,25 +72,23 @@ const UserPostForm = () => {
          startTransition(()=>{
             uploadImages(images)
            .then((data)=>{
+
                 if(data.error){
                     post = ({
                         text: textState,
                         userId: user.id
                     })
-                }
+                };
                 if(data.success){
                      post = ({
                         text: textState,
                         image: data.imageUrls,
                         userId: user.id
                     })
-                }
-               
-      
+                };
             })
             .finally(()=>{
                 setIsUploading(false)
-                console.log(post)
                 Submit(post)
             }) 
         }) 
@@ -234,7 +227,7 @@ const UserPostForm = () => {
         console.log(newImageState)
         setImageFiles(newImageState)
 
-    }
+    };
  
     // useEffect(()=>{
     //     console.log(images)
@@ -253,20 +246,16 @@ const UserPostForm = () => {
                                 multiple
                                 />
                         </label>
-                        <BsEmojiSmile className="scale-110 cursor-pointer" title="Emoji!"/>
-                        
-                        <p className="cursor-pointer" title="Mention">@</p>
-
+                            <BsEmojiSmile className="scale-110 cursor-pointer" title="Emoji!"/>
+                            <p className="cursor-pointer" title="Mention">@</p>
                     </div>
-                
                                 <Textarea 
                                     onChange={(e)=>setTextState(e.target.value)}
                                     disabled={isPending}
                                     className={`${shouldAnimate ? 'animate-shake' : ''} `}
                                     placeholder="Type your message here." 
                                  />
-                                    
-                   
+
                     <div className="flex relative p-1 mt-2 flex-wrap gap-5">
                         {imagesBlobUrl.map((image,index)=>(
                             <div key={index}>
@@ -289,7 +278,7 @@ const UserPostForm = () => {
                         Send
                     </Button>
                     
-                </form>
+    </form>
 
 
            
