@@ -14,6 +14,7 @@ import { IoMdClose } from "react-icons/io"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { microserviceEndpoint } from "@/lib/utils"
 import dynamic from 'next/dynamic';
+import { Theme } from "emoji-picker-react"
 
 const Picker = dynamic(
   () => {
@@ -31,8 +32,7 @@ export interface DataResponse{
     error: string,
     success:string,
 } 
-
-
+;
 const UserPostForm = () => {
 
     const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
@@ -238,7 +238,7 @@ const postSchema = z.object({
                             title="Emoji!" onClick={()=>setEmoji(!isEmoji)}/>
                         <div className="flex flex-wrap justify-center mt-2 z-50 absolute top-[6rem]">
                             {isEmoji&&(
-                                <Picker width={300} className="mt-4 " theme="dark" onEmojiClick={(e)=>handleReactionClick(e)}/>
+                                <Picker width={300} className="mt-4 " theme={Theme.DARK} onEmojiClick={(e)=>handleReactionClick(e)}/>
                             )}
                         </div>
                        
