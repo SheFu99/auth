@@ -47,13 +47,12 @@ const {update} = useSession()
 const [posts, setPosts]=useState<post[]>()
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState<boolean>(false)
-
+const [getPostTrigger,updatePost]=useState<boolean>(false)
 
 const user = useCurrentUser()
 
 ///load user post from server 
     useEffect(()=>{
-        
         async function GetPost() {
             try{
                 if(profile.profile){
@@ -74,7 +73,7 @@ const user = useCurrentUser()
         }}
         GetPost().then(posts => setPosts(posts?.posts))
        
-    },[update,profile])
+    },[update,profile,getPostTrigger])
 ///
 
     
@@ -110,7 +109,7 @@ const user = useCurrentUser()
         const newPosts = posts?.map(post => {
             if (post.PostId === postId) {
                 // Toggle like status and adjust like count optimistically
-                if (post?.likedByUser) {
+                if (post?.likedByUser===true) {
                     return { ...post, likedByUser: false, likeCount: post.likeCount - 1 };
                 } else {
                     return { ...post, likedByUser: true, likeCount: post.likeCount + 1 };
@@ -120,31 +119,19 @@ const user = useCurrentUser()
         });
     
         setPosts(newPosts);
-    
+       
         try {
             await serverLikeaction(postId);
         } catch (error) {
             console.error("Failed to update like status on the server:", error);
-    
-            // Revert Optimistic UI Update on Error
-            const revertedPosts = newPosts?.map(post => {
-                if (post.PostId === postId) {
-                    // Toggle like status and adjust like count to revert changes
-                    if (post.likedByUser) {
-                        return { ...post, likedByUser: false, likeCount: post.likeCount - 1 };
-                    } else {
-                        return { ...post, likedByUser: true, likeCount: post.likeCount + 1 };
-                    }
-                }
-                return post;
-            });
-    
-            setPosts(revertedPosts);
-            console.log(revertedPosts);
-    
+            updatePost(!getPostTrigger)
+            
             toast.error("Error updating post like. Please try again.");
+        }finally{
+            updatePost(!getPostTrigger)
         }
     };
+
 
     const deletePost=(post:any)=>{
         

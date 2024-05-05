@@ -63,8 +63,9 @@ export default  function ImageGrid( {images} ) {
                 
             ))}
              
-
-         <Suspense fallback={<div className='w-[100vh] h-[100vh] bg-zinc-800 inset-0 absolute'> <PacmanLoader color='white'/></div>}>
+             <Suspense fallback={<div className=' bg-zinc-800 w-full relative rounded-md'> <div className='w-full flex justify-center'><PacmanLoader  color='white'/></div></div>
+                }>
+               
                <Lightbox
                 open={isOpen}
                 close={() => setIsOpen(false)}

@@ -168,7 +168,6 @@ const postSchema = z.object({
         const imageBlobUrls = [];
 
     
-      console.log(imagesBlobUrl)
         for(let i=0; i<files.length; i++){
             const file = files[i];
             const reader = new FileReader();
@@ -204,10 +203,12 @@ const postSchema = z.object({
         setTextState(prevValue=>prevValue + reaction.emoji)
         TextInputRef.current.value += reaction.emoji
     }
-useEffect(()=>{console.log(textState)},[textState])
- 
+
     return (
+        
      <form  onSubmit={submitPost}  className="p-2  border border-white rounded-md" >
+
+                {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[90vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
                 
                                 <Textarea 
                                     ref={TextInputRef}
@@ -232,9 +233,8 @@ useEffect(()=>{console.log(textState)},[textState])
                             <BsEmojiSmile 
                             className={`scale-110 cursor-pointer  ${isEmoji ? 'text-yellow-500':'text-white'}`}
                             title="Emoji!" onClick={()=>setEmoji(!isEmoji)}/>
-                        <div className="flex flex-wrap justify-center mt-2 z-50 absolute top-[6rem]">
-                           
-                                <Picker open={isEmoji} width={300} className="mt-4 " theme={Theme.DARK} onEmojiClick={(e)=>handleReactionClick(e)}/>
+                        <div className="flex flex-wrap justify-center mt-2 z-50 absolute top-[6rem]" >
+                                <Picker open={isEmoji}  width={300} className="mt-4 " theme={Theme.DARK} onEmojiClick={(e)=>handleReactionClick(e)}/>
                            
                         </div>
                        

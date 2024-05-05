@@ -146,7 +146,7 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
         };
     }
     const posts = await db.post.findMany(postsQuery) as any
-    console.log(existingUser.name, existingUser.image)
+    // console.log(existingUser.name, existingUser.image)
     if (!posts.length) {
         return { error: "No posts found" };
     }
