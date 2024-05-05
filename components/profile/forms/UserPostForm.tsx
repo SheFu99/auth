@@ -13,15 +13,10 @@ import { BsEmojiSmile } from "react-icons/bs"
 import { IoMdClose } from "react-icons/io"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { microserviceEndpoint } from "@/lib/utils"
-import dynamic from 'next/dynamic';
 import { Theme } from "emoji-picker-react"
+import Picker from 'emoji-picker-react'
 
-const Picker = dynamic(
-  () => {
-    return import('emoji-picker-react');
-  },
-  { ssr: false }
-);
+
 
 export interface DataResponse{
     PostId: string,
@@ -206,9 +201,10 @@ const postSchema = z.object({
     const handleReactionClick = (reaction)=>{
       
         setReaction(reaction);
+        setTextState(prevValue=>prevValue + reaction.emoji)
         TextInputRef.current.value += reaction.emoji
     }
-
+useEffect(()=>{console.log(textState)},[textState])
  
     return (
      <form  onSubmit={submitPost}  className="p-2  border border-white rounded-md" >
@@ -237,9 +233,9 @@ const postSchema = z.object({
                             className={`scale-110 cursor-pointer  ${isEmoji ? 'text-yellow-500':'text-white'}`}
                             title="Emoji!" onClick={()=>setEmoji(!isEmoji)}/>
                         <div className="flex flex-wrap justify-center mt-2 z-50 absolute top-[6rem]">
-                            {isEmoji&&(
-                                <Picker width={300} className="mt-4 " theme={Theme.DARK} onEmojiClick={(e)=>handleReactionClick(e)}/>
-                            )}
+                           
+                                <Picker open={isEmoji} width={300} className="mt-4 " theme={Theme.DARK} onEmojiClick={(e)=>handleReactionClick(e)}/>
+                           
                         </div>
                        
                             <p className="cursor-pointer" title="Mention">@</p>

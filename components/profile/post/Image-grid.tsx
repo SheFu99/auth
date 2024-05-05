@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,lazy,Suspense } from 'react';
 import Image from 'next/image';
-import Lightbox from "yet-another-react-lightbox";
+const Lightbox =lazy(()=> import ('yet-another-react-lightbox'))
+// import Lightbox from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 import "yet-another-react-lightbox/styles.css";
+import { PacmanLoader } from 'react-spinners';
 
 
 export default  function ImageGrid( {images} ) {
@@ -62,7 +64,7 @@ export default  function ImageGrid( {images} ) {
             ))}
              
 
-         
+         <Suspense fallback={<div className='w-[100vh] h-[100vh] bg-zinc-800 inset-0 absolute'> <PacmanLoader color='white'/></div>}>
                <Lightbox
                 open={isOpen}
                 close={() => setIsOpen(false)}
@@ -83,7 +85,7 @@ export default  function ImageGrid( {images} ) {
                 }}
                 
             />  
-             
+             </Suspense>
              
         </div>
     );
