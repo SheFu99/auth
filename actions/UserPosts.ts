@@ -65,15 +65,18 @@ export const CreatePost= async(postCard:PostCard)=>{
 
     try{
         
-    const imagesCopy = [...postCard.image];
     const postData = {
         text:postCard.text,
         userId:user.id,
     } as any
 
-    if(imagesCopy.length>0){
-        postData.image = {create:imagesCopy.map(url=>({url}))}
+    if(postCard.image){
+        const imagesCopy = [...postCard.image];
+        if(imagesCopy.length>0){
+            postData.image = {create:imagesCopy.map(url=>({url}))}
+        }
     }
+      
 
         
         const createPost = await db.post.create({
