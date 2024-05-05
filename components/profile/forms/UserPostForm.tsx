@@ -74,7 +74,7 @@ const postSchema = z.object({
     }
 
     const submitPost= async(event)=>{
-        setEmoji(!isEmoji)
+        setEmoji(false)
         event.preventDefault()
         setIsUploading(true)
         // Validate form data against Zod schema
