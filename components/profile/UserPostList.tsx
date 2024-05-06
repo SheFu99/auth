@@ -13,7 +13,7 @@ import PostHeader from "./post/Post-header";
 import GetPost from "./post/functions/get-post";
 const InfiniteScroll = React.lazy(()=>import ('./post/functions/infinite-scroll'))
 // import InfiniteScroll from "./post/functions/infinite-scroll";
-import PostSkeleton from "./post/Post-Skeleton";
+import PostSkeleton from "./post/skeleton";
 
 type post ={
     PostId: string,
