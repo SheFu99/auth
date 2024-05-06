@@ -53,7 +53,7 @@ const user = useCurrentUser()
 ///load user post from server 
     useEffect(()=>{
       console.log('INIT_GETPOST_TRIGGER')
-        GetPost(profile,user.id,1).then(posts => {setTotalCount(posts.totalPostCount),setPosts(posts?.posts)})
+        GetPost(profile,user?.id,1).then(posts => {setTotalCount(posts.totalPostCount),setPosts(posts?.posts)})
         // GetPost(profile,user.id,1).then(posts => console.log(posts))
 
     },[getPostTrigger])
@@ -171,7 +171,7 @@ const user = useCurrentUser()
             }
 
                 try {
-                    await GetPost(profile,user.id,page+1).then(posts=>setPosts(prev=>[...prev,...posts.posts])).finally(()=>setPage(page+1))
+                    await GetPost(profile,user?.id,page+1).then(posts=>setPosts(prev=>[...prev,...posts.posts])).finally(()=>setPage(page+1))
                     
                 } catch (error) {
                     console.log(error)
