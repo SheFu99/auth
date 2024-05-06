@@ -116,6 +116,11 @@ const config = {
             "0%,70%,100%": { opacity: "1" },
             "20%,50%": { opacity: "0" },
           },
+          'rotate180': {
+            '0%': { transform: 'rotate(0deg)' },
+            '100%': { transform: 'rotate(180deg)' }
+          }
+
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
@@ -128,8 +133,14 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         'shake': 'shake 1s ease-in-out ',
         "caret-blink": "caret-blink 1.25s ease-out infinite",
+        'rotate-180': 'rotate180 0.5s ease-in-out forwards',
       },
     },
+  },
+  variants: {
+    extend: {
+      animation: ['responsive', 'hover']
+    }
   },
   plugins: [
     require("tailwindcss-animate"),

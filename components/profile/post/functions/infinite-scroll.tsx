@@ -1,3 +1,4 @@
+import { ArrowBigDownDash } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 
@@ -5,11 +6,12 @@ interface Props {
   loadMore: () => Promise<void>;
   hasMore: boolean;
   children: React.ReactNode;
+  isloaded: boolean;
 }
 
-const InfiniteScroll = ({ loadMore, hasMore, children }: Props) => {
-  const [isFetching, setIsFetching] = useState(false);
-  const [lastScrollTop, setLastScrollTop] = useState(0);
+const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [lastScrollTop, setLastScrollTop] = useState<number>(0);
 
   useEffect(() => {
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -17,7 +19,7 @@ const InfiniteScroll = ({ loadMore, hasMore, children }: Props) => {
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
-      if (scrollTop > lastScrollTop && scrollTop + clientHeight +50 >= scrollHeight && hasMore) {
+      if (scrollTop > lastScrollTop && scrollTop + clientHeight +50 >= scrollHeight -10 && hasMore) {
         
         setIsFetching(true);
       }
@@ -71,6 +73,20 @@ const InfiniteScroll = ({ loadMore, hasMore, children }: Props) => {
           <BeatLoader className='mb-5 scale-125' color='white'/>
         </div>
       )}
+{isloaded ==true&&(
+  <div>
+      {hasMore ===true? (
+        <div className='flex w-full justify-center'>
+            {/* <ArrowBigDownDash color='white'/> */}
+          </div>
+      ):(
+        <div className='flex w-full justify-center mb-2'>
+          <p className='text-gray-300 text-sm '> No more post to upload!</p>
+        </div>
+      )}
+  </div>
+)}
+     
     </div>
   );
 };

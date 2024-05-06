@@ -1,21 +1,19 @@
 
 "use clinet"
-import * as z from "zod"
-import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
+import { DeleteUserPosts, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { useSession } from "next-auth/react";
-import { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { Skeleton } from "@/components/ui/skeleton";
 import ImageGrid from "./post/Image-grid";
 import { FaCommentDots } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
 import LikeButton from "./post/Like-button";
 import PostHeader from "./post/Post-header";
 import GetPost from "./post/functions/get-post";
-import InfiniteScroll from "./post/functions/infinite-scroll";
-
+const InfiniteScroll = React.lazy(()=>import ('./post/functions/infinite-scroll'))
+// import InfiniteScroll from "./post/functions/infinite-scroll";
+import PostSkeleton from "./post/Post-Skeleton";
 
 type post ={
     PostId: string,
@@ -37,10 +35,9 @@ type image ={
     inedx:number
 }
 
-type PostPromise = Promise<post[]>;
 const UserPostList  = (profile:any) => {
 
-const {update} = useSession()
+
 const [posts, setPosts]=useState<post[]>()
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState<boolean>(false)
@@ -48,6 +45,7 @@ const [getPostTrigger,updatePost]=useState<boolean>(false)
 const [hasMore,setHasMore]= useState<boolean>(true)
 const [page,setPage]=useState<number>(1)
 const [totalPostCount,setTotalCount]=useState<number>(0)
+
 const user = useCurrentUser()
 
 ///load user post from server 
@@ -140,23 +138,13 @@ const user = useCurrentUser()
         
                     if(data.success){
                         
-                        update() 
+                        updatePost(true) 
                         toast.success(data.message)
                     }
                 })
                 
             });
-            // startTransition(()=>{
-            //     fetchDelete(keys)
-            //         .then((data)=>{
-            //             if(!data.error){
-            //                 toast.success('Transition is OK')
-            //             }
-            //         })
-            //         .catch((error)=>{
-            //             toast.error('Error delete Image from storage',error)
-            //         })
-            // })
+       
         
         return 
         
@@ -184,35 +172,8 @@ const user = useCurrentUser()
 
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">
-            {!posts?.length&&(
-                <div className="grid grid-cols-12 p-5 space-y-5">
-                    <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
-                        <Skeleton className="h-12 w-12 rounded-full" />
-                        <div className="space-y-2">
-                        <Skeleton className="h-4 md:w-[450px] w-[150px]" />
-                        <Skeleton className="h-4 md:w-[400px] w-[100px]" />
-                        </div>
-                    </div>
-                    <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
-                        <Skeleton className="h-12 w-12 rounded-full"  />
-                        <div className="space-y-2">
-                        <Skeleton className="h-4 md:w-[450px] w-[150px]" />
-                        <Skeleton className="h-4 md:w-[400px] w-[100px]" />
-                        </div>
-                    </div>
-                    <div className="flex items-center space-x-4 flex-wrap w-full col-span-12 border border-gray-400 rounded-md p-2">
-                        <Skeleton className="h-12 w-12 rounded-full" />
-                        <div className="space-y-2">
-                        <Skeleton className="h-4 md:w-[450px] w-[150px]" />
-                        <Skeleton className="h-4 md:w-[400px] w-[100px]" />
-                    </div>
-                
-            
-               </div>
-               </div>
-
-            )}
-            <InfiniteScroll loadMore={fetchMoreData} hasMore={hasMore}>
+            <PostSkeleton isLoading={!posts?.length}/>
+            <InfiniteScroll loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
             {posts?.map((post,index)=>(
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
                     
