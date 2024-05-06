@@ -10,12 +10,13 @@ import * as z from "zod"
 export type userPost = z.infer<typeof UserPost>
 
 export type postPromise = {
-    posts?:any[],
+    posts?:any,
     success?: boolean,
     error?:string,
     message?:string,
     likesCount?:number,
     hasLike?:boolean,
+    totalPostCount?:number,
    
 };
 type responsePromise = {
@@ -98,10 +99,10 @@ export const CreatePost= async(postCard:PostCard)=>{
         
 };
 
-export const GetUserPostsById = async (userId: string,):Promise<postPromise> => {
-    console.log("GETUSERPOSTBYID",userId)
-    const page=1
-    const pageSize = 10;
+export const GetUserPostsById = async (userId: string,page:number):Promise<postPromise> => {
+    // console.log("GETUSERPOSTBYID",userId)
+   
+    const pageSize = 3;
     const skip = (page - 1) * pageSize; 
 
     const existingUser = await db.user.findFirst({
@@ -145,9 +146,13 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
             select: { userId: true }
         };
     }
-    const posts = await db.post.findMany(postsQuery) as any
+    const [posts, totalPostCount] = await Promise.all([
+     await db.post.findMany(postsQuery) as any,
+     await db.post.count({where:{userId:userId}})
+    ])
+  
     // console.log(existingUser.name, existingUser.image)
-    if (!posts.length) {
+    if (!posts.length||totalPostCount<=0) {
         return { error: "No posts found" };
     }
 
@@ -162,12 +167,13 @@ export const GetUserPostsById = async (userId: string,):Promise<postPromise> => 
                 Image:existingUser.image,
             },
             likeCount: post._count.likes,
-            likedByUser: likedByUser ?? false 
+            likedByUser: likedByUser ?? false ,
+            
         };
     });
-    console.log(postsWithLikeCounts)
+    // console.log(postsWithLikeCounts)
 
-    return { posts: postsWithLikeCounts, success: true };
+    return { posts: postsWithLikeCounts, success: true,totalPostCount:totalPostCount };
 };
 
 export const DeleteUserPosts = async (postId:string,keys:string):Promise<responsePromise>=>{

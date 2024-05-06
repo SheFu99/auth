@@ -5,17 +5,15 @@ import { z } from 'zod';
 
 
 // TypeScript interface for compile-time type checking, inferred from Zod schema
-type Profile = z.infer<typeof UserProfile>;
+
 
 interface ProfileState {
-  profile: Profile | null;
   loading: boolean;
   error: string | null;
   upload:boolean;
 }
 
 const initialState: ProfileState = {
-  profile: null,
   loading: false,
   error: null,
   upload:false,
@@ -25,9 +23,9 @@ export const profileSlice = createSlice({
   name: 'profile',
   initialState,
   reducers: {
-    setProfile: (state, action: PayloadAction<Profile | null>) => {
-      state.profile = action.payload;
-    },
+    // setProfile: (state, action: PayloadAction<Profile | null>) => {
+    //   state.profile = action.payload;
+    // },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
@@ -40,6 +38,6 @@ export const profileSlice = createSlice({
   },
 });
 
-export const { setProfile, setLoading, setError, setUpload } = profileSlice.actions;
+export const {  setLoading, setError, setUpload } = profileSlice.actions;
 
 export default profileSlice.reducer;

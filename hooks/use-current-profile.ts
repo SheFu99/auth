@@ -1,5 +1,5 @@
 import { RootState } from '@/lib/store';
-import { setProfile, setUpload } from '@/slices/profileSlices';
+import {  setUpload } from '@/slices/profileSlices';
 import { useDispatch, useSelector } from 'react-redux';
 
 export interface ProfileData {
@@ -16,19 +16,19 @@ export interface ProfileData {
   success?:string;
 }
 
-export function useCurrentProfile() {
+export function useUpdateProfileTrigger() {
   const dispatch = useDispatch();
-  const profile = useSelector((state: RootState) => state.profile.profile);
-  const upload = useSelector((state:RootState)=> state.profile.upload)
+  // const profile = useSelector((state: RootState) => state.profile.profile);
+  const updateProfile = useSelector((state:RootState)=> state.profile.upload)
   // Define a function for updating the profile
-  const updateProfile = (profileData: ProfileData) => {
-    dispatch(setProfile(profileData));
-  };
+  // const updateProfile = (profileData: ProfileData) => {
+  //   dispatch(setProfile(profileData));
+  // };
 
   const switchUpload = (upload : boolean) =>{
     dispatch(setUpload(upload))
   }
   // Return both the profile state and the update function
-  return { profile, updateProfile ,upload, switchUpload};
+  return { upload: updateProfile, switchUpload};
 }
 

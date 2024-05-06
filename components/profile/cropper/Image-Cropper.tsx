@@ -64,7 +64,7 @@ const ImageCropper = ({ image, type, onImageCropped,closeCroper }:ImageCropperrP
         <div className="">
 
             {modalState&&(
-                <div className='absolute w-full h-full bottom-5 -top-5 left-0 py-20 px-5 z-30 bg-gray-950 bg-opacity-90'>
+                <div className='absolute w-full h-[105vh] bottom-5 -top-5 left-0 py-20 px-5 z-50 bg-gray-950 bg-opacity-90' onClick={()=>closeCroper()}>
 
                  <div className='relative w-full h-full p-6 border border-gray-950 rounded-lg bg-gray-500 ' >
                      <button title='close modal' className=' z-30 w-full flex justify-end mb-2 -mt-2' onClick={()=>onClose()}>

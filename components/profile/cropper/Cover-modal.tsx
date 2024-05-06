@@ -138,7 +138,7 @@ try {
    
   return (
     <div
-      className="relative z-50"
+      className="relative z-[100]"
       aria-labelledby="crop-cover-dialog"
       role="dialog"
       aria-modal="true"
@@ -148,7 +148,7 @@ try {
       <div className="fixed inset-0  bg-gray-900 bg-opacity-75 transition-all backdrop-blur-sm"></div>  
       <div className="fixed z-10 overflow-y-auto left-0 right-0 top-40 bottom-0">
       {visable&&(
-        <div className="fixed inset-0 w-full h-full z-50">
+        <div className="fixed inset-0 w-full h-full z-[100]">
                   <ImageCropper 
                   image={coverSrc}
                   type="Cover"

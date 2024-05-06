@@ -3,22 +3,18 @@
 import * as z from "zod"
 import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { UserPost } from "@/schemas";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 import { Skeleton } from "@/components/ui/skeleton";
 import ImageGrid from "./post/Image-grid";
-import { microserviceEndpoint } from "@/lib/utils";
 import { FaCommentDots } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
-import Image from "next/image";
 import LikeButton from "./post/Like-button";
 import PostHeader from "./post/Post-header";
+import GetPost from "./post/functions/get-post";
+import InfiniteScroll from "./post/functions/infinite-scroll";
 
 
 type post ={
@@ -33,14 +29,15 @@ type post ={
     author:{
         Name:string,
         Image:string,
-    }
+    },
+    
 }
 type image ={
     url:string
     inedx:number
 }
 
-
+type PostPromise = Promise<post[]>;
 const UserPostList  = (profile:any) => {
 
 const {update} = useSession()
@@ -48,35 +45,22 @@ const [posts, setPosts]=useState<post[]>()
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState<boolean>(false)
 const [getPostTrigger,updatePost]=useState<boolean>(false)
-
+const [hasMore,setHasMore]= useState<boolean>(true)
+const [page,setPage]=useState<number>(1)
+const [totalPostCount,setTotalCount]=useState<number>(0)
 const user = useCurrentUser()
 
 ///load user post from server 
     useEffect(()=>{
-        async function GetPost() {
-            try{
-                if(profile.profile){
-                    const posts = await GetUserPostsById(profile.profile)
-                    return posts
+      console.log('INIT_GETPOST_TRIGGER')
+        GetPost(profile,user.id,1).then(posts => {setTotalCount(posts.totalPostCount),setPosts(posts?.posts)})
+        // GetPost(profile,user.id,1).then(posts => console.log(posts))
 
-                }else{
-                   
-                    const posts = await GetUserPostsById(user.id)
-                    
-                    setPosts(posts.posts)
-                    return posts
-                }
-            }catch(error){
-                console.log(error)
-         
-           
-        }}
-        GetPost().then(posts => setPosts(posts?.posts))
-       
-    },[update,profile,getPostTrigger])
-///
-
-    
+    },[getPostTrigger])
+    ///
+  
+   
+    // useEffect(()=>{console.log(posts)},[posts])
   
     const serverLikeaction = (postId:string)=>{
         startTransition(()=>{
@@ -127,9 +111,10 @@ const user = useCurrentUser()
             updatePost(!getPostTrigger)
             
             toast.error("Error updating post like. Please try again.");
-        }finally{
-            updatePost(!getPostTrigger)
         }
+        // }finally{
+        //     updatePost(!getPostTrigger)
+        // }
     };
 
 
@@ -177,7 +162,24 @@ const user = useCurrentUser()
         
         };
            
+        const fetchMoreData = async ()=>{
+            console.log("INFINITE_TRIGGERED")
+            ///gettFrom server posts.lenght 
+            if(posts.length>=totalPostCount){
+                setHasMore(false)
+                return
+            }
 
+                try {
+                    await GetPost(profile,user.id,page+1).then(posts=>setPosts(prev=>[...prev,...posts.posts])).finally(()=>setPage(page+1))
+                    
+                } catch (error) {
+                    console.log(error)
+                    return
+                }
+           
+            
+        }
 
 
     return ( 
@@ -210,6 +212,7 @@ const user = useCurrentUser()
                </div>
 
             )}
+            <InfiniteScroll loadMore={fetchMoreData} hasMore={hasMore}>
             {posts?.map((post,index)=>(
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
                     
@@ -239,7 +242,7 @@ const user = useCurrentUser()
                 </div>
                 </div>
             ))}
-           
+           </InfiniteScroll>
         </div>
      );
 }

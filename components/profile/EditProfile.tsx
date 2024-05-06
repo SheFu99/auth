@@ -7,7 +7,7 @@ import { FaUser } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Cover from "./Cover";
 import { getProfileById } from "@/actions/UserProfile";
-import { ProfileData } from "@/hooks/use-current-profile";
+import { ProfileData, useUpdateProfileTrigger } from "@/hooks/use-current-profile";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import Image from 'next/image';
 import UserProfileForm from './forms/UserProfileForm';
@@ -25,9 +25,11 @@ import PostModal from "./cropper/Post-modal";
 const  EditProfile =  () => {
   
   const user = useCurrentUser();
-  // const {profile , updateProfile, upload , switchUpload} = useCurrentProfile(); //use redux and localstorage for store
+  const {upload , switchUpload} = useUpdateProfileTrigger(); //use redux and localstorage for store
   const [profile, setProfile] = useState<ProfileData>()
-  const {update} = useSession()
+
+  const {update} = useSession() ///replace to updateProfile redux hook 
+  
   const [avatarUploading, setAvatarUloading] = useState(false);
   const [sessionImage, setSessionImage] = useState( user?.image); 
   const [addInfo,swichAddInfo]=useState<boolean>(false)
@@ -69,7 +71,7 @@ const  EditProfile =  () => {
     // if(!profile?.phoneNumber){
     //   swichUserEditState(true)
     // }
-  },[update]) 
+  },[upload]) 
 
   const updateAvatar = async(croppedImageBlob) =>{
  
@@ -102,7 +104,8 @@ const  EditProfile =  () => {
           toast.success('Avatar updated successfully.');
           setSessionImage(imageUrl); // Assuming the response includes the new URL
           setAvatarUloading(false)
-            update()
+          update()
+          switchUpload(true)
         } else {
           setAvatarUloading(false)
           throw new Error('New avatar URL not provided');
@@ -128,11 +131,15 @@ const  EditProfile =  () => {
 
   };
 
+  const onAvatarChange=()=>{
+
+  }
+
   return (
     
     <div className="col-span-12 grid-row-6 ">
         <div className=''>
-          <Cover url={profile?.coverImage!} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
+          <Cover url={profile?.coverImage!} onChange={()=>switchUpload(true)} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
           <div>
 
             {avatarCropper && (
