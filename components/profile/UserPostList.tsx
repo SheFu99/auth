@@ -19,6 +19,8 @@ import { useUpdatePosts } from "@/hooks/use-current-profile";
 import { useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
 import CommentForm from "./forms/CommentForm";
+import { DeleteComment, LikeComment } from "@/actions/commentsAction";
+import IsUserAuth from "./post/functions/ifUserPermissions";
 
 type post ={
     PostId: string,
@@ -53,13 +55,13 @@ const [page,setPage]=useState<number>(1)
 const [totalPostCount,setTotalCount]=useState<number>(0)
 
 const user = useCurrentUser()
-
+const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
 
 ///load user post from server 
     useEffect(()=>{
         console.log('TRIGGERED')
         GetPost(profile, user?.id,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts)})
-        console.log(posts)
+        // console.log(posts)
         // GetPost(profile,user.id,1).then(posts => console.log(posts))
 
     },[update])
@@ -68,7 +70,7 @@ const user = useCurrentUser()
    
     // useEffect(()=>{console.log(posts)},[posts])
   
-    const serverLikeaction = (postId:string)=>{
+    const postLikeAction = (postId:string)=>{
         startTransition(()=>{
             LikePost(postId)
             .then((data)=>{
@@ -87,13 +89,29 @@ const user = useCurrentUser()
               
             })
         })
+    };
+    const commentLikeAction = (CommentId:string)=>{
+        startTransition(()=>{
+            LikeComment(CommentId)
+            .then((data)=>{
+                if(data.error){
+                    toast.error('Comment Like Error')
+                }
+                if(data.success){
+                    return
+                }
+            })
+        })
     }
-    const like = async (postId: string) => {
-        if (!user) {
-            toast.error("You must be authorized");
-            return;
-        }
-    
+
+    const  CommentLike = async (CommentId:string)=>{
+        IsUserAuth(user)
+
+        console.log(posts)
+    }
+
+    const Postlike = async (postId: string) => {
+        IsUserAuth(user)
         // Optimistic UI Update
         const newPosts = posts?.map(post => {
             if (post.PostId === postId) {
@@ -110,11 +128,10 @@ const user = useCurrentUser()
         setPosts(newPosts);
        
         try {
-            await serverLikeaction(postId);
+            postLikeAction(postId);
         } catch (error) {
             console.error("Failed to update like status on the server:", error);
             update()
-            
             toast.error("Error updating post like. Please try again.");
         }
         // }finally{
@@ -122,17 +139,13 @@ const user = useCurrentUser()
         // }
     };
 
-    const deletePost=(post:any)=>{
+        const deletePost=(post:any)=>{
       
             const keys = post.image.map(item => {
                 console.log(item.url)
-                const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
                 const result = item.url.split(splitUrl)[1];
                 return result
               });
-    
-     
-        
             startTransition(()=>{
     
                 DeleteUserPosts(post.PostId,keys)
@@ -153,7 +166,6 @@ const user = useCurrentUser()
         return 
         
         };
-           
         const fetchMoreData = async ()=>{
             ///gettFrom server posts.lenght 
             if(posts.length>=totalPostCount){
@@ -169,8 +181,7 @@ const user = useCurrentUser()
                 }
            
             
-        }
-
+        };
         const openComentForm = (postIndex)=>{
             const isTwice = addComent.filter(item=>item ===postIndex)
       
@@ -190,6 +201,27 @@ const user = useCurrentUser()
                 return false
             }
         };
+        const DeleteCommentFunction = (comment) =>{
+            const keys = comment.image.map(item => {
+                const result = item.url.split(splitUrl)[1];
+                return result
+              });
+
+
+            startTransition(()=>{
+                DeleteComment(comment.CommentId,keys)
+                .then((data)=>{
+                    if(data.success){
+                        toast.success(data.success)
+                        update()
+                    }
+                    if(data.error){
+                        toast.success(data.error)
+                    }
+                })
+            })
+
+        };
 
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">
@@ -206,24 +238,32 @@ const user = useCurrentUser()
                             )}
                                 <ImageGrid images={post.image} />
                         <div className="flex gap-5 justify-between ">
-                            <LikeButton className=" bg-neutral-900" post={post} onLike={()=>like(post.PostId)} isPending={isPending}/>
+                            <LikeButton className=" bg-neutral-900 px-10" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
-                            <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 rounded-md p-2 mt-5 ">
+                            <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-10 rounded-md p-2 mt-5 ">
                                 <FaCommentDots/>
                             </button>
 
-                            <button title= 'repost' className="text-white bg-neutral-900 rounded-md p-2 mt-5  ">
+                            <button title= 'repost' className="text-white bg-neutral-900 px-10 rounded-md p-2 mt-5  ">
                                 <BiRepost className="scale-150"/>
                             </button>
                         </div>
                     </div>
                     {post?.comments.map((comment,index)=>(
                         <div key={index} className="px-20 mt-5">
-                            
+                            {user.id === comment.userId&&(
+                                <button title="delete commetn" 
+                                className="text-black absolute right-20"
+                                onClick={()=>DeleteCommentFunction(comment)}
+                                >
+                                    <RiDeleteBin5Line color="white"/>
+                                </button>
+                            )}
                             <PostHeader author={comment.user} timestamp={comment.timestamp}/>
-                            <p className="text-white">{comment.text}</p>
-
-                            <ImageGrid images={comment?.image} className={'max-w-[150px]'}/>
+                            <p className="text-white px-[3rem]">{comment.text}</p>
+                            
+                            <ImageGrid images={comment?.image} className={'max-w-[300px] px-[3rem]'}/>
+                            <LikeButton className="bg-neutral-900 px-10" post={comment} onLike={()=>CommentLike(comment.CommentId)} isPending={isPending}/>
                         </div>
                     ))}
                     {isPostCommentOpen(index)&&(

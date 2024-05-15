@@ -12,7 +12,7 @@ const LikeButton:React.FC<LikeButtonProps> = ({onLike,post,isPending,className})
     
 
     return ( 
-        <button title="like" className={`${className}text-white rounded-md p-2 mt-5 bg-neutral-900`} onClick={onLike} disabled={isPending}>
+        <button title="like" className={`${className}text-white rounded-md p-2 mt-5 bg-neutral-900 px-10`} onClick={onLike} disabled={isPending}>
         {post.likedByUser?
          <div className="flex align-middle justify-center items-center gap-2 ">
              <FcLike/>

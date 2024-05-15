@@ -1,7 +1,7 @@
 "use client"
 
 import * as z from "zod"
-import { CreateComment, CreatePost } from "@/actions/UserPosts"
+import {  CreatePost } from "@/actions/UserPosts"
 import { useSession } from "next-auth/react"
 import {   useRef, useState, useTransition } from "react"
 import { toast } from "sonner"

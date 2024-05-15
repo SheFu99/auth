@@ -134,7 +134,7 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
             take:5,
         },
         comments:{
-            take:5,
+            take:2,
             include:{
                 image:{
                     select:{url:true},
@@ -143,7 +143,14 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
                 user:{
                     select:{
                         name:true,
-                        image:true
+                        image:true,
+                        id:true
+                    }
+                },
+                likes:true,
+                _count:{
+                    select:{
+                        likes:true
                     }
                 }
             }
@@ -161,7 +168,7 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
     }
     const [posts, totalPostCount] = await Promise.all([
      await db.post.findMany(postsQuery) as any,
-     await db.post.count({where:{userId:userId}})
+     await db.post.count({where:{userId:userId}}),
     ])
   
     // console.log(existingUser.name, existingUser.image)
@@ -173,14 +180,21 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
     // Map posts to include like counts
     const postsWithLikeCounts = posts.map(post => {
         const likedByUser = user && post.likes && post.likes.some(like => like.userId === user.id);
-        const commentsWithAuthor = post.comments.map(comment=>({
-            ...comment,
-        }))
+        const commentsWithAuthor = post.comments.map(comment=>{
+            const commentLikedByUser = user && comment.likes&& comment.likes.some(like=>like.userId===user.id)
+            return{
+                ...comment,
+                likeCount:comment._count.likes,
+                likedByUser: commentLikedByUser ?? false
+            }
+        });
+        
         return {
             ...post,
             author:{
                 name:existingUser.name,
                 image:existingUser.image,
+                id:existingUser.id
             },
             likeCount: post._count.likes,
             likedByUser: likedByUser ?? false ,
@@ -204,7 +218,12 @@ export const DeleteUserPosts = async (postId:string,keys:string):Promise<respons
     if(!existingUser){
         return {error:"User not found"}
     }
-    const result = await deleteImagefromS3(keys)
+    
+    try{
+        await deleteImagefromS3(keys)
+    }catch(error){
+        return{error:`Delete from s3 Error: ${error}`}
+    }
 
     const post = await db.post.delete({
         where:{PostId:postId}
@@ -215,7 +234,7 @@ export const DeleteUserPosts = async (postId:string,keys:string):Promise<respons
     }
     return {success:"Post deleted"}
 };
-        const deleteImagefromS3 = async(keys : any):Promise<deleteS3promise>=>{
+      export  const deleteImagefromS3 = async(keys : any):Promise<deleteS3promise>=>{
             if(!keys||keys.lenght ===0){
                 return {error:'Key is require'}
             };
@@ -276,64 +295,3 @@ export const LikePost = async (postId: string):Promise<postPromise> => {
     }
 };
 
-export const CreateComment = async(commentCard,postId)=>{
-    console.log("PROPS",postId,commentCard)
-    const user= await currentUser()
-    //    console.log("USER created post",user)
-          if(!user){
-            return {error:"You need to be autorize!"}
-            }
-    
-            const existingUser = await db.user.findFirst({
-                    where:{id:user.id,}
-            })
-    
-          if(!existingUser){
-                return {error:"User not found"}
-            }
-         
-            const existingPost = await db.comment.findFirst({
-                where: {
-                    text: commentCard.text,
-                    userId: user.id,
-                },
-            });
-            
-            if (existingPost) {
-                console.log(existingPost)
-                return {error:"A Comment with this content already exists."}
-            }
-    
-        try{
-            
-        const postData = {
-            text:commentCard.text,
-            userId:user.id,
-            postId:postId
-        } as any
-    
-        if(commentCard.image){
-            const imagesCopy = [...commentCard.image];
-            if(imagesCopy.length>0){
-                postData.image = {create:imagesCopy.map(url=>({url}))}
-            }
-        }
-          
-    
-            
-            const createPost = await db.comment.create({
-                data: postData,
-              });
-            //   console.log("after insert:", [...postCard.image])
-            // console.log("Post created", createPost)
-            return createPost
-           
-        }catch(error){
-            if (error.code === 'P2002') { // Prisma's error code for unique constraint violation
-                console.error("Failed to create a Comment: A Comment with this content already exists.");
-            } else {
-                console.error("Failed to create a Comment:", error);
-            }
-            throw error;
-        }
-}

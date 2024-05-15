@@ -1,10 +1,8 @@
 
 "use client"
 
-import * as z from "zod"
-import { CreateComment, CreatePost } from "@/actions/UserPosts"
 import { useSession } from "next-auth/react"
-import {  useEffect, useRef, useState, useTransition } from "react"
+import {  useRef, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
@@ -13,14 +11,13 @@ import { MdAddPhotoAlternate } from "react-icons/md"
 import { BsEmojiSmile } from "react-icons/bs"
 import { IoMdClose } from "react-icons/io"
 import { useCurrentUser } from "@/hooks/use-current-user"
-import { microserviceEndpoint } from "@/lib/utils"
 import { Theme } from "emoji-picker-react"
 import Picker from 'emoji-picker-react'
-import { useUpdatePosts } from "@/hooks/use-current-profile"
 import useBlobImage from "./functions/useBlobImage";
 import useUploadImages, { UploadImagesProps } from "./functions/uploadImages";
 import useOnError from "./functions/onError";
 import { postSchema } from "@/schemas";
+import { CreateComment } from "@/actions/commentsAction"
 
 
 
@@ -51,7 +48,6 @@ const CommentForm = ({postId}) => {
     const [isPending,startTransition]=useTransition()
     const [isEmoji,setEmoji]=useState<boolean>(false)
     const [textState,setTextState]=useState<string>('')
-    const [selectedReaction,setReaction]=useState<string>('')
     const [error,setError] =useState<string| undefined>()
  
     const TextInputRef = useRef(null)
@@ -134,7 +130,6 @@ const CommentForm = ({postId}) => {
     }
     const handleReactionClick = (reaction)=>{
       
-        setReaction(reaction);
         setTextState(prevValue=>prevValue + reaction.emoji)
         TextInputRef.current.value += reaction.emoji
     }
@@ -195,7 +190,7 @@ const CommentForm = ({postId}) => {
                                 </div>
                     </div>
                             <Button disabled={isUploading} type="submit" className="col-start-12 col-span-1 mt-2 h-10" >
-                                <IoSendSharp className="scale-150 mr-2"/>
+                                {/* <IoSendSharp className="mr-2"/> */}
                                 Send
                             </Button>
                         
