@@ -1,9 +1,9 @@
 "use client"
 
 import * as z from "zod"
-import { CreatePost } from "@/actions/UserPosts"
+import { CreateComment, CreatePost } from "@/actions/UserPosts"
 import { useSession } from "next-auth/react"
-import {  useEffect, useRef, useState, useTransition } from "react"
+import {   useRef, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
@@ -12,9 +12,14 @@ import { MdAddPhotoAlternate } from "react-icons/md"
 import { BsEmojiSmile } from "react-icons/bs"
 import { IoMdClose } from "react-icons/io"
 import { useCurrentUser } from "@/hooks/use-current-user"
-import { microserviceEndpoint } from "@/lib/utils"
+
 import { Theme } from "emoji-picker-react"
 import Picker from 'emoji-picker-react'
+
+import useUploadImages, { UploadImagesProps } from "./functions/uploadImages"
+import useOnError from "./functions/onError"
+import useBlobImage from "./functions/useBlobImage"
+import { postSchema } from "@/schemas"
 
 
 
@@ -29,46 +34,34 @@ export interface DataResponse{
 } 
 ;
 const UserPostForm = () => {
+  
+    const {isUploading,
+        setIsUploading,
+        uploadImages}=useUploadImages()
+    const {
+        images,
+        imagesBlobUrl,
+        setImageFiles,
+        setImagesBlobUrl,
+        AddImage,
+        deleteImage}=useBlobImage()
 
-    const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
+    const {shouldAnimate,onError}=useOnError()
     const [isPending,startTransition]=useTransition()
+
     const [isEmoji,setEmoji]=useState<boolean>(false)
-    const [images,setImageFiles]= useState<File[]|undefined>()
-    const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([])
     const [textState,setTextState]=useState<string>('')
-    const [selectedReaction,setReaction]=useState<string>('')
-    const [isUploading, setIsUploading] = useState<boolean>(false);
     const [error,setError] =useState<string| undefined>()
-    // const [editProfile, swichEditProfile]=useState<boolean>(false)
+
     const TextInputRef = useRef(null)
-    const {update} = useSession()
+    const {update}=useSession()
+   
     const user=useCurrentUser()
-
-const postSchema = z.object({
-    text:z.string().min(2,{message:'Error you need to type something to post this!'})
-})
-
-    const Submit = (post)=>{
-                 startTransition(()=>{
-                    CreatePost(post)
-                    .then((data:DataResponse)=>{
-                        if(data.error){
-                            setError(error);
-                            toast.error(data.error)
-                        }
-            
-                        if(!data.error){
-                            // swichEditProfile(false)
-                            update() 
-                            toast.success("Your post has been send")
-                           
-                        }
-                    })
-                    
-                })
-    }
-
+    const userId = user.id
+    const type = 'post'
+ 
     const submitPost= async(event)=>{
+        console.log('SUBMIT!')
         setEmoji(false)
         event.preventDefault()
         setIsUploading(true)
@@ -84,7 +77,8 @@ const postSchema = z.object({
 
         let post
          startTransition(()=>{
-            uploadImages(images)
+            const uploadProps:UploadImagesProps = {images,userId,type}
+            uploadImages(uploadProps)
            .then((data)=>{
 
                 if(data.error){
@@ -104,8 +98,8 @@ const postSchema = z.object({
             .finally(()=>{
                 setIsUploading(false)
                 Submit(post)
-                setImageFiles(undefined)
-                setImagesBlobUrl(null)
+                setImageFiles([])
+                setImagesBlobUrl([])
                 setTextState(undefined)
                 TextInputRef.current.value = null
                   
@@ -116,90 +110,31 @@ const postSchema = z.object({
     
     };
 
-    const uploadImages = async (files) => {
-       
-        setIsUploading(true);
-        let localImageUrls = [];
-        try {
-            const imageUrls = await Promise.all(files.map(async (file, index) => {
-                const now = new Date();
-                const dateTime = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
-            
-                const formData = new FormData();
-                const filename = `post_${user.id}_${dateTime}_${index}.png`; // Unique filename for each image
-                const headers = new Headers()
 
-                headers.append("Content-Type","multipart/form-data")
-                formData.append("cover", file, filename);
-                
-        
-                const uploadResponse = await fetch(`${microserviceEndpoint}/api/s3-array-upload`, {
-                    method: 'POST',
-                    body: formData,
-                });
-                const data = await uploadResponse.json();
-            
-                if (data?.error) {
-                    throw new Error('Upload to S3 failed');
-                };
+
+ 
+    const Submit = (post)=>{
+ 
+        startTransition(()=>{
+            console.log("CREATEPOST")
+            CreatePost(post)
+            .then((data:DataResponse)=>{
+                if(data.error){
+                    setError(error);
+                    toast.error(data.error)
+                }
     
-                localImageUrls.push(data.imageUrls); // Collect URLs in a local array
-            }));
+                if(!data.error){
+                    update() 
+                    toast.success("Your post has been send")
+                   
+                }
+            })
             
-
-            return { success: true, imageUrls: localImageUrls.flat() };
-        
-        } catch (error) {
-            
-            return { error: "Something went wrong! No imageURL from server" };
-        }
-    };
-
-    const AddImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
-      
-        const files = Array.from(event.target.files); // Convert FileList to Array
-
-            if(files.length>imagesBlobUrl.length){
-                setImageFiles(files)
-            }else{
-                setImageFiles(prevFiles=>[...prevFiles,...files])
-            }
-
-        const imageBlobUrls = [];
-
-    
-        for(let i=0; i<files.length; i++){
-            const file = files[i];
-            const reader = new FileReader();
-
-            reader.onload = (e)=>{
-                const blobUrl = e.target.result;
-                imageBlobUrls.push(blobUrl);
-            }
-            const imgURL = URL.createObjectURL(file);
-             imageBlobUrls.push(imgURL); // Push the created Blob URL
-             setImagesBlobUrl(prevImagesUrl=>[...prevImagesUrl,imgURL])
-             
-             reader.readAsDataURL(file)
+        })    
     }
-    };
-
-    const onError =(errors:any)=>{
-        if(Object.keys(errors).length){
-            setShouldAnimate(true)
-            setTimeout(()=>setShouldAnimate(false),1000)
-        }
-    };
-
-    const deleteImage = (image,index) =>{
-        setImagesBlobUrl(prevImagesUrl=>prevImagesUrl.filter(img=>img!==image))
-        const newImageState = images.filter((file,id)=>id !== index)
-        setImageFiles(newImageState)
-    };
 
     const handleReactionClick = (reaction)=>{
-      
-        setReaction(reaction);
         setTextState(prevValue=>prevValue + reaction.emoji)
         TextInputRef.current.value += reaction.emoji
     }

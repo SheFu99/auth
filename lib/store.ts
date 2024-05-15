@@ -1,12 +1,14 @@
 "use client"
 import { configureStore, combineReducers ,} from '@reduxjs/toolkit';
 import profileReducer from '../slices/profileSlices';
+import postsReducer from '../slices/postsSlices'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 const rootReducer = combineReducers({
   profile: profileReducer,
+  posts:postsReducer,
   // Add other reducers here
 });
 

@@ -44,7 +44,7 @@ model Post {
   text      String?   @unique
   timestamp DateTime  @default(now())
   userId    String
-  coments   Comment[]
+  comments   Comment[]
   image     Images[]
   likes     Like[]
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -52,10 +52,27 @@ model Post {
 
 model Images {
   url    String
-  postId String
+  postId String?
+  CommentId String?
   id     Int    @id @default(autoincrement())
-  Post   Post   @relation(fields: [postId], references: [PostId],onDelete: Cascade)
+  Post   Post?   @relation(fields: [postId], references: [PostId],onDelete: Cascade)
+  Comment Comment? @relation(fields: [CommentId],references: [CommentId],onDelete: Cascade)
 }
+
+model Comment {
+  CommentId String   @id @default(cuid())
+  image     Images[]
+  text      String?
+  timestamp DateTime @default(now())
+  postId    String?
+  userId    String
+  galleryId String?
+  gallery   Gallery? @relation(fields: [galleryId], references: [imageId])
+  post      Post?    @relation(fields: [postId], references: [PostId])
+  user      User     @relation(fields: [userId], references: [id])
+  likes     Like[]
+}
+
 
 model Gallery {
   imageId   String    @id @default(cuid())
@@ -68,19 +85,6 @@ model Gallery {
   likes     Like[]
 }
 
-model Comment {
-  CommentId String   @id @default(cuid())
-  image     String?
-  text      String?
-  timestamp DateTime @default(now())
-  postId    String?
-  userId    String
-  galleryId String?
-  gallery   Gallery? @relation(fields: [galleryId], references: [imageId])
-  post      Post?    @relation(fields: [postId], references: [PostId])
-  user      User     @relation(fields: [userId], references: [id])
-  likes     Like[]
-}
 
 model Like {
   likeId    Int      @id @default(autoincrement())

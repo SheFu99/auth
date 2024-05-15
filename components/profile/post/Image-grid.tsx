@@ -8,11 +8,16 @@ import "yet-another-react-lightbox/styles.css";
 import { PacmanLoader } from 'react-spinners';
 
 
-export default  function ImageGrid( {images} ) {
+interface ImageGridProps {
+    images?:any,
+    className?:string,
+}
+
+export default  function ImageGrid( {images,className}:ImageGridProps ) {
     const [isOpen, setIsOpen] = useState(false);
     const [imageState , setImageState]= useState<number>()
 
-    const modifyiedArray= images.map((url)=>{
+    const modifyiedArray= images?.map((url)=>{
         return{src:url.url}
     })
 
@@ -34,7 +39,7 @@ export default  function ImageGrid( {images} ) {
 
 
     const getGridForImage = (index) => {
-        switch (images.length) {
+        switch (images?.length) {
             case 1: return "col-span-6 aspect-2/1" ;
             case 2: return "col-span-3 aspect-1";
             case 3: return index === 0 ? "col-span-6" : "aspect-2/1 col-span-3";
@@ -46,7 +51,7 @@ export default  function ImageGrid( {images} ) {
     };
 
     return (
-        <div className={`grid grid-cols-6  gap-2  ${images.length === 0 ? 'grid-cols-1' : ''}`}>
+        <div className={`${className} grid grid-cols-6  gap-2  ${images?.length === 0 ? 'grid-cols-1' : ''}`}>
             {images?.map((img, index) => (
                 <div key={index} className={`${getGridForImage(index)} relative cursor-pointer col-span-1 `} onClick={() => openLightbox(index)}>
                     <Image

@@ -32,3 +32,15 @@ export function useUpdateProfileTrigger() {
   return { upload: updateProfile, switchUpload};
 }
 
+
+export function useUpdatePosts() {
+ 
+  const dispatch = useDispatch();
+  const upload = useSelector((state:RootState)=> state.posts.upload)
+
+  const switchUpload = (upload : boolean) =>{
+    console.log('SWITCH_Redux')
+    dispatch(setUpload(upload))
+  }
+  return { upload, switchUpload};
+}

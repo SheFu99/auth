@@ -111,3 +111,8 @@ export const UserPost = z.object({
 
   
 export type LoginFormDataType = z.infer<typeof LoginSchema>;
+
+
+export const postSchema = z.object({
+  text:z.string().min(2,{message:'Error you need to type something to post this!'})
+})
