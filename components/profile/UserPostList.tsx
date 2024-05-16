@@ -241,13 +241,13 @@ const debouncedGetPost = useCallback(debounce(()=>{
                             )}
                                 <ImageGrid images={post.image} />
                         <div className="flex gap-5 justify-between ">
-                            <LikeButton className=" bg-neutral-900 px-10" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
+                            <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
-                            <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-10 rounded-md p-2 mt-5 ">
+                            <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-3 rounded-md p-2 mt-5 ">
                                 <FaCommentDots/>
                             </button>
 
-                            <button title= 'repost' className="text-white bg-neutral-900 px-10 rounded-md p-2 mt-5  ">
+                            <button title= 'repost' className="text-white bg-neutral-900 px-3 rounded-md p-2 mt-5  ">
                                 <BiRepost className="scale-150"/>
                             </button>
                         </div>
@@ -263,10 +263,10 @@ const debouncedGetPost = useCallback(debounce(()=>{
                                 </button>
                             )}
                             <PostHeader author={comment?.user} timestamp={comment?.timestamp}/>
-                            <p className="text-white px-[3rem]">{comment?.text}</p>
+                            <p className="text-white ">{comment?.text}</p>
                             
-                            <ImageGrid images={comment?.image} className={'max-w-[300px] px-[3rem]'}/>
-                            <LikeButton className="bg-neutral-900 px-10" post={comment} onLike={()=>CommentLike(comment?.CommentId)} isPending={isPending}/>
+                            <ImageGrid images={comment?.image} className={'max-w-[300px] '}/>
+                            <LikeButton className="bg-neutral-900 px-3" post={comment} onLike={()=>CommentLike(comment?.CommentId)} isPending={isPending}/>
                         </div>
                     ))}
                     {isPostCommentOpen(index)&&(
