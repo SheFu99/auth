@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { db } from "./db";
 import {debounce} from 'lodash'
 
-const debouncedAuth = debounce(auth ,console.log("DEBOUCNE"),1024);
+const debouncedAuth = debounce(auth ,1000);
 
 
 
