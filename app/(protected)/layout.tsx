@@ -23,11 +23,11 @@ const ProtectedLayout = async ({children}:any) => {
         
                 <Navbar/>
             <div className="col-span-12 col-start-1 row-span-2">
-                <div className="grid space-y-10 grid-cols-12">
+                <div className="grid space-y-5 mr-2 ml-2 grid-cols-12">
 
                     <SideBar className="md:col-start-1 md:col-span-2 md:mt-5 hidden md:block "/>
 
-                        <div className="md:col-start-3 md:col-span-9 col-start-2 col-span-10 ">
+                        <div className="md:col-start-3 md:col-span-9 col-start-1 col-span-12 ">
                             {children} 
                        </div>
                 </div>

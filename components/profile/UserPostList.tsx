@@ -14,36 +14,20 @@ import GetPost from "./post/functions/get-post";
 const InfiniteScroll = React.lazy(()=>import ('./post/functions/infinite-scroll'))
 // import InfiniteScroll from "./post/functions/infinite-scroll";
 import PostSkeleton from "./post/skeleton";
-import UserPostForm from "./forms/UserPostForm";
 import { useSession } from "next-auth/react";
 import CommentForm from "./forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
-import IsUserAuth from "./post/functions/ifUserPermissions";
+import IsUserAuthToast from "./post/functions/ifUserPermissions";
 import {debounce} from 'lodash'
-type post ={
-    PostId: string,
-    image?: image[],
-    text: string,
-    timestamp: Date,
-    userId: string,
-    likeCount: number,
-    likes?:any[]
-    likedByUser?:boolean,
-    author:{
-        Name:string,
-        Image:string,
-    },
-    comments:any[]
-    
-}
-type image ={
-    url:string
-    inedx:number
-}
+import { comments, post } from "../types/globalTs";
+
+
 
 const UserPostList  = (profile:any) => {
 
 const [posts, setPosts]=useState<post[]>()
+const [comment,setComment]=useState<comments>()
+
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
 const {update}=useSession()
@@ -58,20 +42,11 @@ const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process
 ///load user post from server 
 const debouncedGetPost = useCallback(debounce(()=>{
     GetPost(profile, user?.id,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts)})
-    console.log("GETPOST_)_________")
 },1000),[])
-
-
     useEffect(()=>{
-        console.log('TRIGGERED')
         debouncedGetPost()
     },[update])
-
- 
-    ///
-  
-   
-    // useEffect(()=>{console.log(posts)},[posts])
+///
   
     const postLikeAction = (postId:string)=>{
         startTransition(()=>{
@@ -81,15 +56,10 @@ const debouncedGetPost = useCallback(debounce(()=>{
                     currentPosts.map(post=>
                         post.PostId === postId?{ ...post,likeCount:data.likesCount}:post
                     )
-                        
-                   
                 )
                 if(data.error){
-
                     toast.error(data.error)
                 }
-
-              
             })
         })
     };
@@ -107,23 +77,76 @@ const debouncedGetPost = useCallback(debounce(()=>{
         })
     }
 
-    const  CommentLike = async (CommentId:string)=>{
-        IsUserAuth(user)
-
-        console.log(CommentId)
-    }
+    const CommentLike = async (comment) => {
+        const commentId = comment.CommentId
+        
+        IsUserAuthToast(user);
+    
+        // Find the post containing the comment
+        const updatedPosts = posts.map((post) => {
+            if (post.PostId !== comment.postId) {
+                return post; // No changes for posts that don't contain the comment
+            }
+    
+            // Find the comment within the post
+            const updatedComments = post.comments.map((com) => {
+                if (com.CommentId !== commentId) {
+                    return com; // No changes for other comments
+                }
+    
+                // Update the comment here
+                return {
+                    ...com,
+                    likedByUser: !com.likedByUser,
+                    _count: {
+                        ...com._count,
+                        likes: com.likedByUser ? com._count.likes - 1 : com._count.likes + 1
+                    }
+                };
+            });
+    
+            // Return the updated post with the updated comments
+            return {
+                ...post,
+                comments: updatedComments
+            };
+        });
+        setPosts(updatedPosts);
+        try {
+            commentLikeAction(commentId);
+        } catch (error) {
+            console.error("Failed to update like status on the server:", error);
+            update()
+            toast.error("Error updating post like. Please try again.");
+        }
+    };
 
     const Postlike = async (postId: string) => {
-        IsUserAuth(user)
+        IsUserAuthToast(user)
         // Optimistic UI Update
         const newPosts = posts?.map(post => {
             if (post.PostId === postId) {
+                
+
                 // Toggle like status and adjust like count optimistically
                 if (post?.likedByUser===true) {
-                    return { ...post, likedByUser: false, likeCount: post.likeCount - 1 };
-                } else {
-                    return { ...post, likedByUser: true, likeCount: post.likeCount + 1 };
-                }
+                   
+                    return { 
+                        ...post, 
+                        likedByUser: false, 
+                            _count:{
+                                ...post._count,
+                                likes: post._count.likes - 1 
+                            } 
+                        };
+                    } else {
+                        return { ...post, likedByUser: true, 
+                            _count:{
+                            ...post._count,
+                            likes: post._count.likes + 1 
+                            }  
+                        };
+                    }
             }
             return post;
         });
@@ -233,6 +256,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 <>
                 {/* TODO: Need to pass key to parent component  */}
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
+                
                     <PostHeader author={post.author} timestamp={post.timestamp}/>
                     <div className="ml-[3rem] mr-[1rem]">
                         <p className="text-white col-span-10 col-start-2 ">{post.text}</p>
@@ -244,7 +268,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
                             <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
                             <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-3 rounded-md p-2 mt-5 ">
-                                <FaCommentDots/>
+                                <div className="flex gap-2 item-center justify-center align-middle"><FaCommentDots className="mt-1"/><p>{post?._count.comments}</p> </div>
                             </button>
 
                             <button title= 'repost' className="text-white bg-neutral-900 px-3 rounded-md p-2 mt-5  ">
@@ -252,21 +276,24 @@ const debouncedGetPost = useCallback(debounce(()=>{
                             </button>
                         </div>
                     </div>
+
+
                     {post?.comments.map((comment,index)=>(
-                        <div key={index} className="px-20 mt-5">
+                        <div key={index} className="md:px-20 px-10 mt-5">
                             {user?.id === comment.userId&&(
                                 <button title="delete commetn" 
-                                className="text-black absolute right-20"
+                                className="text-black absolute md:right-20 right-10"
                                 onClick={()=>DeleteCommentFunction(comment)}
                                 >
                                     <RiDeleteBin5Line color="white"/>
                                 </button>
                             )}
                             <PostHeader author={comment?.user} timestamp={comment?.timestamp}/>
-                            <p className="text-white ">{comment?.text}</p>
+                                
+                            <p className="text-white ml-[3rem]">{comment?.text}</p>
                             
-                            <ImageGrid images={comment?.image} className={'max-w-[300px] '}/>
-                            <LikeButton className="bg-neutral-900 px-3" post={comment} onLike={()=>CommentLike(comment?.CommentId)} isPending={isPending}/>
+                            <ImageGrid images={comment?.image} className={'max-w-[300px] ml-[3rem]'}/>
+                            <LikeButton className="bg-neutral-900 px-3" post={comment} onLike={()=>CommentLike(comment)} isPending={isPending}/>
                         </div>
                     ))}
                     {isPostCommentOpen(index)&&(

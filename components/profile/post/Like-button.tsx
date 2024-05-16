@@ -1,8 +1,9 @@
+import { post } from "@/components/types/globalTs";
 import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 
 interface LikeButtonProps {
     onLike:()=>void,
-    post:any,
+    post:post,
     isPending:boolean,
     className?:string
 }
@@ -16,12 +17,12 @@ const LikeButton:React.FC<LikeButtonProps> = ({onLike,post,isPending,className})
         {post.likedByUser?
          <div className="flex align-middle justify-center items-center gap-2 ">
              <FcLike/>
-             {post.likeCount}
+             {post._count.likes}
          </div>
         :
         <div className="flex align-middle justify-center items-center gap-2 ">
         <FcLikePlaceholder/>
-        {post.likeCount>0 ? post.likeCount: undefined}
+        {/* {post._count.likes>0 ? post._count.likes: undefined} */}
     </div>
          }
         </button>

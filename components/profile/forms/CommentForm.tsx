@@ -34,20 +34,14 @@ export interface DataResponse{
 ;
 const CommentForm = ({postId}) => {
   
-    const {isUploading,
-        setIsUploading,
-        uploadImages}=useUploadImages()
+    const { isUploading,
+            setIsUploading,
+            uploadImages}=useUploadImages()
+    const {shouldAnimate,onError}=useOnError()
+    const {update}=useSession()
     const [manager]=useState(new BlobImageManager());
     const [images,setImageFiles]=useState<File[]>([]);
     const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([])
-    // const {
-    //     images,
-    //     imagesBlobUrl,
-    //     setImageFiles,
-    //     setImagesBlobUrl,
-    //     AddImage,
-    //     deleteImage}=useBlobImage()
-    const {shouldAnimate,onError}=useOnError()
 
     const [isPending,startTransition]=useTransition()
     const [isEmoji,setEmoji]=useState<boolean>(false)
@@ -55,7 +49,7 @@ const CommentForm = ({postId}) => {
     const [error,setError] =useState<string| undefined>()
  
     const TextInputRef = useRef(null)
-    const {update}=useSession()
+   
    
     const user=useCurrentUser()
     const userId = user.id
@@ -131,12 +125,11 @@ const CommentForm = ({postId}) => {
         })
     
               
-    }
+    };
     const handleReactionClick = (reaction)=>{
-      
         setTextState(prevValue=>prevValue + reaction.emoji)
         TextInputRef.current.value += reaction.emoji
-    }
+    };
 
     const AddImages = (event:React.ChangeEvent<HTMLInputElement>) => {
         manager.addImage(event)
@@ -147,11 +140,11 @@ const CommentForm = ({postId}) => {
         manager.deleteImage(image,index)
         setImageFiles(manager.getImages());
         setImagesBlobUrl(manager.getImagesBlobUrl());
-    }
+    };
 
     return (
-        <div className="p-5">
-            <form  onSubmit={submitPost}  className="px-4 border border-gray-500 rounded-md grid grid-cols-12 space-x-5 " >
+        <div className="md:p-5 mt-5">
+            <form  onSubmit={submitPost}  className="px-4 border border-gray-500 rounded-md grid grid-cols-12 md:space-x-5 " >
 
                         {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[90vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
                     
@@ -162,7 +155,7 @@ const CommentForm = ({postId}) => {
                                             className={` ${shouldAnimate ? 'animate-shake' : ''} col-span-12 mt-5`}
                                             placeholder="Type your message here." 
                                         />
-                    <div className=" col-span-11">
+                    <div className=" col-span-10">
                             <div  className="mt-3 md:col-start-11 md:col-span-1 col-span-11 col-start-1  flex justify-around align-middle items-center p-1 mb-2">
                                 <label title="Add image"  >
                                     <MdAddPhotoAlternate className="scale-150 cursor-pointer "  />
@@ -187,7 +180,7 @@ const CommentForm = ({postId}) => {
                                     <p className="cursor-pointer" title="Mention">@</p>
                                 
                             </div>
-                                <div className="flex relative p-1 mt-2 flex-wrap gap-5">
+                                <div className="flex relative p-1 mt-2 flex-wrap gap-5 mb-2 ">
                                     {imagesBlobUrl?.map((image,index)=>(
                                         <div key={index}>
                                             <div className="relative" title="remove image">
@@ -204,10 +197,10 @@ const CommentForm = ({postId}) => {
                                     ))}
                                 </div>
                     </div>
-                            <Button disabled={isUploading} type="submit" className="col-start-12 col-span-1 mt-2 h-10" >
-                                {/* <IoSendSharp className="mr-2"/> */}
-                                Send
-                            </Button>
+                    <Button disabled={isUploading} type="submit" className="col-start-11 col-span-2 mt-2 h-10 " >
+                                <IoSendSharp className="mr-2"/>
+                        Send
+                    </Button>
                         
             </form>
         </div>

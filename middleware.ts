@@ -10,7 +10,7 @@ const {auth} =NextAuth(authConfig)
 const debouncedPaths = ['/api/auth/session'];
 
 const rateLimiter = new RateLimiterMemory({
-  points: 3, // 10 requests
+  points: 10, // 10 requests
   duration: 1, // per 1 second by IP
 });
 

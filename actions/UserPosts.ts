@@ -126,7 +126,8 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
     include: {
         _count: {
             select: {
-                likes: true,  // This will count the likes
+                likes: true, 
+                comments:true // This will count the likes
             }
         },
         image:{
@@ -196,7 +197,6 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
                 image:existingUser.image,
                 id:existingUser.id
             },
-            likeCount: post._count.likes,
             likedByUser: likedByUser ?? false ,
             comments:commentsWithAuthor
             
