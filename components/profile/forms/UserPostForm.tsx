@@ -20,6 +20,7 @@ import useUploadImages, { UploadImagesProps } from "./functions/uploadImages"
 import useOnError from "./functions/onError"
 import useBlobImage from "./functions/useBlobImage"
 import { postSchema } from "@/schemas"
+import BlobImageManager from "./classes/BlobImageManager"
 
 
 
@@ -38,13 +39,16 @@ const UserPostForm = () => {
     const {isUploading,
         setIsUploading,
         uploadImages}=useUploadImages()
-    const {
-        images,
-        imagesBlobUrl,
-        setImageFiles,
-        setImagesBlobUrl,
-        AddImage,
-        deleteImage}=useBlobImage()
+    // const {
+    //     images,
+    //     imagesBlobUrl,
+    //     setImageFiles,
+    //     setImagesBlobUrl,
+    //     AddImage,
+    //     deleteImage}=useBlobImage()
+    const [manager] = useState(new BlobImageManager)
+    const [images, setImageFiles]=useState<File[]>([]);
+    const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([]);
 
     const {shouldAnimate,onError}=useOnError()
     const [isPending,startTransition]=useTransition()
@@ -57,7 +61,7 @@ const UserPostForm = () => {
     const {update}=useSession()
    
     const user=useCurrentUser()
-    const userId = user.id
+    const userId = user?.id
     const type = 'post'
  
     const submitPost= async(event)=>{
@@ -137,6 +141,16 @@ const UserPostForm = () => {
     const handleReactionClick = (reaction)=>{
         setTextState(prevValue=>prevValue + reaction.emoji)
         TextInputRef.current.value += reaction.emoji
+    };
+    const AddImages = (event:React.ChangeEvent<HTMLInputElement>)=>{
+        manager.addImage(event);
+        setImageFiles(manager.getImages());        
+        setImagesBlobUrl(manager.getImagesBlobUrl());
+    };
+    const DeleteImage = (image:string,inedx:number)=>{
+        manager.deleteImage(image,inedx);
+        setImageFiles(manager.getImages);
+        setImagesBlobUrl(manager.getImagesBlobUrl);
     }
 
     return (
@@ -156,7 +170,7 @@ const UserPostForm = () => {
                         <label title="Add image"  >
                             <MdAddPhotoAlternate className="scale-150 cursor-pointer "  />
                             <input 
-                                onChange={AddImage}
+                                onChange={AddImages}
                                 type='file'
                                 accept="image/*"
                                 className="hidden"
@@ -181,7 +195,7 @@ const UserPostForm = () => {
                             <div key={index}>
                                 <div className="relative" title="remove image">
                                     <button 
-                                        onClick={()=>deleteImage(image,index)} 
+                                        onClick={()=>DeleteImage(image,index)} 
                                         title="Delete image" 
                                         type="button"
                                         className="text-white absolute right-0" >

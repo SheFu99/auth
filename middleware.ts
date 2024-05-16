@@ -1,14 +1,30 @@
+import { RateLimiterMemory } from 'rate-limiter-flexible';
 import {adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from './routes';
 import authConfig from "./auth.config"
 import NextAuth from "next-auth"
-import { currentRole, currentUser } from './lib/auth';
+import { currentRole } from './lib/auth';
 import { NextResponse } from 'next/server';
 
 
 const {auth} =NextAuth(authConfig)
+const debouncedPaths = ['/api/auth/session'];
+
+const rateLimiter = new RateLimiterMemory({
+  points: 3, // 10 requests
+  duration: 1, // per 1 second by IP
+});
+
 
 export default auth(async (req) => {
-const user = await currentUser()
+  const ipAddr = req.headers.get('x-forwarded-for') || req.ip || '127.0.0.1';
+  if (debouncedPaths.includes(req.nextUrl.pathname)) {
+    try {
+        await rateLimiter.consume(ipAddr);
+    } catch (rateLimiterRes) {
+        // Rate limiter response if too many requests
+        return new Response('Too Many Requests', { status: 429 });
+    }
+}
 const userRole = await currentRole()           
 const {nextUrl}=req;
 const isLoggedIn = !!req.auth;

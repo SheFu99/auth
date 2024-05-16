@@ -1,16 +1,20 @@
 import { auth } from "@/auth";
 import { db } from "./db";
+import {debounce} from 'lodash'
+
+const debouncedAuth = debounce(auth ,console.log("DEBOUCNE"),1024);
+
 
 
 export const currentUser = async () =>{
-    const session = await auth()
+    const session = await debouncedAuth()
 
     return session?.user
 }
 
 export const currentRole = async () =>{
-    const session = await auth()
-    console.log("CurrentRole",session?.user.role)
+    const session = await debouncedAuth()
+    // console.log("CurrentRole",session?.user.role)
     return session?.user.role
 }
 

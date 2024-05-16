@@ -44,24 +44,23 @@ model Post {
   text      String?   @unique
   timestamp DateTime  @default(now())
   userId    String
-  comments   Comment[]
+  comments  Comment[]
   image     Images[]
   likes     Like[]
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Images {
-  url    String
-  postId String?
+  url       String
+  postId    String?
   CommentId String?
-  id     Int    @id @default(autoincrement())
-  Post   Post?   @relation(fields: [postId], references: [PostId],onDelete: Cascade)
-  Comment Comment? @relation(fields: [CommentId],references: [CommentId],onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  Comment   Comment? @relation(fields: [CommentId], references: [CommentId], onDelete: Cascade)
+  Post      Post?    @relation(fields: [postId], references: [PostId], onDelete: Cascade)
 }
 
 model Comment {
   CommentId String   @id @default(cuid())
-  image     Images[]
   text      String?
   timestamp DateTime @default(now())
   postId    String?
@@ -70,9 +69,9 @@ model Comment {
   gallery   Gallery? @relation(fields: [galleryId], references: [imageId])
   post      Post?    @relation(fields: [postId], references: [PostId])
   user      User     @relation(fields: [userId], references: [id])
+  image     Images[]
   likes     Like[]
 }
-
 
 model Gallery {
   imageId   String    @id @default(cuid())
@@ -84,7 +83,6 @@ model Gallery {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   likes     Like[]
 }
-
 
 model Like {
   likeId    Int      @id @default(autoincrement())

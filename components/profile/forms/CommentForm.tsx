@@ -18,6 +18,7 @@ import useUploadImages, { UploadImagesProps } from "./functions/uploadImages";
 import useOnError from "./functions/onError";
 import { postSchema } from "@/schemas";
 import { CreateComment } from "@/actions/commentsAction"
+import BlobImageManager from "./classes/BlobImageManager"
 
 
 
@@ -36,13 +37,16 @@ const CommentForm = ({postId}) => {
     const {isUploading,
         setIsUploading,
         uploadImages}=useUploadImages()
-    const {
-        images,
-        imagesBlobUrl,
-        setImageFiles,
-        setImagesBlobUrl,
-        AddImage,
-        deleteImage}=useBlobImage()
+    const [manager]=useState(new BlobImageManager());
+    const [images,setImageFiles]=useState<File[]>([]);
+    const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([])
+    // const {
+    //     images,
+    //     imagesBlobUrl,
+    //     setImageFiles,
+    //     setImagesBlobUrl,
+    //     AddImage,
+    //     deleteImage}=useBlobImage()
     const {shouldAnimate,onError}=useOnError()
 
     const [isPending,startTransition]=useTransition()
@@ -134,6 +138,17 @@ const CommentForm = ({postId}) => {
         TextInputRef.current.value += reaction.emoji
     }
 
+    const AddImages = (event:React.ChangeEvent<HTMLInputElement>) => {
+        manager.addImage(event)
+        setImageFiles(manager.getImages())
+        setImagesBlobUrl(manager.getImagesBlobUrl())
+    };
+    const DeleteImage = (image:string,index:number)=>{
+        manager.deleteImage(image,index)
+        setImageFiles(manager.getImages());
+        setImagesBlobUrl(manager.getImagesBlobUrl());
+    }
+
     return (
         <div className="p-5">
             <form  onSubmit={submitPost}  className="px-4 border border-gray-500 rounded-md grid grid-cols-12 space-x-5 " >
@@ -152,7 +167,7 @@ const CommentForm = ({postId}) => {
                                 <label title="Add image"  >
                                     <MdAddPhotoAlternate className="scale-150 cursor-pointer "  />
                                     <input 
-                                        onChange={AddImage}
+                                        onChange={AddImages}
                                         type='file'
                                         accept="image/*"
                                         className="hidden"
@@ -177,7 +192,7 @@ const CommentForm = ({postId}) => {
                                         <div key={index}>
                                             <div className="relative" title="remove image">
                                                 <button 
-                                                    onClick={()=>deleteImage(image,index)} 
+                                                    onClick={()=>DeleteImage(image,index)} 
                                                     title="Delete image" 
                                                     type="button"
                                                     className="text-white absolute right-0" >

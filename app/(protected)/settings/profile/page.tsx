@@ -17,11 +17,11 @@ const ProfilePage = () => {
       
       
         <div className="">
-            <Provider store={store}>
+            {/* <Provider store={store}> */}
        
             <EditProfile></EditProfile>
 
-            </Provider>
+            {/* </Provider> */}
         </div>
 
       

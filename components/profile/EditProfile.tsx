@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BsFillPencilFill } from "react-icons/bs";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { toast } from "sonner";
@@ -7,25 +7,26 @@ import { FaUser } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Cover from "./Cover";
 import { getProfileById } from "@/actions/UserProfile";
-import { ProfileData, useUpdateProfileTrigger } from "@/hooks/use-current-profile";
+// import { ProfileData, useUpdateProfileTrigger } from "@/hooks/use-current-profile";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import Image from 'next/image';
 import UserProfileForm from './forms/UserProfileForm';
 import { RiGalleryFill, RiProfileLine } from 'react-icons/ri';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import UserPostForm from './forms/UserPostForm';
 import UserPostList from './UserPostList';
 import ImageCropper from "./cropper/Image-Cropper";
 import { BounceLoader } from "react-spinners";
 import PostModal from "./cropper/Post-modal";
+import { ProfileData } from "../types/globalTs";
+import {debounce} from 'lodash'
 
 
 
 const  EditProfile =  () => {
   
   const user = useCurrentUser();
-  const {upload , switchUpload} = useUpdateProfileTrigger(); //use redux and localstorage for store
+  // const {upload , switchUpload} = useUpdateProfileTrigger(); //use redux and localstorage for store
   const [profile, setProfile] = useState<ProfileData>()
 
   const {update} = useSession() ///replace to updateProfile redux hook 
@@ -66,12 +67,16 @@ const  EditProfile =  () => {
         console.error('Failed to fetch profile:', error);
       }
   };
+
+  const debounceFetchProfile = useCallback(
+    debounce(()=>{
+      fetchProfile();
+  },1000),[])
+
+  
   useEffect(()=>{
-    fetchProfile();
-    // if(!profile?.phoneNumber){
-    //   swichUserEditState(true)
-    // }
-  },[upload]) 
+    debounceFetchProfile();
+  },[update]) 
 
   const updateAvatar = async(croppedImageBlob) =>{
  
@@ -105,7 +110,7 @@ const  EditProfile =  () => {
           setSessionImage(imageUrl); // Assuming the response includes the new URL
           setAvatarUloading(false)
           update()
-          switchUpload(true)
+          // switchUpload(true)
         } else {
           setAvatarUloading(false)
           throw new Error('New avatar URL not provided');
@@ -139,7 +144,7 @@ const  EditProfile =  () => {
     
     <div className="col-span-12 grid-row-6 ">
         <div className=''>
-          <Cover url={profile?.coverImage!} onChange={()=>switchUpload(true)} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
+          <Cover url={profile?.coverImage!} onChange={update} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
           <div>
 
             {avatarCropper && (

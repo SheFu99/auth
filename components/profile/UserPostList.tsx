@@ -2,7 +2,7 @@
 "use clinet"
 import { DeleteUserPosts, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import React, { Profiler, useEffect, useState, useTransition } from "react";
+import React, { Profiler, useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import ImageGrid from "./post/Image-grid";
@@ -15,13 +15,11 @@ const InfiniteScroll = React.lazy(()=>import ('./post/functions/infinite-scroll'
 // import InfiniteScroll from "./post/functions/infinite-scroll";
 import PostSkeleton from "./post/skeleton";
 import UserPostForm from "./forms/UserPostForm";
-import { useUpdatePosts } from "@/hooks/use-current-profile";
-import { useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
 import CommentForm from "./forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import IsUserAuth from "./post/functions/ifUserPermissions";
-
+import {debounce} from 'lodash'
 type post ={
     PostId: string,
     image?: image[],
@@ -58,13 +56,18 @@ const user = useCurrentUser()
 const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
 
 ///load user post from server 
+const debouncedGetPost = useCallback(debounce(()=>{
+    GetPost(profile, user?.id,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts)})
+    console.log("GETPOST_)_________")
+},1000),[])
+
+
     useEffect(()=>{
         console.log('TRIGGERED')
-        GetPost(profile, user?.id,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts)})
-        // console.log(posts)
-        // GetPost(profile,user.id,1).then(posts => console.log(posts))
-
+        debouncedGetPost()
     },[update])
+
+ 
     ///
   
    
@@ -107,7 +110,7 @@ const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process
     const  CommentLike = async (CommentId:string)=>{
         IsUserAuth(user)
 
-        console.log(posts)
+        console.log(CommentId)
     }
 
     const Postlike = async (postId: string) => {
@@ -182,16 +185,15 @@ const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process
            
             
         };
+
         const openComentForm = (postIndex)=>{
             const isTwice = addComent.filter(item=>item ===postIndex)
-      
             if(isTwice.length>0){
                 const isNotTwice = addComent.filter(item=>item !==postIndex);
                 setComentState(isNotTwice)
             }else{
                 setComentState(prev=>[...prev,postIndex])
             }
-          
         };
         const isPostCommentOpen =(index)=>{
             const isExistInArray = addComent.filter(item=>item ===index)
@@ -229,6 +231,7 @@ const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process
             <InfiniteScroll loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
             {posts?.map((post,index)=>(
                 <>
+                {/* TODO: Need to pass key to parent component  */}
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
                     <PostHeader author={post.author} timestamp={post.timestamp}/>
                     <div className="ml-[3rem] mr-[1rem]">
@@ -251,7 +254,7 @@ const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process
                     </div>
                     {post?.comments.map((comment,index)=>(
                         <div key={index} className="px-20 mt-5">
-                            {user.id === comment.userId&&(
+                            {user?.id === comment.userId&&(
                                 <button title="delete commetn" 
                                 className="text-black absolute right-20"
                                 onClick={()=>DeleteCommentFunction(comment)}
@@ -259,11 +262,11 @@ const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process
                                     <RiDeleteBin5Line color="white"/>
                                 </button>
                             )}
-                            <PostHeader author={comment.user} timestamp={comment.timestamp}/>
-                            <p className="text-white px-[3rem]">{comment.text}</p>
+                            <PostHeader author={comment?.user} timestamp={comment?.timestamp}/>
+                            <p className="text-white px-[3rem]">{comment?.text}</p>
                             
                             <ImageGrid images={comment?.image} className={'max-w-[300px] px-[3rem]'}/>
-                            <LikeButton className="bg-neutral-900 px-10" post={comment} onLike={()=>CommentLike(comment.CommentId)} isPending={isPending}/>
+                            <LikeButton className="bg-neutral-900 px-10" post={comment} onLike={()=>CommentLike(comment?.CommentId)} isPending={isPending}/>
                         </div>
                     ))}
                     {isPostCommentOpen(index)&&(

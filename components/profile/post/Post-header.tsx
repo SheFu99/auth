@@ -10,7 +10,6 @@ const formatter = buildFormatter(csStrings);
 
 const PostHeader = ({author,timestamp}) => {
     const user = author
-    console.log(user)
     
     return ( 
         <div className="flex item-center space-x-2">
