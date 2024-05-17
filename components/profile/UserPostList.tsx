@@ -79,7 +79,6 @@ const debouncedGetPost = useCallback(debounce(()=>{
 
     const CommentLike = async (comment) => {
         const commentId = comment.CommentId
-        
         IsUserAuthToast(user);
     
         // Find the post containing the comment
@@ -111,6 +110,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 comments: updatedComments
             };
         });
+
         setPosts(updatedPosts);
         try {
             commentLikeAction(commentId);
@@ -268,7 +268,10 @@ const debouncedGetPost = useCallback(debounce(()=>{
                             <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
                             <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-3 rounded-md p-2 mt-5 ">
-                                <div className="flex gap-2 item-center justify-center align-middle"><FaCommentDots className="mt-1"/><p>{post?._count.comments}</p> </div>
+                                <div className="flex gap-2 item-center justify-center align-middle">
+                                    <FaCommentDots className="mt-1"/>
+                                {post._count.comments>0&&(<p>{post?._count.comments}</p>)}
+                                </div>
                             </button>
 
                             <button title= 'repost' className="text-white bg-neutral-900 px-3 rounded-md p-2 mt-5  ">
