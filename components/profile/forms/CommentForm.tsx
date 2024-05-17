@@ -145,9 +145,9 @@ const CommentForm = ({postId}) => {
     return (
         <div className="md:p-5 mt-5">
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
+                        {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[80vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
             <form  onSubmit={submitPost}  className="px-4 border border-gray-500 rounded-md grid grid-cols-12 md:space-x-5 " >
 
-                        {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[90vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
                     
                                         <Textarea 
                                             ref={TextInputRef}

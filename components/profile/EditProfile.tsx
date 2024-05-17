@@ -157,26 +157,31 @@ const  EditProfile =  () => {
             )}
            
         </div>
-            <div className="flex items-center relative ">
-            <div className="absolute left-4 md:mt-[1px] md:-ml-[6px] mt-[2px] rounded-full w-[60px] h-[60px] md:w-[112px] md:h-[111px] bg-black -ml-[5px] z-10 shadow-md">
-                      </div>
-                  <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem]  -bottom-15 left-0 p-[1rem] justify-center ">
+        <div className="flex items-center relative ">
+            {/* <div className="absolute left-4 md:mt-[1px] md:-ml-[6px] mt-[2px] rounded-full w-[60px] h-[60px] md:w-[112px] md:h-[111px] bg-black -ml-[5px] z-10 shadow-md"></div> */}
+                  <div className="absolute md:left-0  m-auto w-fit md:p-[1rem]  md:-bottom-10 -bottom-5 left-3  justify-center ">
 
                   {sessionImage? (
-                    <div className="flex justify-center relative rounded-full w-[52px] h-[50px] md:w-[102px] md:h-[100px] z-30">
+                    <div className="flex justify-center relative rounded-full w-[65px] h-[65px] md:w-[100px] md:h-[100px] z-30">
                      
                      {avatarUploading?(
-                       <BounceLoader color="white"/>
+                       <BounceLoader color="white" className="md:-ml-[2px] mr-[1px]"/>
                       ):(
-                      <Image
-                        src={sessionImage}
-                        alt='Avatar'
-                        // layout="fill"
-                        width={100}
-                        height={100}
-                        className={`rounded-full z-30 md:-ml-[2px] mr-[1px]`}
                         
-                      />
+                          <div className="bg-black rounded-full  flex justify-center items-center align-middle">
+                          
+
+                          <Image
+                            src={sessionImage}
+                            alt='Avatar'
+                            // layout="fill"
+                            width={100}
+                            height={100}
+                            className={`rounded-full z-30 p-1`}
+                            
+                          />
+                        </div>
+                       
                       )}
                    
                   </div>
@@ -190,7 +195,7 @@ const  EditProfile =  () => {
 
 
                     <button
-                      className="absolute bottom-2 left-0 right-0 m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75 z-40"
+                      className="absolute md:bottom-2 -bottom-2 left-0 right-0  m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75 z-40"
                       title="Change photo"
                       onClick={() =>ChangeAvatar() } // Use ref to trigger file input click
                     >

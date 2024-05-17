@@ -199,7 +199,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 return
             }
                 try {
-                    await GetPost(profile,user?.id,page+1).then(posts=>setPosts(prev=>[...prev,...posts.posts])).finally(()=>setPage(page+1))
+                    await GetPost(profile,user?.id,page+1).then(posts=>setPosts(prev=>[...prev,...posts?.posts])).finally(()=>setPage(page+1))
                     
                 } catch (error) {
                     console.log(error)
@@ -259,22 +259,22 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 
                     <PostHeader author={post.author} timestamp={post.timestamp}/>
                     <div className="ml-[3rem] mr-[1rem]">
-                        <p className="text-white col-span-10 col-start-2 ">{post.text}</p>
+                        <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
                             {user?.id === post.userId&&(
                                 <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                             )}
-                                <ImageGrid images={post.image} />
+                                <ImageGrid images={post.image} className="-mt-5 mb-3" />
                         <div className="flex gap-5 justify-between ">
                             <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
-                            <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-3 rounded-md p-2 mt-5 ">
+                            <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-3 rounded-md   ">
                                 <div className="flex gap-2 item-center justify-center align-middle">
                                     <FaCommentDots className="mt-1"/>
-                                {post._count.comments>0&&(<p>{post?._count.comments}</p>)}
+                                {post._count.comments>0 &&(<p>{post?._count.comments}</p>)}
                                 </div>
                             </button>
 
-                            <button title= 'repost' className="text-white bg-neutral-900 px-3 rounded-md p-2 mt-5  ">
+                            <button title= 'repost' className="text-white bg-neutral-900 px-3 rounded-md p-2   ">
                                 <BiRepost className="scale-150"/>
                             </button>
                         </div>

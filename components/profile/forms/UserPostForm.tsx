@@ -149,8 +149,8 @@ const UserPostForm = () => {
     };
     const DeleteImage = (image:string,inedx:number)=>{
         manager.deleteImage(image,inedx);
-        setImageFiles(manager.getImages);
-        setImagesBlobUrl(manager.getImagesBlobUrl);
+        setImageFiles(manager.getImages());
+        setImagesBlobUrl(manager.getImagesBlobUrl());
     }
 
     return (
