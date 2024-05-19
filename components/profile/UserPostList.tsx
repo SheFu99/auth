@@ -268,7 +268,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
                             {user?.id === post.userId&&(
                                 <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                             )}
-                                <ImageGrid images={post.image} className={`${user.id===post.userId? '-mt-5':''}  mb-3`} />
+                                <ImageGrid images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3`} />
                         <div className="flex gap-5 justify-between ">
                             <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
