@@ -17,7 +17,6 @@ import PostSkeleton from "./post/skeleton";
 import { useSession } from "next-auth/react";
 import CommentForm from "./forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
-import IsUserAuthToast from "./post/functions/ifUserPermissions";
 import {debounce} from 'lodash'
 import { comments, post } from "../types/globalTs";
 
@@ -79,7 +78,10 @@ const debouncedGetPost = useCallback(debounce(()=>{
 
     const CommentLike = async (comment) => {
         const commentId = comment.CommentId
-        IsUserAuthToast(user);
+        if (!user) {
+            toast.error("You must be authorized");
+            return;
+        }
     
         // Find the post containing the comment
         const updatedPosts = posts.map((post) => {
@@ -122,7 +124,10 @@ const debouncedGetPost = useCallback(debounce(()=>{
     };
 
     const Postlike = async (postId: string) => {
-        IsUserAuthToast(user)
+        if (!user) {
+            toast.error("You must be authorized");
+            return;
+        }
         // Optimistic UI Update
         const newPosts = posts?.map(post => {
             if (post.PostId === postId) {
@@ -258,12 +263,13 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
                 
                     <PostHeader author={post.author} timestamp={post.timestamp}/>
+                    {user?.id === post.userId&&(
+                                <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="absolute top-2 right-2"/> </button>
+                            )}
                     <div className="ml-[3rem] mr-[1rem]">
                         <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
-                            {user?.id === post.userId&&(
-                                <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
-                            )}
-                                <ImageGrid images={post.image} className="-mt-5 mb-3" />
+                           
+                                <ImageGrid images={post.image} className=" mb-3" />
                         <div className="flex gap-5 justify-between ">
                             <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
