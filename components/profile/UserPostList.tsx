@@ -263,13 +263,12 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
                 
                     <PostHeader author={post.author} timestamp={post.timestamp}/>
-                    {user?.id === post.userId&&(
-                                <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="absolute top-2 right-2"/> </button>
-                            )}
                     <div className="ml-[3rem] mr-[1rem]">
                         <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
-                           
-                                <ImageGrid images={post.image} className=" mb-3" />
+                            {user?.id === post.userId&&(
+                                <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
+                            )}
+                                <ImageGrid images={post.image} className={`${user.id===post.userId? '-mt-5':''}  mb-3`} />
                         <div className="flex gap-5 justify-between ">
                             <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
