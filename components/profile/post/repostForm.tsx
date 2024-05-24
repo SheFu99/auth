@@ -10,7 +10,7 @@ interface RepostFormProps {
     isOpen:boolean,
     repostCount:number,
     onClick:()=>void,
-    title:string,
+    title?:string,
 }
 
 const RepostForm = ({postId,isOpen,repostCount}:RepostFormProps) => {

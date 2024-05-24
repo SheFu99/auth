@@ -21,7 +21,7 @@ import {debounce} from 'lodash'
 import { comments, post } from "../types/globalTs";
 import { repostAction, repostProps } from "@/actions/repost";
 import RepostHeader from "./post/Repost-author-header";
-import RepostForm from "./post/repostForm";
+import RepostForm from "./post/repostForm"
 
 
 export const awsBaseUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
@@ -324,7 +324,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
                             </button>
 
                             
-                            <RepostForm postId={post.PostId} isOpen={isOpen} repostCount={post?.repostCount} onClick={()=>setIsOpen(!isOpen)}/>
+                            <RepostForm postId={post.PostId} isOpen={isOpen} repostCount={post?.repostCount} onClick={()=>setIsOpen(!isOpen)} title="repsot"/>
                         </div>
                     </div>
 
