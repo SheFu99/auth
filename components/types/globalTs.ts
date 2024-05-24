@@ -10,26 +10,45 @@ export interface ProfileData {
     userId: string;
     error?:string;
     success?:string;
-  }
+  };
 
 
 
 export type post ={
     PostId: string,
+
+    originPostId?:string,
+
     image?: image[],
+
+    superText?:string,
+    
     text: string,
     timestamp: Date,
+    originTimeStamp?: Date,
     userId: string,
+    originUserId?:string,
     likes?:any[]
     likedByUser?:boolean,
     _count:_count,
-    author:{
-        Name:string,
-        Image:string,
-    },
-    comments:any[]
-    
+    author:author,
+
+    originUserName?:string,
+    originAvatar?:string,
+
+    comments:any[],
+    repostCount?:number,
+   
 };
+export type deletePostParams ={
+  postId:string,
+  keys:string[],
+  originPostId?:string
+}
+type author = {
+  Name:string,
+  Image:string
+}
 type _count = {
   comments:number,
   likes:number,

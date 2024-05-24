@@ -1,6 +1,7 @@
 "use server"
 
 import { s3Client } from "@/app/api/s3-upload/route"
+import { deletePostParams } from "@/components/types/globalTs"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { UserPost } from "@/schemas"
@@ -189,7 +190,7 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
                 likedByUser: commentLikedByUser ?? false
             }
         });
-        
+        ///TODO: use another method to determinate author of post
         return {
             ...post,
             author:{
@@ -207,7 +208,7 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
     return { posts: postsWithLikeCounts, success: true,totalPostCount:totalPostCount };
 };
 
-export const DeleteUserPosts = async (postId:string,keys:string):Promise<responsePromise>=>{
+export const DeleteUserPosts = async ({postId,keys,originPostId}:deletePostParams):Promise<responsePromise>=>{
     const user = await currentUser()
     if(!user){
         return {error:"You need to be autorize!"}
@@ -218,20 +219,46 @@ export const DeleteUserPosts = async (postId:string,keys:string):Promise<respons
     if(!existingUser){
         return {error:"User not found"}
     }
-    
-    try{
-        await deleteImagefromS3(keys)
-    }catch(error){
-        return{error:`Delete from s3 Error: ${error}`}
+    if(keys){
+        try{
+            await deleteImagefromS3(keys)
+        }catch(error){
+            return{error:`Delete from s3 Error: ${error}`}
+        }
     }
 
-    const post = await db.post.delete({
-        where:{PostId:postId}
+///FIX_ERROR-handle case where is repost post repost again 
+
+try {
+    await db.post.update({
+        where:{
+            PostId:originPostId
+        },
+        data:{
+            repostCount:{
+                decrement:1
+            }
+        }
     })
-    // console.log(result)
-    if(!post){
-        return {error:"Post not found"}
+    console.log("DECREMENT repostCOUNT")
+} catch (error) {
+   return{error:'Error decrement repost count'} 
+}
+    ////
+    try {
+        await db.post.delete({
+            where:{PostId:postId}
+        })
+        await db.post.deleteMany({
+            where:{
+                originPostId:postId
+            }
+        })
+    } catch (error) {
+        return {error:'Something gone wrong!'}
     }
+
+   
     return {success:"Post deleted"}
 };
       export  const deleteImagefromS3 = async(keys : any):Promise<deleteS3promise>=>{

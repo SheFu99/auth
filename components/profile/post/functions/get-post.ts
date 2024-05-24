@@ -7,7 +7,7 @@ interface GetPostProps {
 }
 
 export default async function GetPost(profile,user,page) {
-   console.log("GET_____POST___INSIDE")
+//    console.log("GET_____POST___INSIDE")
    
     try{
         if(profile.profile){

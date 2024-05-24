@@ -29,6 +29,7 @@ model Profile {
   firstName   String?
   lastName    String?
   coverImage  String? @default("")
+  shortName   String?
   gender      Gender? @map("gender")
   age         Int?
   phoneNumber String?
@@ -38,12 +39,19 @@ model Profile {
   userId      String  @unique
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
+///TODO: create a new model for reposts
 model Post {
   PostId    String    @id @default(cuid())
-  text      String?   @unique
+  text      String?  
+  superText String?
   timestamp DateTime  @default(now())
   userId    String
+  originUserId String?
+  originPostId String?
+  originUserName String?
+  originAvatar String?
+  originTimeStamp DateTime?
+  repostCount Int? @default(0)
   comments  Comment[]
   image     Images[]
   likes     Like[]

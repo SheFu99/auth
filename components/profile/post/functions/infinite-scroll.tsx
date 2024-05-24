@@ -68,7 +68,7 @@ const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
   return (
     <div className='space-y-5'>
       {children}
-      {isFetching && (
+      {isFetching&&hasMore && (
         <div className='flex w-full justify-center'>
           <BeatLoader className='mb-5 scale-125' color='white'/>
         </div>

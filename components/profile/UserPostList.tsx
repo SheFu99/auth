@@ -2,7 +2,7 @@
 "use clinet"
 import { DeleteUserPosts, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import React, { Profiler, useCallback, useEffect, useState, useTransition } from "react";
+import React, {  Profiler, useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import ImageGrid from "./post/Image-grid";
@@ -19,14 +19,18 @@ import CommentForm from "./forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import {debounce} from 'lodash'
 import { comments, post } from "../types/globalTs";
+import { repostAction, repostProps } from "@/actions/repost";
+import RepostHeader from "./post/Repost-author-header";
+import RepostForm from "./post/repostForm";
 
 
+export const awsBaseUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
 
 const UserPostList  = (profile:any) => {
 
 const [posts, setPosts]=useState<post[]>()
 const [comment,setComment]=useState<comments>()
-
+const [isOpen,setIsOpen]=useState<boolean>(false)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
 const {update}=useSession()
@@ -36,7 +40,7 @@ const [page,setPage]=useState<number>(1)
 const [totalPostCount,setTotalCount]=useState<number>(0)
 
 const user = useCurrentUser()
-const splitUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
+
 
 ///load user post from server 
 const debouncedGetPost = useCallback(debounce(()=>{
@@ -62,67 +66,6 @@ const debouncedGetPost = useCallback(debounce(()=>{
             })
         })
     };
-    const commentLikeAction = (CommentId:string)=>{
-        startTransition(()=>{
-            LikeComment(CommentId)
-            .then((data)=>{
-                if(data.error){
-                    toast.error('Comment Like Error')
-                }
-                if(data.success){
-                    return
-                }
-            })
-        })
-    }
-
-    const CommentLike = async (comment) => {
-        const commentId = comment.CommentId
-        if (!user) {
-            toast.error("You must be authorized");
-            return;
-        }
-    
-        // Find the post containing the comment
-        const updatedPosts = posts.map((post) => {
-            if (post.PostId !== comment.postId) {
-                return post; // No changes for posts that don't contain the comment
-            }
-    
-            // Find the comment within the post
-            const updatedComments = post.comments.map((com) => {
-                if (com.CommentId !== commentId) {
-                    return com; // No changes for other comments
-                }
-    
-                // Update the comment here
-                return {
-                    ...com,
-                    likedByUser: !com.likedByUser,
-                    _count: {
-                        ...com._count,
-                        likes: com.likedByUser ? com._count.likes - 1 : com._count.likes + 1
-                    }
-                };
-            });
-    
-            // Return the updated post with the updated comments
-            return {
-                ...post,
-                comments: updatedComments
-            };
-        });
-
-        setPosts(updatedPosts);
-        try {
-            commentLikeAction(commentId);
-        } catch (error) {
-            console.error("Failed to update like status on the server:", error);
-            update()
-            toast.error("Error updating post like. Please try again.");
-        }
-    };
-
     const Postlike = async (postId: string) => {
         if (!user) {
             toast.error("You must be authorized");
@@ -169,17 +112,80 @@ const debouncedGetPost = useCallback(debounce(()=>{
         //     updatePost(!getPostTrigger)
         // }
     };
+    const commentLikeAction = (CommentId:string)=>{
+        startTransition(()=>{
+            LikeComment(CommentId)
+            .then((data)=>{
+                if(data.error){
+                    toast.error('Comment Like Error')
+                }
+                if(data.success){
+                    return
+                }
+            })
+        })
+    };
+    const CommentLike = async (comment:comments) => {
+        const commentId = comment.CommentId
+        if (!user) {
+            toast.error("You must be authorized");
+            return;
+        }
+        const updatedPosts = posts.map((post) => {
+            if (post.PostId !== comment.postId) {
+                return post; // No changes for posts that don't contain the comment
+            }
+    
+            // Find the comment within the post
+            const updatedComments = post.comments.map((com) => {
+                if (com.CommentId !== commentId) {
+                    return com; // No changes for other comments
+                }
+    
+                // Update the comment here
+                return {
+                    ...com,
+                    likedByUser: !com.likedByUser,
+                    _count: {
+                        ...com._count,
+                        likes: com.likedByUser ? com._count.likes - 1 : com._count.likes + 1
+                    }
+                };
+            });
+    
+            // Return the updated post with the updated comments
+            return {
+                ...post,
+                comments: updatedComments
+            };
+        });
 
-        const deletePost=(post:any)=>{
+        setPosts(updatedPosts);
+        try {
+            commentLikeAction(commentId);
+        } catch (error) {
+            console.error("Failed to update like status on the server:", error);
+            update()
+            toast.error("Error updating post like. Please try again.");
+        }
+    };
+        const deletePost=(post:post)=>{
       
+        
             const keys = post.image.map(item => {
-                console.log(item.url)
-                const result = item.url.split(splitUrl)[1];
+                const result = item.url.replace(awsBaseUrl,'');
                 return result
               });
+              
+           
+            
             startTransition(()=>{
     
-                DeleteUserPosts(post.PostId,keys)
+                DeleteUserPosts({
+                    postId:post.PostId,
+                    keys:post?.originPostId ? undefined:keys,
+                    originPostId:post.originPostId
+                })
                 .then((data)=>{
                     if(data.error){
                         toast.error(data.error)
@@ -213,8 +219,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
            
             
         };
-
-        const openComentForm = (postIndex)=>{
+        const openComentForm = (postIndex:number)=>{
             const isTwice = addComent.filter(item=>item ===postIndex)
             if(isTwice.length>0){
                 const isNotTwice = addComent.filter(item=>item !==postIndex);
@@ -223,7 +228,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 setComentState(prev=>[...prev,postIndex])
             }
         };
-        const isPostCommentOpen =(index)=>{
+        const isPostCommentOpen =(index:number)=>{
             const isExistInArray = addComent.filter(item=>item ===index)
             if(isExistInArray.length>0){
                 return true
@@ -231,9 +236,9 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 return false
             }
         };
-        const DeleteCommentFunction = (comment) =>{
-            const keys = comment.image.map(item => {
-                const result = item.url.split(splitUrl)[1];
+        const DeleteCommentFunction = (comment:comments) =>{
+            const keys:any = comment.image.map(item => {
+                const result = item.url.split(awsBaseUrl)[1];
                 return result
               });
 
@@ -253,16 +258,55 @@ const debouncedGetPost = useCallback(debounce(()=>{
 
         };
 
+        const repost = ({postId,superText}:repostProps)=>{
+            // startTransition(()=>{
+            //     repostAction({postId:postId,superText:superText})
+            //     .then((response)=>{
+            //         if(response.success){
+            //             toast.success('Now this post will display on your page')
+            //         }else{
+            //             toast.error(`Something went wrong: ${response.error}`)
+            //         }
+            //     })
+
+            // })
+            setIsOpen(!isOpen)
+         
+            
+        }
+
+
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">
             <PostSkeleton isLoading={!posts?.length}/>
             <InfiniteScroll loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
             {posts?.map((post,index)=>(
                 <>
+                {/* <Profiler onRender={console.log(post)}></Profiler> */}
                 {/* TODO: Need to pass key to parent component  */}
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
                 
                     <PostHeader author={post.author} timestamp={post.timestamp}/>
+                    {post?.superText&&(
+                        <p className="px-10 mt-2">{post.superText}</p>
+                    )}
+                    {post?.originUserName&&post?.originAvatar&&(
+                    <>
+                        <div className="py-2 px-5">
+                            <BiRepost color="white" className="scale-150"/>
+                        </div>
+                  
+                        <div className=" px-5 ">
+                            <RepostHeader  
+                                originUserId={post.originUserId}
+                                originUserName={post.originUserName}
+                                originAvatar={post.originAvatar}
+                                timestamp={post.originTimeStamp}
+                                
+                                />
+                        </div>
+                    </>
+                    )}
                     <div className="ml-[3rem] mr-[1rem]">
                         <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
                             {user?.id === post.userId&&(
@@ -279,9 +323,8 @@ const debouncedGetPost = useCallback(debounce(()=>{
                                 </div>
                             </button>
 
-                            <button title= 'repost' className="text-white bg-neutral-900 px-3 rounded-md p-2   ">
-                                <BiRepost className="scale-150"/>
-                            </button>
+                            
+                            <RepostForm postId={post.PostId} isOpen={isOpen} repostCount={post?.repostCount} onClick={()=>setIsOpen(!isOpen)}/>
                         </div>
                     </div>
 
