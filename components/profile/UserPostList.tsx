@@ -21,7 +21,8 @@ import {debounce} from 'lodash'
 import { comments, post } from "../types/globalTs";
 import { repostAction, repostProps } from "@/actions/repost";
 import RepostHeader from "./post/Repost-author-header";
-import RepostForm from "./post/repostForm"
+const RepostForm = React.lazy(()=>import ('./post/repostForm'))
+// import RepostForm from "./post/repostForm"
 
 
 export const awsBaseUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
