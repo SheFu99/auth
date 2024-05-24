@@ -148,7 +148,7 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
             <TabsContent id="tab1" className="grid grid-cols-12 ">
                 
             <div className='col-span-12 space-y-5'>
-            <Suspense fallback={<div>Loading...</div>}> 
+            <Suspense fallback={<div className="flex justify-center align-middle items-center mt-10"><BounceLoader color="white"/></div>}> 
                 <UserPostList profile={profile.profile?.userId}/>  
             </Suspense>
             </div>
