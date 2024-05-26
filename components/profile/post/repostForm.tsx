@@ -1,20 +1,22 @@
 import { repostAction, repostProps } from "@/actions/repost";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { startTransition, useState } from "react";
+import { startTransition, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { BiRepost } from "react-icons/bi";
 import { toast } from "sonner";
 
 interface RepostFormProps {
+    ButtonTitle?:string,
     postId:string,
     isOpen:boolean,
     repostCount:number,
     onClick:()=>void,
-    title?:string,
+    callBack:()=>void
 }
 
-const RepostForm = ({postId,isOpen,repostCount}:RepostFormProps) => {
+const RepostModalForm = ({postId,isOpen,repostCount,callBack,ButtonTitle}:RepostFormProps) => {
     const [superText,setSuperText]=useState<string>('')
+    const [isPending,startTransition]=useTransition()
 
     const repost = ({postId,superText}:repostProps)=>{
         startTransition(()=>{
@@ -27,17 +29,20 @@ const RepostForm = ({postId,isOpen,repostCount}:RepostFormProps) => {
                     toast.error(`Something went wrong: ${response.error}`)
                 }
             })
+            .catch(error=>{
+                toast.error(error)
+            })
 
         })
             
-        
+        callBack()
     }
     return (
         <>
         {!isOpen && (
                 <Dialog>
                     <DialogTrigger >
-                            <div className="flex gap-2 items-center justify-center align-middle text-white bg-neutral-900 px-3 rounded-md p-2 " title="Repost">
+                            <div className="flex gap-2 items-center justify-center align-middle text-white bg-neutral-900 px-3 rounded-md p-2 " title={`${ButtonTitle?ButtonTitle:'Repost'}`}>
                                 <BiRepost className="scale-150"/>
                                 {repostCount>0&&(<p>{repostCount}</p>)}
                             </div>
@@ -47,7 +52,14 @@ const RepostForm = ({postId,isOpen,repostCount}:RepostFormProps) => {
                             <div  className="grid grid-cols-1 space-y-5">
                                 <label htmlFor="superText" className="justify-center flex absolute -top-1 left-0 right-0">Add your comment, or repost as it is!</label>
                                 <input id="superText" className="p-5 rounded-md" placeholder="You can leave this field blank" onChange={(e)=>setSuperText(e.target.value)} />
-                                <button title="repost" type="submit" className="p-2 rounded-md hover:bg-neutral-700 bg-neutral-800"  onClick={()=>repost({postId:postId,superText:superText})}>Make Repost</button>
+                                <button 
+                                    title="repost" 
+                                    type="submit" 
+                                    disabled={isPending}
+                                    className="p-2 rounded-md hover:bg-neutral-700 bg-neutral-800"  
+                                    onClick={()=>repost({postId:postId,superText:superText})}>
+                                        Make Repost
+                                    </button>
                             </div>
                         </div>
                     </DialogContent>
@@ -58,4 +70,4 @@ const RepostForm = ({postId,isOpen,repostCount}:RepostFormProps) => {
       );
 }
  
-export default RepostForm;
+export default RepostModalForm;

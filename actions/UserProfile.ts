@@ -99,14 +99,26 @@ export const updateUserProfile = async (values: Profile)=>{
 
 }
 
-export const getDynamicProfile = async (userId:string)=>{
-
+type publicProfileParams = {
+  userId:string,
+  requesterId?:string,
+}
+export const getPublicProfile = async (userId:string)=>{
+    const user = await currentUser()
   
     if(!userId){
       return {error: 'userId is required'}
     }
-  
-    const user = await db.user.findFirst({
+    // const includeRequesterId = requesterId? 
+    //   {include:{
+    //     received:{
+    //       where:{
+    //         requesterId:requesterId
+    //       },select:{status:true}
+    //     }
+    //   }}:undefined
+    
+    const ExtendedProfile = await db.user.findFirst({
       where: {
         id: userId
       },
@@ -115,23 +127,42 @@ export const getDynamicProfile = async (userId:string)=>{
       }
     });
   
-    if (!user) {
+    if (!ExtendedProfile) {
       return { error: "User not found" };
     }
-   
+   console.log(user)
+  try {
     const existingProfile = await db.profile.findFirst({
       where:{
         userId:userId,
-      }
-    })
+      }, 
+    });
+    const relations = user? 
+    await db.friendShip.findFirst({
+      where:{
+        adresseedId:userId,
+        requesterId:user.id
+      },
+      include:{
+        
+      },
+      
+    }):undefined
+    console.log(relations)
+  
+    console.log(existingProfile)
+
       if(!existingProfile){
         return {error: 'Profile not found'}
       }
       
-      console.log(existingProfile)
        return {
       profile: existingProfile,
-      userImage: user.image
+      userImage: ExtendedProfile.image,
+      friendStatus: relations
     };
+  } catch (error) {
+    return {error:error}
+  }
   }
 

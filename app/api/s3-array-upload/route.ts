@@ -6,11 +6,11 @@ import { currentUser } from '@/lib/auth';
 import { Readable } from "stream";
 import { Upload } from '@aws-sdk/lib-storage'
 
-interface FileUpload {
+interface File {
     buffer: Buffer;
     name: string;
 }
-function bufferToStream(buffer) {
+function bufferToStream(buffer:Buffer) {
     let stream = new Readable();
     stream.push(buffer);
     stream.push(null); // No more data to write
@@ -19,7 +19,7 @@ function bufferToStream(buffer) {
 
 
 
-async function uploadFileToS3(file) {
+async function uploadFileToS3(file:File):Promise<string> {
     const { buffer, name } = file;
     const fileName = `uploads/${Date.now()}_${name}`;
     const contentType = name.endsWith('.svg') ? "image/svg+xml" : (name.endsWith('.png') ? "image/png" : "image/jpeg");
@@ -50,9 +50,20 @@ async function uploadFileToS3(file) {
     }
 };
 
-const uploadFilesToS3 = async (files) => {
-    const uploadPromises = files.map(uploadFileToS3);
+const uploadFilesToS3 = async (files:File[]):Promise<string[]> => {
+    const uploadPromises = files.map(file=>uploadFileToS3(file));
     return Promise.all(uploadPromises);
+
+///TODO: Try with Promise.allSettled
+    //1: Logging inputs and outputs 
+    //2: Make a new array of value with status 
+    //2: Get index of rejected values
+    //3: Make a new array with status rejected reason and index
+    //4: Retry rejected arrays one more time 
+    //5: If rejected arrays returns array with fulfilled status,then replace by index
+    //6: If inside rejected arrays still be any values , then cash result and return rejected 
+    //7: After manualy retry it may get result from cash and retry rejected values 
+    //8: If it still be have rejected then return resolved but without rejected values 
 };
 
 export async function POST(request: Request): Promise<Response> {

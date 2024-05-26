@@ -1,36 +1,44 @@
 "use client"
-import React, {  Suspense,useEffect, useState } from "react";
+import React, {  Suspense,startTransition,useEffect, useState, useTransition } from "react";
 import {  BsGenderFemale, BsGenderMale } from "react-icons/bs";
-import { FaGenderless, FaPhone, FaUser } from "react-icons/fa";
+import { FaGenderless, FaHandshake, FaPhone, FaRegHandshake, FaUser } from "react-icons/fa";
 const Cover = React.lazy(() => import("./Cover"))
 import Image from 'next/image';
 import { RiGalleryFill, RiProfileLine } from 'react-icons/ri';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { MdElderly, MdLocationCity } from "react-icons/md";
+import { MdElderly, MdLocationCity, MdOutlinePendingActions } from "react-icons/md";
 import { BounceLoader, FadeLoader } from "react-spinners";
 import { Profile } from "@/actions/UserProfile";
-import { IoPersonCircle, IoPersonCircleSharp } from "react-icons/io5";
+import { IoAddCircle, IoPersonCircle, IoPersonCircleSharp } from "react-icons/io5";
+import { deletePendingOffer, getProfileFriends, sendFriendShipOffer } from "@/actions/friends";
+import { toast } from "sonner";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { friendRelation, friendshipStatus } from "../types/globalTs";
+import PublicProfileFriends from "./friends/publicProfileFriends";
 const UserPostList = React.lazy(()=>import('./UserPostList'))
 // import UserPostList from "./forms/UserPostList";
 
 export interface ProfileData{
     profile:Profile
     userImage:string;
+    friendStatus:friendRelation
+    
 }
 interface profileProps {
-    profile:any;
+    profile:ProfileData;
 }
 
-
 const  PublicProfile =  ({profile}:profileProps) => {
-  const [updateState, setUpdate] = useState<boolean>(false)
+const [updateState, setUpdate] = useState<boolean>(false)
 const [isLoading, setIsLoading]=useState<boolean>(true)
-
-
-
+const [friendStatus,setFriendStatus]=useState<friendshipStatus>(profile?.friendStatus?.status ||undefined)
+const [isPending,startTransition]=useTransition()
+console.log(profile)
+const user = useCurrentUser()
+const userId = profile?.profile?.userId
   const gender = profile.profile?.gender
-  const getGenderIcon = (gender:any)=>{
+  const getGenderIcon = (gender:string)=>{
       switch(gender){
           case 'Male':
               return <BsGenderMale color='black'/>
@@ -40,9 +48,83 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
               return <FaGenderless color='black'/>
       }
       
-  }
+  };
   
-//   useEffect(()=>{console.log(profile.userImage)},[profile])
+                      
+  const friendStatusButton = () =>{
+    switch(friendStatus){
+        case "PENDING":
+            return (
+                <div  
+                title="Cancel friendship offer" 
+                    className="bg-white rounded-full border-black border-4 cursor-pointer"
+                    onClick={()=>cancelOffer(userId)}
+                    >
+                            <MdOutlinePendingActions className="md:w-[45px] md:h-[45px] w-[30px] h-[30px] p-1 " color="black"/>
+                </div>
+            )
+        case "ACCEPTED":
+            return (
+                <div 
+                    title="Delete this profile from your friends"
+                    className="bg-white rounded-full border-black border-4 cursor-pointer"
+                    onClick={()=>cancelOffer(userId)}
+
+                    >
+                    <FaHandshake className='md:w-[45px] md:h-[45px] w-[30px] h-[30px] p-1' color="black"/>
+                </div>
+            )
+        default :
+            return(
+                <div title="Send friendship request"  
+                    className="cursor-pointer" 
+                    onClick={()=>addToFriends(userId)} >
+                    <IoAddCircle color="white" className=" md:w-[50px] md:h-[50px] w-[35px] h-[35px]"/>
+                </div>
+            )
+    }
+  };
+
+  const addToFriends = (userId:string)=>{
+    startTransition(()=>{
+        sendFriendShipOffer(userId)
+        .then(response=>{
+            if(response.success){
+                toast.success(response.message)
+            }
+        }).catch(err=>{
+            toast.error(err)
+        }).finally(()=>setFriendStatus('PENDING'))
+    })
+  };
+  const cancelOffer = (userId:string)=>{
+    startTransition(()=>{
+        deletePendingOffer(userId)
+        .then(response=>{
+            if(response.success){
+                toast.success('Your offer has been cancelled')
+            }
+        }).catch(err=>{
+            toast.error(err)
+        }).finally(()=>setFriendStatus(undefined))
+    })
+  };
+  const getListOfFriends = async (userId:string)=>{
+  startTransition(()=>{
+    getProfileFriends(userId)
+        .then(response=>{
+            console.log(response)
+        })
+  })
+      
+      
+    
+  };
+  
+  useEffect(()=>{
+    getListOfFriends(userId)
+    setFriendStatus(profile?.friendStatus?.status)
+  },[userId])
 //   useEffect(()=>{console.log(avatar)},[avatar])
  if(!profile){
     return <FadeLoader/>
@@ -69,34 +151,37 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
                             <BounceLoader className="w-[65px] h-[65px] md:w-[102px] md:h-[100px] z-20 rounded-md shadow-xs col-span-12 absolute" color="white"/>   
                         )}
                        
-                  <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-30 -bottom-15 left-0 p-[1rem] justify-center ">
-
-                
-                   <div className="flex justify-center relative rounded-full w-[52px] h-[50px] md:w-[102px] md:h-[100px] z-30">
-                    
-                        {profile.userImage !==undefined ?(
-                          <div className="bg-black rounded-full  flex justify-center items-center align-middle p-1">
-
-                            <Image
-                            src={profile.userImage}
-                            alt='Avatar'
-                            // layout="fill"
-                            width={100}
-                            height={100}
-                            className={`rounded-full z-30 `}
+                <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-30 -bottom-15 left-0 p-[1rem] justify-center ">
+                        <div className="flex justify-center relative rounded-full w-[52px] h-[50px] md:w-[102px] md:h-[100px] z-30">
                             
-                          />
-                          </div>
-                        ):(
-                         <IoPersonCircleSharp className="w-[70px] h-[55px] md:w-[102px] md:h-[100px] bg-black rounded-full -mt-1 mr-[1px]"/>
-                        )}
-                        
-                    
-                    
-                    
-                 </div>
-              </div>
+                                {profile.userImage !==undefined ?(
+                                <div className="bg-black rounded-full  flex justify-center items-center align-middle p-1">
 
+                                    <Image
+                                    src={profile.userImage}
+                                    alt='Avatar'
+                                    // layout="fill"
+                                    width={100}
+                                    height={100}
+                                    className={`rounded-full z-30 `}
+                                    
+                                />
+                                </div>
+                                ):(
+                                <IoPersonCircleSharp className="w-[70px] h-[55px] md:w-[102px] md:h-[100px] bg-black rounded-full -mt-1 mr-[1px]"/>
+                                )}
+                                
+                            
+                            
+                            
+                        </div>
+                </div>
+                {user&&(
+                    <div className="absolute -bottom-15  md:right-[4rem] right-8 z-30 bg-black rounded-full ">
+                        {friendStatusButton()}
+                    </div>
+                )}
+              
            
             </div>
         </div>
@@ -156,8 +241,7 @@ const [isLoading, setIsLoading]=useState<boolean>(true)
             </TabsContent>
 
             <TabsContent id="tab2" className="p-4">
-                <h1>Content for Tab Two</h1>
-                <p>This is the detailed content for Tab Two.</p>
+                <PublicProfileFriends userId={profile?.profile?.userId}/>
             </TabsContent>
             <TabsContent id="tab3" className="p-4">
                 <h1>Content for Tab Three</h1>

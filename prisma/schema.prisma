@@ -19,10 +19,14 @@ model User {
   accounts              Account[]
   comments              Comment[]
   gallery               Gallery[]
+  friends               friendsList[]
   likes                 Like[]
   posts                 Post[]
   profile               Profile?
   twoFactorConfirmation TwoFactorConformation?
+
+  requested    FriendShip[] @relation("RequestedFriends")
+  received     FriendShip[] @relation("ReceivedFriends")
 }
 
 model Profile {
@@ -34,12 +38,44 @@ model Profile {
   age         Int?
   phoneNumber String?
   regionCode  String?
+  friends     friendsList[]
   /// Extend this {lat ,lng, zipCode, postService...} 
   adres       String?
   userId      String  @unique
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
 }
-///TODO: create a new model for reposts
+model friendsList {
+  id Int @id @default(autoincrement())
+  profileId String 
+  createdAt DateTime @default(now())
+  userId String
+  user User @relation(fields: [userId],references: [id])
+  profile Profile @relation(fields: [profileId],references: [userId])
+}
+
+model FriendShip {
+  transactionId String @id @default(cuid())
+  requesterId String
+  adresseedId String 
+  status FriendStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  requester     User @relation("RequestedFriends" ,fields: [requesterId],references: [id],onDelete: Cascade)
+  addressee     User @relation("ReceivedFriends"  ,fields: [adresseedId],references: [id],onDelete: Cascade)
+
+  @@index([requesterId])
+  @@index([adresseedId])
+  @@unique([requesterId,adresseedId])
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
 model Post {
   PostId    String    @id @default(cuid())
   text      String?  
@@ -171,3 +207,4 @@ enum Gender {
   Female
   Undefined
 }
+

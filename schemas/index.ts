@@ -98,6 +98,7 @@ export const UserProfile = z.object({
   }).nullable().optional(),
   regionCode: z.string().regex(RegionCode).nullable().optional(),
   adres: z.string().regex(Address).nullable().optional(),
+  userId:z.string().min(10,'UserId must have at least 10 charecters').optional(),
 });
 
 export const UserPost = z.object({

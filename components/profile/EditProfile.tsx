@@ -20,6 +20,7 @@ import { BounceLoader } from "react-spinners";
 import PostModal from "./cropper/Post-modal";
 import { ProfileData } from "../types/globalTs";
 import {debounce} from 'lodash'
+import IncomeOfferList from "./friends/incomeOfferList";
 
 
 
@@ -267,8 +268,8 @@ const  EditProfile =  () => {
             </TabsContent>
 
             <TabsContent id="tab2" className="p-4">
-                <h1>Content for Tab Two</h1>
-                <p>This is the detailed content for Tab Two.</p>
+                {/* <h1>Content for Tab Two</h1> */}
+                <IncomeOfferList/>
             </TabsContent>
             <TabsContent id="tab3" className="p-4">
                 <h1>Content for Tab Three</h1>

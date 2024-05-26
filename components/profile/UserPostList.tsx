@@ -21,7 +21,7 @@ import {debounce} from 'lodash'
 import { comments, post } from "../types/globalTs";
 import { repostAction, repostProps } from "@/actions/repost";
 import RepostHeader from "./post/Repost-author-header";
-const RepostForm = React.lazy(()=>import ('./post/repostForm'))
+const RepostModalForm = React.lazy(()=>import ('./post/repostForm'))
 // import RepostForm from "./post/repostForm"
 
 
@@ -325,7 +325,14 @@ const debouncedGetPost = useCallback(debounce(()=>{
                             </button>
 
                             
-                            <RepostForm postId={post.PostId} isOpen={isOpen} repostCount={post?.repostCount} onClick={()=>setIsOpen(!isOpen)} title="repsot"/>
+                            <RepostModalForm 
+                                title="Repost"
+                                postId={post.PostId}
+                                isOpen={isOpen}
+                                repostCount={post?.repostCount}
+                                onClick={()=>setIsOpen(!isOpen)}
+                                callBack={()=>setIsOpen(!isOpen)}
+                                />
                         </div>
                     </div>
 

@@ -2,7 +2,7 @@ export interface ProfileData {
     firstName: string | null;
     lastName: string | null;
     coverImage: string | null;
-    gender: string | null;
+    gender: string|null;
     age: string | null;
     phoneNumber: string | null;
     regionCode: string | null;
@@ -11,8 +11,18 @@ export interface ProfileData {
     error?:string;
     success?:string;
   };
-
-
+  export type gender = {
+    gender:"Male" | "Female" | "Undefined"|null;
+  };
+export type friendRelation = {
+  transactionId:string,
+  requesterId:String,
+  adresseedId:String,
+  status:friendshipStatus,
+  createdAt:Date,
+  updatedAt:Date
+};
+export type friendshipStatus = "PENDING"|"ACCEPTED"|"DECLINED"|"BLOCKED" | undefined
 
 export type post ={
     PostId: string,
@@ -67,4 +77,10 @@ export type comments={
   likes?:any[]
   _count?:_count,
   likedByUser:boolean;
-}
+};
+
+export type requester= {
+  id: string;
+  name: string;
+  image: string;
+};
