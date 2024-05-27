@@ -135,7 +135,8 @@ export const getPublicProfile = async (userId:string)=>{
         requesterId:user.id
       },
       select:{
-        transactionId:true
+        transactionId:true,
+        status:true,
       }
       
     }):undefined

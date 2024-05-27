@@ -71,9 +71,9 @@ export const getCurrentUserOffer = async ():Promise<getOfferProps>=>{
                     include:{
                         requester:{
                                 select:{
-                                    name:true,
+                                    firstName:true,
                                     image:true,
-                                    id:true,
+                                    userId:true,
                                 }    
                             }
                     }
@@ -98,20 +98,6 @@ export const changeFriendOfferStatus = async ({transactionId,status,requesterId}
     if(!user){
         return {error:'You need to be athorize!'}
     };
-    if(status==='ACCEPTED'&&requesterId){
-        try {
-            await db.friendsList.create({
-                data:{
-                    profileId:user.id,
-                    userId:requesterId,
-                    transactionId:transactionId
-                }
-            })
-        } catch (error) {
-            return {error:error}
-        }
-        
-    }
     try {
         await db.friendShip.update({
             where:{
@@ -154,8 +140,9 @@ export const getProfileFriends = async (userId:string):Promise<getPublicFriendsP
                 include:{
                     addressee:{
                         select:{
-                            name:true,
-                            image:true
+                            firstName:true,
+                            image:true,
+                            userId:true,
                         }
                     }
                 }
@@ -170,16 +157,17 @@ export const getProfileFriends = async (userId:string):Promise<getPublicFriendsP
                 include:{
                     requester:{
                         select:{
-                            name:true,
-                            image:true
+                            firstName:true,
+                            image:true,
+                            userId:true,
                         }
                     }
                 }
             })
     
             const profileFirendsList = [...userFriendsListLeft,...userFriendsListRight]
-            console.log("LEFT",userFriendsListLeft)
-            console.log("Right",userFriendsListRight)
+            // console.log("LEFT",userFriendsListLeft)
+            // console.log("Right",userFriendsListRight)
             
     
     
@@ -215,8 +203,9 @@ export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
             include:{
                 addressee:{
                     select:{
-                        name:true,
-                        image:true
+                         firstName:true,
+                            image:true,
+                            userId:true,
                     }
                 }
             }
@@ -231,16 +220,17 @@ export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
             include:{
                 requester:{
                     select:{
-                        name:true,
-                        image:true
+                        firstName:true,
+                            image:true,
+                            userId:true,
                     }
                 }
             }
         })
 
         const userFriendsList = [...userFriendsListLeft,...userFriendsListRight]
-        console.log("LEFT",userFriendsListLeft)
-        console.log("Right",userFriendsListRight)
+        // console.log("LEFT",userFriendsListLeft)
+        // console.log("Right",userFriendsListRight)
         
 
 

@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { friendRelation, friendshipStatus } from "../types/globalTs";
 import PublicProfileFriends from "./friends/publicProfileFriends";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import AvatarWithFallback from "../ui/AvatarCoustom";
 const UserPostList = React.lazy(()=>import('./UserPostList'))
 // import UserPostList from "./forms/UserPostList";
 
@@ -154,29 +156,12 @@ const isTheSameUser = user?.id === userId
                         )}
                        
                 <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-30 -bottom-15 left-0 p-[1rem] justify-center ">
-                        <div className="flex justify-center relative rounded-full w-[52px] h-[50px] md:w-[102px] md:h-[100px] z-30">
-                            
-                                {profile.userImage !==undefined ?(
-                                <div className="bg-black rounded-full  flex justify-center items-center align-middle p-1">
-
-                                    <Image
-                                    src={profile.userImage}
-                                    alt='Avatar'
-                                    // layout="fill"
-                                    width={100}
-                                    height={100}
-                                    className={`rounded-full z-30 `}
-                                    
+                                <AvatarWithFallback
+                                 src={profile.userImage}
+                                 width={100}
+                                 height={100}
+                                 alt={profile?.profile?.firstName}
                                 />
-                                </div>
-                                ):(
-                                <IoPersonCircleSharp className="w-[70px] h-[55px] md:w-[102px] md:h-[100px] bg-black rounded-full -mt-1 mr-[1px]"/>
-                                )}
-                                
-                            
-                            
-                            
-                        </div>
                 </div>
                 {user&&!isTheSameUser&&(
                     <div className="absolute -bottom-15  md:right-[4rem] right-8 z-30 bg-black rounded-full ">

@@ -11,24 +11,35 @@ export const updateImage = async ({image}:z.infer<typeof UserInfoSchema>)=>{
     }
    const user= await currentUser()
    
-   const existedUser = await db.user.findFirst({
-    where:{
-        email:user?.email
+    if(!user ){
+        return {error:"User dosent exists"}
     }
-   })
-  
-    if(user || existedUser){
+        try {
+            await db.user.update({
+                where:{ 
+                    email: user?.email!
+                },
+                data:{
+                    image:image
+                },
+            })
 
-        const selectedUser = await db.user.update({
-            where:{ 
-                email: user?.email!
-            },
-            data:{
-                image:image
-            },
-        })
-        return {success:"Image has changed!"}
+            await db.profile.update({
+                where:{
+                    userId:user.id
+                },
+                data:{
+                    image:image
+                }
+                
+            })
+            console.log('QUERY_EXECUTEd')
+            return {success:"Image was changed!"}
+        } catch (error) {
+            return {error:error}
         }
-return {error:"User dosent exists"}
+        
 }
+
+
 

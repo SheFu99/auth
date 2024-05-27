@@ -37,6 +37,7 @@ export default  function PublicProfileParams({ params }) {
     
     useEffect(()=>{
       getMemoProfile()
+      console.log(profile)
     },[getMemoProfile])
 
 

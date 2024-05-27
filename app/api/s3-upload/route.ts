@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { PutObjectAclCommand, PutObjectCommand, PutObjectCommandInput, S3Client} from "@aws-sdk/client-s3";
 import { currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { updateImage } from "@/actions/updateImage";
 
 export interface S3Response {
   imageUrl?:String;
@@ -37,34 +38,12 @@ export const s3Client = new S3Client({
   }
 }
  const updateAvatar = async (image:string)=>{
-    
-   const user= await currentUser()
-   console.log('USER:',user)
-   if(!user){
-    return {error: "You need to be authorize for this action"}
-   }
-
-    const existedUser = await db.user.findFirst({
-        where:{
-            id:user?.id
-        }
-     })
-     console.log("existing user",existedUser )
-    
-   
-   
-   if(user || existedUser){
-        const selectedUser = await db.user.update({
-            where:{ 
-                id: user?.id
-            },
-            data:{
-                image: image
-            },
-        })
-        return {success:"Image has changed!"}
-        }
-return {error:"User dosent exists"}
+  try {
+    updateImage({image})
+    return {success:true}
+  } catch (error) {
+    return {error:error}
+  }   
 }
 
 

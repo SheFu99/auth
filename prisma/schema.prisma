@@ -24,8 +24,6 @@ model User {
   profile               Profile?
   twoFactorConfirmation TwoFactorConformation?
 
-  requested    FriendShip[] @relation("RequestedFriends")
-  received     FriendShip[] @relation("ReceivedFriends")
 }
 
 model Profile {
@@ -43,6 +41,10 @@ model Profile {
   userId      String  @unique
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    requested    FriendShip[] @relation("RequestedFriends")
+    received     FriendShip[] @relation("ReceivedFriends")
+
+
 }
 
 model FriendShip {
@@ -52,8 +54,8 @@ model FriendShip {
   status FriendStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  requester     User @relation("RequestedFriends" ,fields: [requesterId],references: [id],onDelete: Cascade)
-  addressee     User @relation("ReceivedFriends"  ,fields: [adresseedId],references: [id],onDelete: Cascade)
+  requester     Profile @relation("RequestedFriends" ,fields: [requesterId],references: [userId],onDelete: Cascade)
+  addressee     Profile @relation("ReceivedFriends"  ,fields: [adresseedId],references: [userId],onDelete: Cascade)
 
   @@index([requesterId])
   @@index([adresseedId])
