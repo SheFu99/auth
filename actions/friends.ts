@@ -1,5 +1,5 @@
 "use server"
-import { FriedsList, FriendsOffer, friendshipStatus, requester } from "@/components/types/globalTs"
+import {  FriendsOffer, friendshipStatus } from "@/components/types/globalTs"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 
@@ -133,7 +133,7 @@ export const changeFriendOfferStatus = async ({transactionId,status,requesterId}
 
 
 export type getPublicFriendsPromise ={
-    profileFirendsList?:FriedsList[];
+    profileFirendsList?:FriendsOffer[];
     message?:string,
     success?:boolean;
     error?:string
@@ -144,24 +144,46 @@ export const getProfileFriends = async (userId:string):Promise<getPublicFriendsP
         return {error:'Profile is not found'}
     }
     try {
-        const profileFirendsList = await db.friendsList.findMany({
-            where:{
-                    userId:userId
-            },
-            select: {
-                userId: true,
-                profileId: true,
-                id:true,
-                createdAt:true,
-                profile: {
-                    select: {
-                        firstName: true,
-                        image: true
+            const userFriendsListLeft = await db.friendShip.findMany({
+                where:{
+                    AND:[
+                        {requesterId:userId},
+                        {status:'ACCEPTED'}
+                    ]
+                },
+                include:{
+                    addressee:{
+                        select:{
+                            name:true,
+                            image:true
+                        }
                     }
                 }
-            }
-
-        });
+            })
+            const userFriendsListRight = await db.friendShip.findMany({
+                where:{
+                    AND:[
+                        {adresseedId:userId},
+                        {status:'ACCEPTED'}
+                    ]
+                },
+                include:{
+                    requester:{
+                        select:{
+                            name:true,
+                            image:true
+                        }
+                    }
+                }
+            })
+    
+            const profileFirendsList = [...userFriendsListLeft,...userFriendsListRight]
+            console.log("LEFT",userFriendsListLeft)
+            console.log("Right",userFriendsListRight)
+            
+    
+    
+          
         return {success:true,profileFirendsList:profileFirendsList}
     } catch (error) {
         return {error:error}
@@ -172,7 +194,7 @@ export const getProfileFriends = async (userId:string):Promise<getPublicFriendsP
  
 
 export type getPrivateFriendsPromise = {
-    userFriendsList?:FriedsList[],
+    userFriendsList?:FriendsOffer[],
     message?:string,
     success?:boolean,
     error?:string,
@@ -183,47 +205,64 @@ export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
         return {error:'Error user not found!'}
     }
     try {
-        const userFriendsList = await db.friendsList.findMany({
+        const userFriendsListLeft = await db.friendShip.findMany({
             where:{
-                profileId:user.id
+                AND:[
+                    {requesterId:user.id},
+                    {status:'ACCEPTED'}
+                ]
             },
             include:{
-                user:{
+                addressee:{
                     select:{
-                        id:true,
                         name:true,
-                        image:true,
-                    },
+                        image:true
+                    }
                 }
             }
-
         })
+        const userFriendsListRight = await db.friendShip.findMany({
+            where:{
+                AND:[
+                    {adresseedId:user.id},
+                    {status:'ACCEPTED'}
+                ]
+            },
+            include:{
+                requester:{
+                    select:{
+                        name:true,
+                        image:true
+                    }
+                }
+            }
+        })
+
+        const userFriendsList = [...userFriendsListLeft,...userFriendsListRight]
+        console.log("LEFT",userFriendsListLeft)
+        console.log("Right",userFriendsListRight)
+        
+
+
         return {success:true ,userFriendsList:userFriendsList }
     } catch (error) {
         return {error:error}
     }
 };
 
- const deleteFromList = async(id:number)=>{
-    await db.friendsList.delete({
-        where:{
-            id:id
-            }  
-    })
-};
+
 
 export type deleteFriendParams = {
     transactionId:string,
-    listId:number,
     status:friendshipStatus
 }
 
-export const deleteFriend = async ({transactionId,listId,status}:deleteFriendParams)=>{
+export const deleteFriend = async ({transactionId,status}:deleteFriendParams)=>{
     const user = currentUser()
     if(!user){
         return {error:'You need to be authorize!'}
     }
-    if(!transactionId||!listId){
+    if(!transactionId){
         return {error:'Unacceptable behavior!'}
     };
     try {
@@ -233,7 +272,6 @@ export const deleteFriend = async ({transactionId,listId,status}:deleteFriendPar
                 status:status
             }
         });
-        await deleteFromList(listId)  
         return {succes:true}
     } catch (error) {
         return {error:error}

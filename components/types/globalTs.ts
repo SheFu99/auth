@@ -22,12 +22,10 @@ export type friendRelation = {
   createdAt:Date,
   updatedAt:Date
 };
-type user = {
-  name:string,
-  image?:string
-}
+
 export type FriedsList={
-  user:user;
+  addressee?:user;
+  requester?:user;
   id: number;
   transactionId?:string;
   profileId: string;
@@ -35,7 +33,8 @@ export type FriedsList={
   userId: string
 };
 export type FriendsOffer ={
-  requester: requester;
+  addressee?:user;
+  requester?: user;
   transactionId: string;
   requesterId: string;
   adresseedId: string;
@@ -101,8 +100,8 @@ export type comments={
   likedByUser:boolean;
 };
 
-export type requester = {
-  id: string;
+export type user = {
+  id?: string;
   name: string;
-  image: string;
+  image?: string;
 };

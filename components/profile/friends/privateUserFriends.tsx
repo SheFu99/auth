@@ -1,7 +1,7 @@
 "use client"
 
 import {  deleteFriend, deleteFriendParams, getUserFreinds } from "@/actions/friends"
-import { FriedsList, friendshipStatus } from "@/components/types/globalTs"
+import { FriendsOffer, friendshipStatus } from "@/components/types/globalTs"
 import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { useSession } from "next-auth/react"
@@ -14,7 +14,7 @@ import { TiCancel } from "react-icons/ti"
 import { toast } from "sonner"
 
 const UserFriends = () => {
-    const [friendsList,setFriendList]=useState<FriedsList[]>([])
+    const [friendsList,setFriendList]=useState<FriendsOffer[]>([])
     const [refresh,setRefresh]=useState<boolean>(false)
     const {update}=useSession()
     const user = useCurrentUser()
@@ -38,7 +38,7 @@ const UserFriends = () => {
     const changeFriendStatus = ({
         status,
         transactionId,
-        listId}:deleteFriendParams)=>{
+        }:deleteFriendParams)=>{
             const operation = (status:friendshipStatus)=>{
                 switch(status){
                     case 'DECLINED':
@@ -49,7 +49,6 @@ const UserFriends = () => {
             }
             deleteFriend({
                 transactionId:transactionId,
-                listId:listId,
                 status:status
             }).then(response=>{
                 if(response.succes){
@@ -67,15 +66,15 @@ const UserFriends = () => {
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full"> 
                  
-                    <Link  href={`/profile/${user.userId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
-                        <Image
-                            className="rounded-full"
-                            src={user.user.image}
-                            alt={user.user.name}
-                            width={55}
-                            height={55}
-                            />
-                        <p className="text-white ml-2">{user.user.name}</p>
+                    <Link  href={`/profile/${user?.addressee?.id||user?.requester?.id}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
+                    <Image 
+                        className="rounded-full"
+                        src={user?.addressee?.image||user?.requester?.image}
+                        alt={user?.addressee?.name||user?.requester?.name}
+                        width={55}
+                        height={55}
+                        />
+                    <p className="text-white ml-2">{user?.addressee?.name||user?.requester?.name}</p>
                     </Link>
 
                     <div className="md:col-start-11 md:col-span-2 col-span-3 col-start-10 flex justify-end items-center allign-middle space-x-1">
@@ -94,7 +93,6 @@ const UserFriends = () => {
                                     onClick={()=>changeFriendStatus({
                                         status:'DECLINED',
                                         transactionId:user.transactionId,
-                                        listId:user.id
                                     })}
                                     >
                                     {/* <p>Delete</p> */}

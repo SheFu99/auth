@@ -15,7 +15,7 @@ const PublicProfileFriends:React.FC<props> = ({userId}) => {
     const [refresh,setRefresh]=useState<boolean>(false)
     useEffect(()=>{
         getFriends()
-       console.log(friendsList)
+       
     },[refresh])   
     const getFriends = ()=>{
         startTransition(()=>{
@@ -33,15 +33,15 @@ const PublicProfileFriends:React.FC<props> = ({userId}) => {
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full"> 
                  
-                <Link  href={`/profile/${user.profileId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
+                <Link  href={`/profile/${user.userId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
                     <Image 
                         className="rounded-full"
-                        src={user.profile.image}
-                        alt={user.profile.firstName}
+                        src={user?.addressee?.image||user?.requester?.image}
+                        alt={user?.addressee?.name||user?.requester?.name}
                         width={55}
                         height={55}
                         />
-                    <p className="text-white ml-2">{user?.profile.firstName}</p>
+                    <p className="text-white ml-2">{user?.addressee?.name||user.requester?.name}</p>
                 </Link>
                 </div>
             ))}

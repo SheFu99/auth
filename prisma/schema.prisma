@@ -19,7 +19,6 @@ model User {
   accounts              Account[]
   comments              Comment[]
   gallery               Gallery[]
-  friends               friendsList[]
   likes                 Like[]
   posts                 Post[]
   profile               Profile?
@@ -39,21 +38,11 @@ model Profile {
   age         Int?
   phoneNumber String?
   regionCode  String?
-  friends     friendsList[]
   /// Extend this {lat ,lng, zipCode, postService...} 
   adres       String?
   userId      String  @unique
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-}
-model friendsList {
-  id Int @id @default(autoincrement())
-  profileId String 
-  createdAt DateTime @default(now())
-  userId String
-  transactionId String 
-  user User @relation(fields: [userId],references: [id], onDelete: Cascade)
-  profile Profile @relation(fields: [profileId],references: [userId], onDelete: Cascade)
 }
 
 model FriendShip {
