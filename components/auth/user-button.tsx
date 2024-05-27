@@ -18,6 +18,7 @@ import { ImProfile } from "react-icons/im";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { SlLogin } from "react-icons/sl";
 import { LoginButton } from "./loginButton"
+import { useEffect } from "react"
 // import { useEffect } from "react"
 
 
@@ -29,16 +30,16 @@ import { LoginButton } from "./loginButton"
     const role = useCurrentRole()
 
     // useEffect(()=>{
-    //     // console.log(role)
+    //     console.log(userImage)
     // },[])
 
 
     return(
         <DropdownMenu>
             {user ?(
-                <DropdownMenuTrigger title="User interface">
+            <DropdownMenuTrigger title="User interface">
                 <Avatar>
-                    <AvatarImage src={userImage} alt="User Menu Button"/>
+                    <AvatarImage src={userImage} alt="User Menu Button" />
                     <AvatarFallback className="bg-sky-500">
                         <FaUser className="text-white"/>
                     </AvatarFallback>

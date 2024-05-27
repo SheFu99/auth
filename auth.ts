@@ -42,6 +42,7 @@ export const {
             data: {
               userId: existedUser.id,
               firstName: user.name,
+              image:user.image
             }
           });
         }catch(error){

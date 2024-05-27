@@ -37,6 +37,7 @@ const [isPending,startTransition]=useTransition()
 console.log(profile)
 const user = useCurrentUser()
 const userId = profile?.profile?.userId
+const isTheSameUser = user?.id === userId
   const gender = profile.profile?.gender
   const getGenderIcon = (gender:string)=>{
       switch(gender){
@@ -52,6 +53,7 @@ const userId = profile?.profile?.userId
   
                       
   const friendStatusButton = () =>{
+    console.log(friendStatus)
     switch(friendStatus){
         case "PENDING":
             return (
@@ -176,7 +178,7 @@ const userId = profile?.profile?.userId
                             
                         </div>
                 </div>
-                {user&&(
+                {user&&!isTheSameUser&&(
                     <div className="absolute -bottom-15  md:right-[4rem] right-8 z-30 bg-black rounded-full ">
                         {friendStatusButton()}
                     </div>
@@ -241,6 +243,7 @@ const userId = profile?.profile?.userId
             </TabsContent>
 
             <TabsContent id="tab2" className="p-4">
+
                 <PublicProfileFriends userId={profile?.profile?.userId}/>
             </TabsContent>
             <TabsContent id="tab3" className="p-4">

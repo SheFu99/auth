@@ -1,6 +1,7 @@
 'use client'
 
-import { getProfileFriends, getPublicFriedsList, getPublicFriendsPromise } from "@/actions/friends";
+import { getProfileFriends, getPublicFriendsPromise } from "@/actions/friends";
+import { FriedsList } from "@/components/types/globalTs";
 import Image from "next/image";
 import Link from "next/link";
 import { startTransition, useEffect, useState } from "react";
@@ -9,19 +10,19 @@ interface props {
     userId:string
 }
 const PublicProfileFriends:React.FC<props> = ({userId}) => {
-    console.log(userId)
-    const [friendsList,setFriendList]=useState<getPublicFriedsList[]>()
+    
+    const [friendsList,setFriendList]=useState<FriedsList[]>()
     const [refresh,setRefresh]=useState<boolean>(false)
     useEffect(()=>{
         getFriends()
-        console.log(friendsList)
+       console.log(friendsList)
     },[refresh])   
     const getFriends = ()=>{
         startTransition(()=>{
             getProfileFriends(userId)
             .then(response=>{
                 setFriendList(response.profileFirendsList)
-                console.log(response.profileFirendsList)
+               
             })
         })
  
@@ -32,15 +33,15 @@ const PublicProfileFriends:React.FC<props> = ({userId}) => {
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full"> 
                  
-                <Link  href={`/profile/${user.userId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
+                <Link  href={`/profile/${user.profileId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
                     <Image 
                         className="rounded-full"
-                        src={user.user.image}
-                        alt={user.user.name}
+                        src={user.profile.image}
+                        alt={user.profile.firstName}
                         width={55}
                         height={55}
                         />
-                    <p className="text-white ml-2">{user?.user.name}</p>
+                    <p className="text-white ml-2">{user?.profile.firstName}</p>
                 </Link>
                 </div>
             ))}

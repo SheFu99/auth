@@ -22,6 +22,28 @@ export type friendRelation = {
   createdAt:Date,
   updatedAt:Date
 };
+type user = {
+  name:string,
+  image?:string
+}
+export type FriedsList={
+  user:user;
+  id: number;
+  transactionId?:string;
+  profileId: string;
+  createdAt: Date;
+  userId: string
+};
+export type FriendsOffer ={
+  requester: requester;
+  transactionId: string;
+  requesterId: string;
+  adresseedId: string;
+  status: friendshipStatus;
+  createdAt: Date;
+  updatedAt?: Date;
+};
+
 export type friendshipStatus = "PENDING"|"ACCEPTED"|"DECLINED"|"BLOCKED" | undefined
 
 export type post ={
@@ -79,7 +101,7 @@ export type comments={
   likedByUser:boolean;
 };
 
-export type requester= {
+export type requester = {
   id: string;
   name: string;
   image: string;

@@ -326,7 +326,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
 
                             
                             <RepostModalForm 
-                                title="Repost"
+                                ButtonTitle="Repost"
                                 postId={post.PostId}
                                 isOpen={isOpen}
                                 repostCount={post?.repostCount}

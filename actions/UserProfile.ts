@@ -109,15 +109,6 @@ export const getPublicProfile = async (userId:string)=>{
     if(!userId){
       return {error: 'userId is required'}
     }
-    // const includeRequesterId = requesterId? 
-    //   {include:{
-    //     received:{
-    //       where:{
-    //         requesterId:requesterId
-    //       },select:{status:true}
-    //     }
-    //   }}:undefined
-    
     const ExtendedProfile = await db.user.findFirst({
       where: {
         id: userId
@@ -137,15 +128,15 @@ export const getPublicProfile = async (userId:string)=>{
         userId:userId,
       }, 
     });
-    const relations = user? 
-    await db.friendShip.findFirst({
+    console.log('adresat:',userId,'reqestner:',user.id)
+    const relations = user ? await db.friendShip.findFirst({
       where:{
         adresseedId:userId,
         requesterId:user.id
       },
-      include:{
-        
-      },
+      select:{
+        transactionId:true
+      }
       
     }):undefined
     console.log(relations)

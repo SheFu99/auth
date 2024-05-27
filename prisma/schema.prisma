@@ -33,6 +33,7 @@ model Profile {
   firstName   String?
   lastName    String?
   coverImage  String? @default("")
+  image       String?
   shortName   String?
   gender      Gender? @map("gender")
   age         Int?
@@ -50,8 +51,9 @@ model friendsList {
   profileId String 
   createdAt DateTime @default(now())
   userId String
-  user User @relation(fields: [userId],references: [id])
-  profile Profile @relation(fields: [profileId],references: [userId])
+  transactionId String 
+  user User @relation(fields: [userId],references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId],references: [userId], onDelete: Cascade)
 }
 
 model FriendShip {
@@ -110,9 +112,9 @@ model Comment {
   postId    String?
   userId    String
   galleryId String?
-  gallery   Gallery? @relation(fields: [galleryId], references: [imageId])
-  post      Post?    @relation(fields: [postId], references: [PostId])
-  user      User     @relation(fields: [userId], references: [id])
+  gallery   Gallery? @relation(fields: [galleryId], references: [imageId],onDelete: Cascade)
+  post      Post?    @relation(fields: [postId], references: [PostId],onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id],onDelete: Cascade)
   image     Images[]
   likes     Like[]
 }
@@ -134,10 +136,10 @@ model Like {
   commentId String?
   userId    String
   galleryId String?
-  comment   Comment? @relation(fields: [commentId], references: [CommentId])
+  comment   Comment? @relation(fields: [commentId], references: [CommentId], onDelete: Cascade)
   gallery   Gallery? @relation(fields: [galleryId], references: [imageId])
   post      Post?    @relation(fields: [postId], references: [PostId], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
   @@unique([commentId, userId])

@@ -1,5 +1,5 @@
 "use server"
-import { friendshipStatus, requester } from "@/components/types/globalTs"
+import { FriedsList, FriendsOffer, friendshipStatus, requester } from "@/components/types/globalTs"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 
@@ -49,22 +49,14 @@ export const deletePendingOffer = async (userId:string)=>{
     }
    
 }
-export type getCurrentUserOfferPromise ={
-    requester: requester;
-    transactionId: string;
-    requesterId: string;
-    adresseedId: string;
-    status: friendshipStatus;
-    createdAt: Date;
-    updatedAt?: Date;
-}
+
+
+
 type getOfferProps ={
-    currentOfferList?:getCurrentUserOfferPromise[],
+    currentOfferList?:FriendsOffer[],
     error?:string,
     success?:boolean
-}
-export type getCurrentUserOfferResult = getCurrentUserOfferPromise[] | {error?:string};
-
+};
 export const getCurrentUserOffer = async ():Promise<getOfferProps>=>{
         const user = await currentUser()
         if(!user){
@@ -92,6 +84,9 @@ export const getCurrentUserOffer = async ():Promise<getOfferProps>=>{
             return {error:error};
         }
 };
+
+
+
 export type changeStatusParams = {
     transactionId:string,
     requesterId?:string
@@ -109,6 +104,7 @@ export const changeFriendOfferStatus = async ({transactionId,status,requesterId}
                 data:{
                     profileId:user.id,
                     userId:requesterId,
+                    transactionId:transactionId
                 }
             })
         } catch (error) {
@@ -132,37 +128,35 @@ export const changeFriendOfferStatus = async ({transactionId,status,requesterId}
         return {error:error}
     }
 };
-type user = {
-    name:string,
-    image?:string
-}
-export type getPublicFriedsList={
-    user:user;
-    id: number;
-    profileId: string;
-    createdAt: Date;
-    userId: string
-}
+
+
+
+
 export type getPublicFriendsPromise ={
-    profileFirendsList?:getPublicFriedsList[];
+    profileFirendsList?:FriedsList[];
+    message?:string,
     success?:boolean;
     error?:string
 }
 export const getProfileFriends = async (userId:string):Promise<getPublicFriendsPromise>=>{
+    console.log(userId)
     if(!userId){
         return {error:'Profile is not found'}
     }
     try {
         const profileFirendsList = await db.friendsList.findMany({
             where:{
-                profileId:userId
+                    userId:userId
             },
-            
-            include:{
-                user:{
-                    select:{
-                        name:true,
-                        image:true
+            select: {
+                userId: true,
+                profileId: true,
+                id:true,
+                createdAt:true,
+                profile: {
+                    select: {
+                        firstName: true,
+                        image: true
                     }
                 }
             }
@@ -174,4 +168,75 @@ export const getProfileFriends = async (userId:string):Promise<getPublicFriendsP
     }
    
 
+};
+ 
+
+export type getPrivateFriendsPromise = {
+    userFriendsList?:FriedsList[],
+    message?:string,
+    success?:boolean,
+    error?:string,
+};
+export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
+    const user = await currentUser()
+    if(!user){
+        return {error:'Error user not found!'}
+    }
+    try {
+        const userFriendsList = await db.friendsList.findMany({
+            where:{
+                profileId:user.id
+            },
+            include:{
+                user:{
+                    select:{
+                        id:true,
+                        name:true,
+                        image:true,
+                    },
+                }
+            }
+
+        })
+        return {success:true ,userFriendsList:userFriendsList }
+    } catch (error) {
+        return {error:error}
+    }
+};
+
+ const deleteFromList = async(id:number)=>{
+    await db.friendsList.delete({
+        where:{
+            id:id
+            }  
+    })
+};
+
+export type deleteFriendParams = {
+    transactionId:string,
+    listId:number,
+    status:friendshipStatus
+}
+
+export const deleteFriend = async ({transactionId,listId,status}:deleteFriendParams)=>{
+    const user = currentUser()
+    if(!user){
+        return {error:'You need to be authorize!'}
+    }
+    if(!transactionId||!listId){
+        return {error:'Unacceptable behavior!'}
+    };
+    try {
+        await db.friendShip.update({
+            where:{transactionId:transactionId},
+            data:{
+                status:status
+            }
+        });
+        await deleteFromList(listId)  
+        return {succes:true}
+    } catch (error) {
+        return {error:error}
+    }
+  
 }

@@ -21,6 +21,7 @@ import PostModal from "./cropper/Post-modal";
 import { ProfileData } from "../types/globalTs";
 import {debounce} from 'lodash'
 import IncomeOfferList from "./friends/incomeOfferList";
+import UserFriends from "./friends/privateUserFriends";
 
 
 
@@ -270,6 +271,7 @@ const  EditProfile =  () => {
             <TabsContent id="tab2" className="p-4">
                 {/* <h1>Content for Tab Two</h1> */}
                 <IncomeOfferList/>
+                <UserFriends/>
             </TabsContent>
             <TabsContent id="tab3" className="p-4">
                 <h1>Content for Tab Three</h1>
