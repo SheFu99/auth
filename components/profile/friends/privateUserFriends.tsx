@@ -1,22 +1,19 @@
 "use client"
 
 import {  changeFriendOfferStatus, changeStatusParams, deleteFriend, deleteFriendParams, getUserFreinds } from "@/actions/friends"
-import { FriendsOffer, friendshipStatus } from "@/components/types/globalTs"
+import { FriendsOffer } from "@/components/types/globalTs"
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { useSession } from "next-auth/react"
-import Image from "next/image"
 import Link from "next/link"
 import { Profiler, startTransition, useEffect, useState } from "react"
 import { FaBan, FaUser } from "react-icons/fa"
 import { IoMdMore } from "react-icons/io"
 import { IoPersonRemoveSharp } from "react-icons/io5"
-import { MdMoreVert } from "react-icons/md"
-import { TiCancel } from "react-icons/ti"
 import { toast } from "sonner"
 
-const UserFriends = () => {
+const UserFriends = ({setListLength}) => {
     const [friendsList,setFriendList]=useState<FriendsOffer[]>([])
     const [refresh,setRefresh]=useState<boolean>(false)
     const {update}=useSession()
@@ -24,8 +21,11 @@ const UserFriends = () => {
 
     useEffect(()=>{
         getFriends()
-       console.log(user)
-    },[refresh])   
+    },[update])   
+
+    useEffect(()=>{
+        setListLength(friendsList.length)
+    },[friendsList])
 
     const getFriends = ()=>{
         startTransition(()=>{
@@ -53,7 +53,6 @@ const UserFriends = () => {
             })
         
     };
-
     const deleteFriendButton = (userId:string)=>{
             deleteFriend(userId)
             .then(response=>{
@@ -66,11 +65,11 @@ const UserFriends = () => {
                     toast.error(response.error)
                 }
             })
-    }
+    };
     return ( 
         <div className=" w-full space-y-2">
-            <button title="refresh" onClick={()=>setRefresh(!refresh)}>Refresh</button>
-            <p className="text-white">{`You have: ${friendsList?.length} friends`}</p>
+            {/* <button title="refresh" onClick={()=>setRefresh(!refresh)}>Refresh</button> */}
+            {/* <p className="text-white">{`You have: ${friendsList?.length} friends`}</p> */}
 
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full row-span-1"> 
@@ -82,7 +81,7 @@ const UserFriends = () => {
                             className="rounded-sm w-[50px] h-[50px]"
                         />
                         <AvatarFallback>
-                                <FaUser color="white"/>
+                            <FaUser color="white" className="w-[50px] h-[50px] bg-neutral-400 rounded-sm p-1"/>
                         </AvatarFallback>
                    </Avatar>
                     <p className="text-white ml-2">{user?.addressee?.firstName||user?.requester?.firstName}</p>

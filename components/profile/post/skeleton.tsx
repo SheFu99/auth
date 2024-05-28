@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 type SkeletonProps ={
-    isLoading:boolean
+    isLoading?:boolean
 }
 const PostSkeleton = (isLoading:SkeletonProps) => {
    

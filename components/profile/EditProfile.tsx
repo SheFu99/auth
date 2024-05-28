@@ -1,5 +1,5 @@
 "use client"
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { BsFillPencilFill } from "react-icons/bs";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { toast } from "sonner";
@@ -20,26 +20,37 @@ import { BounceLoader } from "react-spinners";
 import PostModal from "./cropper/Post-modal";
 import { ProfileData } from "../types/globalTs";
 import {debounce} from 'lodash'
-import IncomeOfferList from "./friends/incomeOfferList";
-import UserFriends from "./friends/privateUserFriends";
+const IncomeOfferList = React.lazy(()=> import ('./friends/incomeOfferList'))
+const UserFriends = React.lazy(()=> import ('./friends/privateUserFriends'))
+
 import AvatarWithFallback from "../ui/AvatarCoustom";
+import PostSkeleton from "./post/skeleton";
+import ListSkeleton from "./friends/FriendSkeleton";
 
 
 
 const  EditProfile =  () => {
   
   const user = useCurrentUser();
+  const [friendsOfferLength,setOfferLength] =useState<number>(0)
+  const [friendsListLength,setListLength] =useState<number>(0)
+
   // const {upload , switchUpload} = useUpdateProfileTrigger(); //use redux and localstorage for store
   const [profile, setProfile] = useState<ProfileData>()
 
   const {update} = useSession() ///replace to updateProfile redux hook 
-  
   const [avatarUploading, setAvatarUloading] = useState(false);
   const [sessionImage, setSessionImage] = useState( user?.image); 
   const [addInfo,swichAddInfo]=useState<boolean>(false)
   const [imageSrc, setImageSrc] = useState<string>(''); // State to hold the source URL of the image to crop
   const [avatarCropper,setModalAvatarCropper]=useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+  useEffect(()=>{
+    console.log(friendsOfferLength)
+    console.log(friendsListLength)
+  },[friendsListLength])
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     
@@ -126,19 +137,16 @@ const  EditProfile =  () => {
       setAvatarUloading(false)
     }
     
-  };
-
+  };///TODO: incapsulate
    const closeAvatarCropper = ()=>{
     setModalAvatarCropper(false)
     setImageSrc("")
   };
-
    const ChangeAvatar = ()=>{
     setImageSrc("")
     fileInputRef.current?.click()
 
   };
-
   const onAvatarChange=()=>{
 
   }
@@ -160,39 +168,35 @@ const  EditProfile =  () => {
             )}
            
         </div>
-        <div className="flex items-center relative ">
-                  <div className="absolute md:left-0  m-auto w-fit md:p-[1rem]  md:-bottom-10 -bottom-5 left-3  justify-center z-[50]">
+          <div className="flex items-center relative ">
+                    <div className="absolute md:left-0  m-auto w-fit md:p-[1rem]  md:-bottom-10 -bottom-5 left-3  justify-center z-[50]">
+                      {avatarUploading?(
+                        <BounceLoader color="white" className="md:-ml-[2px] mr-[1px]"/>
+                        ):(
+                          <AvatarWithFallback
+                            src={sessionImage}
+                            width={100}
+                            height={100}
+                            alt={profile?.firstName}
+                        />
+                        )}
+                      <button
+                        className="absolute md:bottom-2 -bottom-2 left-0 right-0  m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75 z-40"
+                        title="Change photo"
+                        onClick={() =>ChangeAvatar() } // Use ref to trigger file input click
+                      >
+                        <BsFillPencilFill className="grid scale-100"/>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAvatarChange}
+                          style={{ display: 'none' }} 
+                        />
+                      </button>
 
-
-                     {avatarUploading?(
-                       <BounceLoader color="white" className="md:-ml-[2px] mr-[1px]"/>
-                      ):(
-                        <AvatarWithFallback
-                          src={sessionImage}
-                          width={100}
-                          height={100}
-                          alt={profile?.firstName}
-                       />
-                      )}
-                    <button
-                      className="absolute md:bottom-2 -bottom-2 left-0 right-0  m-auto w-fit p-[.35rem] rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-600 scale-75 z-40"
-                      title="Change photo"
-                      onClick={() =>ChangeAvatar() } // Use ref to trigger file input click
-                    >
-                      <BsFillPencilFill className="grid scale-100"/>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarChange}
-                        style={{ display: 'none' }} 
-                      />
-                    </button>
-
-              </div>
-
-           
-            </div>
+                </div>
+          </div>
         </div>
           
 
@@ -233,7 +237,7 @@ const  EditProfile =  () => {
         <Tabs defaultId="tab1" >
             <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
                 <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/>Posts</TabsTrigger>
-                <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/>Friends</TabsTrigger>
+                <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/><p>{friendsListLength}</p>Friends </TabsTrigger>
                 <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiGalleryFill/>Gallery</TabsTrigger>
             </TabsList>
 
@@ -247,9 +251,10 @@ const  EditProfile =  () => {
             </TabsContent>
 
             <TabsContent id="tab2" className="p-4">
-                {/* <h1>Content for Tab Two</h1> */}
-                <IncomeOfferList/>
-                <UserFriends/>
+              <Suspense fallback={<ListSkeleton/>}>
+                <IncomeOfferList setOfferLength={setOfferLength}/>
+                <UserFriends setListLength={setListLength}/>
+              </Suspense>
             </TabsContent>
             <TabsContent id="tab3" className="p-4">
                 <h1>Content for Tab Three</h1>

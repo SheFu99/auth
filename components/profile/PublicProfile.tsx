@@ -15,10 +15,13 @@ import { deletePendingOffer, getProfileFriends, sendFriendShipOffer } from "@/ac
 import { toast } from "sonner";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { friendRelation, friendshipStatus } from "../types/globalTs";
-import PublicProfileFriends from "./friends/publicProfileFriends";
+const PublicProfileFriends = React.lazy(()=> import ('./friends/publicProfileFriends'))
+// import PublicProfileFriends from "./friends/publicProfileFriends";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import AvatarWithFallback from "../ui/AvatarCoustom";
 import FriendStatusButton from "./friends/function/publicFriendButton";
+import PostSkeleton from "./post/skeleton";
+import ListSkeleton from "./friends/FriendSkeleton";
 
 const UserPostList = React.lazy(()=>import('./UserPostList'))
 // import UserPostList from "./forms/UserPostList";
@@ -37,6 +40,7 @@ const  PublicProfile =  ({profile}:profileProps) => {
 const [updateState, setUpdate] = useState<boolean>(false)
 const [isLoading, setIsLoading]=useState<boolean>(true)
 const [isPending,startTransition]=useTransition()
+const [friendsLength,setFriendsLength] = useState<number>(0)
 const user = useCurrentUser()
 const userId = profile?.profile?.userId
 const isTheSameUser = user?.id === userId
@@ -158,7 +162,7 @@ const isTheSameUser = user?.id === userId
         <Tabs defaultId="tab1" >
             <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
                 <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/>Posts</TabsTrigger>
-                <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/>Friends</TabsTrigger>
+                <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/> {friendsLength}  Friends</TabsTrigger>
                 <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiGalleryFill/>Gallery</TabsTrigger>
             </TabsList>
 
@@ -174,7 +178,10 @@ const isTheSameUser = user?.id === userId
 
             <TabsContent id="tab2" className="p-4">
 
-                <PublicProfileFriends userId={profile?.profile?.userId}/>
+            <Suspense fallback={<ListSkeleton/>}>
+              <PublicProfileFriends userId={profile?.profile?.userId} setFriendsLength={setFriendsLength}/>
+            </Suspense>
+
             </TabsContent>
             <TabsContent id="tab3" className="p-4">
                 <h1>Content for Tab Three</h1>

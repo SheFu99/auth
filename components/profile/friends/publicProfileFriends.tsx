@@ -3,23 +3,28 @@
 import { getProfileFriends, getPublicFriendsPromise } from "@/actions/friends";
 import { FriendsOffer } from "@/components/types/globalTs";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import Image from "next/image";
 import Link from "next/link";
-import { Profiler, startTransition, useEffect, useState } from "react";
+import {  startTransition, useEffect, useState } from "react";
 import { FaUser } from "react-icons/fa";
 
 interface props {
-    userId:string
+    userId:string,
+    setFriendsLength:any,
 }
-const PublicProfileFriends:React.FC<props> = ({userId}) => {
+const PublicProfileFriends:React.FC<props> = ({userId,setFriendsLength}) => {
     
     const [friendsList,setFriendList]=useState<FriendsOffer[]>()
     const [refresh,setRefresh]=useState<boolean>(false)
 
     useEffect(()=>{
         getFriends()
-       
-    },[refresh])   
+    },[userId]) 
+    
+    useEffect(()=>{
+        console.log(friendsList?.length)
+        setFriendsLength(friendsList?.length)
+    },[friendsList])
+
     const getFriends = ()=>{
         startTransition(()=>{
             getProfileFriends(userId)
@@ -32,8 +37,8 @@ const PublicProfileFriends:React.FC<props> = ({userId}) => {
     }
     return ( 
         <div className=" w-full space-y-2">
-            <button title="refresh" onClick={()=>setRefresh(!refresh)}>Refresh</button>
-            <p className="text-white">{`User have: ${friendsList?.length} friends`}</p>
+            {/* <button title="refresh" onClick={()=>setRefresh(!refresh)}>Refresh</button> */}
+            {/* <p className="text-white">{`User have: ${friendsList?.length} friends`}</p> */}
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full" key={index}> 
                  
@@ -44,7 +49,7 @@ const PublicProfileFriends:React.FC<props> = ({userId}) => {
                         className="w-[50px] h-[50px] rounded-sm"
                         />
                         <AvatarFallback>
-                                <FaUser color="white"/>
+                                <FaUser color="white" className="w-[50px] h-[50px] bg-neutral-400 rounded-sm p-1"/>
                         </AvatarFallback>
                    </Avatar>
                    

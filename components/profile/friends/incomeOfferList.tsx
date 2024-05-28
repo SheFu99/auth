@@ -13,11 +13,14 @@ import AvatarWithFallback from "@/components/ui/AvatarCoustom";
 import { Avatar } from "@radix-ui/react-avatar";
 import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FaUser } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
 
 const IncomeOfferList = () => {
     const [userList,setUserList]=useState<FriendsOffer[]>([])
     const [click,setClick]=useState<boolean>(false)
+    const {update}=useSession()
+    
     const getIncomeOfferList = ()=>{
         getCurrentUserOffer()
         .then(response=>{
@@ -32,8 +35,8 @@ const IncomeOfferList = () => {
             toast.error(err)
         })
     };
-    const changeStatus = ({status,transactionId,requesterId}:changeStatusParams) => {
-        changeFriendOfferStatus({ status, transactionId, requesterId })
+    const changeStatus = ({status,transactionId}:changeStatusParams) => {
+        changeFriendOfferStatus({ status, transactionId })
         .then(response=>{
             if(response.success){
                 toast.success(response.message)
@@ -46,11 +49,11 @@ const IncomeOfferList = () => {
     useEffect(()=>{
         getIncomeOfferList() 
         console.log(userList)
-    },[click])
+    },[update])
 
     return ( 
         <div className="flex space-y-2 flex-wrap">
-            <button title="button" onClick={()=>{setClick(!click)}}>Refresh</button>
+            {/* <button title="button" onClick={()=>{setClick(!click)}}>Refresh</button> */}
             {userList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full "> 
                         <Link  href={`/profile/${user.requester.userId}`} className="md:col-span-10 col-span-9 flex items-center gap-1 cursor-pointer">
@@ -74,18 +77,16 @@ const IncomeOfferList = () => {
                         <button 
                             title="Confirm"
                             className=" flex justify-center items-center w-full bg-slate-400 rounded-sm hover:bg-slate-300"
-                            onClick={()=>changeStatus({status:'ACCEPTED',transactionId:user.transactionId,requesterId:user.requesterId})}
+                            onClick={()=>changeStatus({status:'ACCEPTED',transactionId:user.transactionId})}
                             >
                             <MdDoneOutline color="white" className="scale-150"/>
                         </button>
-                        
                         <button 
                             title="Reject"
                             className=" w-full flex justify-center items-center bg-red-800 rounded-sm hover:bg-red-700"
                             onClick={()=>changeStatus({
                                 status:'DECLINED',
                                 transactionId:user.transactionId,
-                                requesterId:user.requesterId
                             })}
 
                             >
