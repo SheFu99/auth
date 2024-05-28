@@ -23,18 +23,9 @@ export type friendRelation = {
   updatedAt:Date
 };
 
-export type FriedsList={
-  addressee?:user;
-  requester?:user;
-  id: number;
-  transactionId?:string;
-  profileId: string;
-  createdAt: Date;
-  userId: string
-};
 export type FriendsOffer ={
-  addressee?:user;
-  requester?: user;
+  addressee?:profileOfferDetail;
+  requester?: profileOfferDetail;
   transactionId: string;
   requesterId: string;
   adresseedId: string;
@@ -100,8 +91,8 @@ export type comments={
   likedByUser:boolean;
 };
 
-export type user = {
-  id?: string;
-  name: string;
+export type profileOfferDetail = {
+  userId?: string;
+  firstName: string;
   image?: string;
 };
