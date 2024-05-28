@@ -13,6 +13,15 @@ import { friendshipStatus } from "@/components/types/globalTs"
 //   success:z.boolean().nullable(),
 //   error:z.string().nullable()
 // })
+
+export type relation = {
+  relationTo?:FRtransaction;
+  relationFrom?:FRtransaction;
+}
+export type FRtransaction={
+  transactionId:string;
+  status:friendshipStatus
+}
 export type Profile = z.infer<typeof UserProfile>
 
 export const getProfileById = async (userId:string)=>{
@@ -188,11 +197,3 @@ export const getPublicProfile = async (userId:string)=>{
   }
   }
 
-type relation = {
-  relationTo?:FRtransaction;
-  relationFrom?:FRtransaction;
-}
-type FRtransaction={
-  transactionId:string;
-  status:friendshipStatus
-}
