@@ -32,9 +32,7 @@ import ListSkeleton from "./friends/FriendSkeleton";
 const  EditProfile =  () => {
   
   const user = useCurrentUser();
-  const [friendsOfferLength,setOfferLength] =useState<number>(0)
-  const [friendsListLength,setListLength] =useState<number>(0)
-
+  const [friendsOfferLength,setOfferLength] =useState<number>()
   // const {upload , switchUpload} = useUpdateProfileTrigger(); //use redux and localstorage for store
   const [profile, setProfile] = useState<ProfileData>()
 
@@ -47,11 +45,7 @@ const  EditProfile =  () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
-  useEffect(()=>{
-    console.log(friendsOfferLength)
-    console.log(friendsListLength)
-  },[friendsListLength])
-
+  
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     
       if (event.target.files && event.target.files[0]) {
@@ -237,7 +231,7 @@ const  EditProfile =  () => {
         <Tabs defaultId="tab1" >
             <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
                 <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/>Posts</TabsTrigger>
-                <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/><p>{friendsListLength}</p>Friends </TabsTrigger>
+                <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/>Friends</TabsTrigger>
                 <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiGalleryFill/>Gallery</TabsTrigger>
             </TabsList>
 
@@ -251,9 +245,10 @@ const  EditProfile =  () => {
             </TabsContent>
 
             <TabsContent id="tab2" className="p-4">
+              <p>{friendsOfferLength}</p>
               <Suspense fallback={<ListSkeleton/>}>
-                <IncomeOfferList setOfferLength={setOfferLength}/>
-                <UserFriends setListLength={setListLength}/>
+                <IncomeOfferList/>
+                <UserFriends/>
               </Suspense>
             </TabsContent>
             <TabsContent id="tab3" className="p-4">

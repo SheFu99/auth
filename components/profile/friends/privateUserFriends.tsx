@@ -13,7 +13,7 @@ import { IoMdMore } from "react-icons/io"
 import { IoPersonRemoveSharp } from "react-icons/io5"
 import { toast } from "sonner"
 
-const UserFriends = ({setListLength}) => {
+const UserFriends = () => {
     const [friendsList,setFriendList]=useState<FriendsOffer[]>([])
     const [refresh,setRefresh]=useState<boolean>(false)
     const {update}=useSession()
@@ -21,11 +21,7 @@ const UserFriends = ({setListLength}) => {
 
     useEffect(()=>{
         getFriends()
-    },[update])   
-
-    useEffect(()=>{
-        setListLength(friendsList.length)
-    },[friendsList])
+    },[update])
 
     const getFriends = ()=>{
         startTransition(()=>{
@@ -68,8 +64,8 @@ const UserFriends = ({setListLength}) => {
     };
     return ( 
         <div className=" w-full space-y-2">
-            {/* <button title="refresh" onClick={()=>setRefresh(!refresh)}>Refresh</button> */}
-            {/* <p className="text-white">{`You have: ${friendsList?.length} friends`}</p> */}
+            <button title="refresh" onClick={()=>setRefresh(!refresh)}>Refresh</button>
+            <p className="text-white">{`You have: ${friendsList?.length} friends`}</p>
 
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full row-span-1"> 
