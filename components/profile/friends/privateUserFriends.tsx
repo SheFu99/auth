@@ -68,7 +68,7 @@ const UserFriends = () => {
             <p className="text-white">{`You have: ${friendsList?.length} friends`}</p>
 
             {friendsList?.map((user,index)=>(
-                <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full row-span-1"> 
+                <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full row-span-1" key={index}> 
                     <Link  href={`/profile/${user?.addressee?.userId||user?.requester?.userId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
                     <Avatar>
                         <AvatarImage 

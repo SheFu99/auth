@@ -55,7 +55,7 @@ const IncomeOfferList = () => {
         <div className="flex space-y-2 flex-wrap">
             {/* <button title="button" onClick={()=>{setClick(!click)}}>Refresh</button> */}
             {userList?.map((user,index)=>(
-                <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full "> 
+                <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full "key={index}> 
                         <Link  href={`/profile/${user.requester.userId}`} className="md:col-span-10 col-span-9 flex items-center gap-1 cursor-pointer">
                             <Avatar>
                                 <AvatarImage
