@@ -4,6 +4,7 @@ import * as z from "zod"
 import { db } from "@/lib/db"
 import { UserProfile } from "@/schemas"
 import { CurrentProfile, currentUser } from "@/lib/auth"
+import { friendshipStatus } from "@/components/types/globalTs"
 
 
 // type UserProfile = z.infer<typeof UserProfile>
@@ -99,10 +100,7 @@ export const updateUserProfile = async (values: Profile)=>{
 
 }
 
-type publicProfileParams = {
-  userId:string,
-  requesterId?:string,
-}
+
 export const getPublicProfile = async (userId:string)=>{
     const user = await currentUser()
   
@@ -122,25 +120,57 @@ export const getPublicProfile = async (userId:string)=>{
       return { error: "User not found" };
     }
    console.log(user)
-  try {
+ 
+   try {
     const existingProfile = await db.profile.findFirst({
       where:{
         userId:userId,
       }, 
     });
     console.log('adresat:',userId,'reqestner:',user.id)
-    const relations = user ? await db.friendShip.findFirst({
-      where:{
-        adresseedId:userId,
-        requesterId:user.id
-      },
-      select:{
-        transactionId:true,
-        status:true,
-      }
-      
-    }):undefined
-    console.log(relations)
+    let relation:relation
+    if(user){
+    try {
+      const relationsFrom = await db.friendShip.findFirst({
+        where:{
+            AND:[
+              {adresseedId:userId},
+              {requesterId:user.id}
+            ]
+        },
+        select:{
+          transactionId:true,
+          status:true,
+        }
+        
+      });
+      const relationsTo = await db.friendShip.findFirst({
+        where:{
+          AND:[
+            {adresseedId:user.id},
+            {requesterId:userId}
+          ]
+        
+        
+        },
+        select:{
+          transactionId:true,
+          status:true,
+        }
+        
+      });
+
+      relation = relationsFrom !==null||undefined ? {relationFrom:relationsFrom}:{relationTo:relationsTo}
+      console.log(relation)
+    } catch (error) {
+      return {error:'Error with profile FR.relation'}
+    }
+     
+   }
+
+
+   
+    console.log(relation)
   
     console.log(existingProfile)
 
@@ -151,10 +181,18 @@ export const getPublicProfile = async (userId:string)=>{
        return {
       profile: existingProfile,
       userImage: ExtendedProfile.image,
-      friendStatus: relations
+      friendStatus: relation
     };
   } catch (error) {
     return {error:error}
   }
   }
 
+type relation = {
+  relationTo?:FRtransaction;
+  relationFrom?:FRtransaction;
+}
+type FRtransaction={
+  transactionId:string;
+  status:friendshipStatus
+}

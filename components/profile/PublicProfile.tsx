@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { MdElderly, MdLocationCity, MdOutlinePendingActions } from "react-icons/md";
 import { BounceLoader, FadeLoader } from "react-spinners";
-import { Profile } from "@/actions/UserProfile";
+import { Profile, relation } from "@/actions/UserProfile";
 import { IoAddCircle, IoPersonCircle, IoPersonCircleSharp } from "react-icons/io5";
 import { deletePendingOffer, getProfileFriends, sendFriendShipOffer } from "@/actions/friends";
 import { toast } from "sonner";
@@ -18,13 +18,15 @@ import { friendRelation, friendshipStatus } from "../types/globalTs";
 import PublicProfileFriends from "./friends/publicProfileFriends";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import AvatarWithFallback from "../ui/AvatarCoustom";
+import FriendStatusButton from "./friends/function/publicFriendButton";
+
 const UserPostList = React.lazy(()=>import('./UserPostList'))
 // import UserPostList from "./forms/UserPostList";
 
 export interface ProfileData{
     profile:Profile
     userImage:string;
-    friendStatus:friendRelation
+    friendStatus:relation
     
 }
 interface profileProps {
@@ -34,9 +36,7 @@ interface profileProps {
 const  PublicProfile =  ({profile}:profileProps) => {
 const [updateState, setUpdate] = useState<boolean>(false)
 const [isLoading, setIsLoading]=useState<boolean>(true)
-const [friendStatus,setFriendStatus]=useState<friendshipStatus>(profile?.friendStatus?.status ||undefined)
 const [isPending,startTransition]=useTransition()
-console.log(profile)
 const user = useCurrentUser()
 const userId = profile?.profile?.userId
 const isTheSameUser = user?.id === userId
@@ -54,65 +54,8 @@ const isTheSameUser = user?.id === userId
   };
   
                       
-  const friendStatusButton = () =>{
-    console.log(friendStatus)
-    switch(friendStatus){
-        case "PENDING":
-            return (
-                <div  
-                title="Cancel friendship offer" 
-                    className="bg-white rounded-full border-black border-4 cursor-pointer"
-                    onClick={()=>cancelOffer(userId)}
-                    >
-                            <MdOutlinePendingActions className="md:w-[45px] md:h-[45px] w-[30px] h-[30px] p-1 " color="black"/>
-                </div>
-            )
-        case "ACCEPTED":
-            return (
-                <div 
-                    title="Delete this profile from your friends"
-                    className="bg-white rounded-full border-black border-4 cursor-pointer"
-                    onClick={()=>cancelOffer(userId)}
 
-                    >
-                    <FaHandshake className='md:w-[45px] md:h-[45px] w-[30px] h-[30px] p-1' color="black"/>
-                </div>
-            )
-        default :
-            return(
-                <div title="Send friendship request"  
-                    className="cursor-pointer" 
-                    onClick={()=>addToFriends(userId)} >
-                    <IoAddCircle color="white" className=" md:w-[50px] md:h-[50px] w-[35px] h-[35px]"/>
-                </div>
-            )
-    }
-  };
 
-  const addToFriends = (userId:string)=>{
-    startTransition(()=>{
-        sendFriendShipOffer(userId)
-        .then(response=>{
-            if(response.success){
-                toast.success(response.message)
-            }
-        }).catch(err=>{
-            toast.error(err)
-        }).finally(()=>setFriendStatus('PENDING'))
-    })
-  };
-  const cancelOffer = (userId:string)=>{
-    startTransition(()=>{
-        deletePendingOffer(userId)
-        .then(response=>{
-            if(response.success){
-                toast.success('Your offer has been cancelled')
-            }
-        }).catch(err=>{
-            toast.error(err)
-        }).finally(()=>setFriendStatus(undefined))
-    })
-  };
   const getListOfFriends = async (userId:string)=>{
   startTransition(()=>{
     getProfileFriends(userId)
@@ -127,7 +70,7 @@ const isTheSameUser = user?.id === userId
   
   useEffect(()=>{
     getListOfFriends(userId)
-    setFriendStatus(profile?.friendStatus?.status)
+    // setFriendStatus(profile?.friendStatus?.relationFrom?.status || profile.friendStatus?.relationTo?.status)
   },[userId])
 //   useEffect(()=>{console.log(avatar)},[avatar])
  if(!profile){
@@ -165,7 +108,9 @@ const isTheSameUser = user?.id === userId
                 </div>
                 {user&&!isTheSameUser&&(
                     <div className="absolute -bottom-15  md:right-[4rem] right-8 z-30 bg-black rounded-full ">
-                        {friendStatusButton()}
+                        <FriendStatusButton 
+                            friendStatus={profile?.friendStatus}
+                            userId={profile.profile?.userId}/>
                     </div>
                 )}
               

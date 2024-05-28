@@ -5,10 +5,14 @@ import {changeFriendOfferStatus} from '@/actions/friends'
 import { FriendsOffer, friendshipStatus } from "@/components/types/globalTs";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Profiler, useEffect, useState } from "react";
 import { MdDoneOutline } from "react-icons/md";
 import { toast } from "sonner";
 import { TiCancel } from "react-icons/ti";
+import AvatarWithFallback from "@/components/ui/AvatarCoustom";
+import { Avatar } from "@radix-ui/react-avatar";
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FaUser } from "react-icons/fa";
 
 
 const IncomeOfferList = () => {
@@ -49,15 +53,19 @@ const IncomeOfferList = () => {
             <button title="button" onClick={()=>{setClick(!click)}}>Refresh</button>
             {userList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full "> 
-                 
                         <Link  href={`/profile/${user.requester.userId}`} className="md:col-span-10 col-span-9 flex items-center gap-1 cursor-pointer">
-                            <Image 
-                                className="rounded-full"
-                                src={user.requester.image}
-                                alt={user.requester.firstName}
-                                width={55}
-                                height={55}
-                                />
+                            <Avatar>
+                                <AvatarImage
+                                    src={user.requester.image}
+                                    alt={user.requester.firstName}
+                                    className="rounded-sm w-[50px] h-[50px]"
+
+                                    />
+                                     <AvatarFallback>
+                                        <FaUser className="text-white"/>
+                                    </AvatarFallback>
+                            </Avatar>
+                               
                             <p className="text-white ml-2">{user?.requester?.firstName}</p>
                         </Link>
                   
@@ -65,7 +73,7 @@ const IncomeOfferList = () => {
 
                         <button 
                             title="Confirm"
-                            className=" flex justify-center items-center w-full bg-slate-400 rounded-md hover:bg-slate-300"
+                            className=" flex justify-center items-center w-full bg-slate-400 rounded-sm hover:bg-slate-300"
                             onClick={()=>changeStatus({status:'ACCEPTED',transactionId:user.transactionId,requesterId:user.requesterId})}
                             >
                             <MdDoneOutline color="white" className="scale-150"/>
@@ -73,7 +81,7 @@ const IncomeOfferList = () => {
                         
                         <button 
                             title="Reject"
-                            className=" w-full flex justify-center items-center bg-red-800 rounded-md hover:bg-red-700"
+                            className=" w-full flex justify-center items-center bg-red-800 rounded-sm hover:bg-red-700"
                             onClick={()=>changeStatus({
                                 status:'DECLINED',
                                 transactionId:user.transactionId,

@@ -1,14 +1,14 @@
 "use client"
 
-import {  deleteFriend, deleteFriendParams, getUserFreinds } from "@/actions/friends"
+import {  changeFriendOfferStatus, changeStatusParams, deleteFriend, deleteFriendParams, getUserFreinds } from "@/actions/friends"
 import { FriendsOffer, friendshipStatus } from "@/components/types/globalTs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
-import { startTransition, useEffect, useState } from "react"
+import { Profiler, startTransition, useEffect, useState } from "react"
 import { FaBan, FaUser } from "react-icons/fa"
 import { IoMdMore } from "react-icons/io"
 import { IoPersonRemoveSharp } from "react-icons/io5"
@@ -21,10 +21,12 @@ const UserFriends = () => {
     const [refresh,setRefresh]=useState<boolean>(false)
     const {update}=useSession()
     const user = useCurrentUser()
+
     useEffect(()=>{
         getFriends()
        console.log(user)
     },[refresh])   
+
     const getFriends = ()=>{
         startTransition(()=>{
             getUserFreinds()
@@ -38,26 +40,26 @@ const UserFriends = () => {
         })
  
     };
-    const changeFriendStatus = ({
-        status,
-        transactionId,
-        }:deleteFriendParams)=>{
-            console.log('CALL')
-            const operation = (status:friendshipStatus)=>{
-                switch(status){
-                    case 'DECLINED':
-                        return 'delete friend!'
-                    case 'BLOCKED':
-                        return 'block user!'
+
+    const changeFriendStatus = ({status,transactionId}:changeStatusParams)=>{
+            changeFriendOfferStatus({status:status,transactionId:transactionId})
+            .then(response => {
+                if(response.success){
+                    toast.success(response.message)
                 }
-            }
-            deleteFriend({
-                transactionId:transactionId,
-                status:status
-            }).then(response=>{
+            })
+            .catch(err =>{
+                toast.error(err)
+            })
+        
+    };
+
+    const deleteFriendButton = (userId:string)=>{
+            deleteFriend(userId)
+            .then(response=>{
                 console.log(response)
                 if(response.succes){
-                    toast.success(`Your successfully ${operation(status)} `)
+                    toast.success(`Your successfully delete friends from list`)
                     update()
                 }
                 if(response.error){
@@ -68,12 +70,17 @@ const UserFriends = () => {
     return ( 
         <div className=" w-full space-y-2">
             <button title="refresh" onClick={()=>setRefresh(!refresh)}>Refresh</button>
+            <p className="text-white">{`You have: ${friendsList?.length} friends`}</p>
+
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full row-span-1"> 
-                 
                     <Link  href={`/profile/${user?.addressee?.userId||user?.requester?.userId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
                     <Avatar>
-                        <AvatarImage src={user.addressee?.image || user.requester?.image }/>
+                        <AvatarImage 
+                            src={user.addressee?.image || user.requester?.image } 
+                            alt={user?.addressee?.firstName||user?.requester?.firstName}
+                            className="rounded-sm w-[50px] h-[50px]"
+                        />
                         <AvatarFallback>
                                 <FaUser color="white"/>
                         </AvatarFallback>
@@ -92,10 +99,7 @@ const UserFriends = () => {
                                     <div 
                                         title="Delete"
                                         className="flex w-full px-3 py-1 rounded-sm justify-evenly gap-2 cursor-pointer hover:bg-neutral-800"
-                                        onClick={()=>changeFriendStatus({
-                                            status:'DECLINED',
-                                            transactionId:user.transactionId,
-                                        })}
+                                        onClick={()=>deleteFriendButton(user?.addressee?.userId||user?.requester?.userId)}
                                         >
                                     <p>Delete</p>
                                         <button 

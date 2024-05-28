@@ -18,17 +18,65 @@ export const sendFriendShipOffer = async (userId:string)=> {
         if(!recepient){
             return {error:'Recipient is not found'}
         }
-        await db.friendShip.create({
-            data:{
-                requesterId:user.id,
-                adresseedId:userId,
+        const requester = await db.friendShip.findFirst({
+            where:{
+                    requesterId:user.id,
             }
-        })
-        return {success:true,message:'Your request has been succesfully send!'}
+        });
+        const adresser = await db.friendShip.findFirst({
+            where:{
+                adresseedId:user.id
+            }
+        }) ;
+        const notFound = adresser ===null && requester ===null
+   
+        if(notFound){
+            await db.friendShip.create({
+                data:{
+                    requesterId:user.id,
+                    adresseedId:userId,
+                }
+            })
+            return {success:true,message:'Your request has been successfully send!'}
+          }
+        if(adresser?.status ==='PENDING' ){
+            await db.friendShip.update({
+                where:{
+                    transactionId:adresser.transactionId
+                },
+                data:{
+                    status:'ACCEPTED'
+                }
+            })
+        console.log('UPDATE_ACCEPTED')
+
+            return {success:true , messsage:'You successfully apply this offer'}
+        };
+        if(adresser?.status === 'DECLINED'){
+            await db.friendShip.update({
+                where:{transactionId:adresser.transactionId},
+                data:{
+                    status:'PENDING'
+                }
+            });
+        }
+        if(requester?.status === 'DECLINED'){
+            await db.friendShip.update({
+                where:{transactionId:requester.transactionId},
+                data:{
+                    status:'PENDING'
+                }
+            })
+        console.log('UPDATE_PENDING')
+
+            return {success:true , message:'Your successfully resend offer'}
+        }
+    
+        
     } catch (error) {
         return{error:error}
     }
-}
+};
 export const deletePendingOffer = async (userId:string)=>{
     const user = await currentUser()
     if(!user||!userId){
@@ -48,8 +96,71 @@ export const deletePendingOffer = async (userId:string)=>{
         return {error:error}
     }
    
+};
+export const deleteFriend = async (userId:string)=>{
+    const user = await currentUser()
+    if(!user||!userId){
+        return {error:'Unacceptable behavior!'}
+    };
+    const existingTransaction = await db.friendShip.findFirst({
+        where:{
+            OR:[
+                {AND:[
+                        {requesterId:user.id},
+                        {adresseedId:userId}
+                ]},
+                {AND:[
+                    {requesterId:userId},
+                    {adresseedId:user.id}
+                ]}
+            ]
+        }
+    })
+    if(!existingTransaction){
+        return {error:'Relation is not found!'}
+    }
+    try {
+        await db.friendShip.delete({
+            where:{transactionId:existingTransaction.transactionId},
+        });
+        return {succes:true}
+    } catch (error) {
+        return {error:error}
+    }
+  
+};
+export type changeStatusParams = {
+    transactionId:string,
+    status:friendshipStatus,
 }
+export const changeFriendOfferStatus = async ({transactionId,status}:changeStatusParams)=>{
+    const user = await currentUser()
 
+    if(!user){
+        return {error:'You need to be athorize!'}
+    };
+
+    const existingTransaction = await db.friendShip.findFirst({
+        where:{transactionId:transactionId}
+    })
+    if(user.id !== existingTransaction.requesterId && user.id !== existingTransaction.adresseedId){
+        return {error:'You can`t change status of unAuthorized transaction!'}
+    }
+
+    try {
+        await db.friendShip.update({
+            where:{
+                transactionId:transactionId
+            },
+            data:{
+                status:status
+            }
+        });
+        return {success:true,message:`You are, ${status} offer!`}
+    } catch (error) {
+        return {error:error}
+    }
+};
 
 
 type getOfferProps ={
@@ -85,34 +196,9 @@ export const getCurrentUserOffer = async ():Promise<getOfferProps>=>{
         }
 };
 
-
-
-export type changeStatusParams = {
+export type deleteFriendParams = {
     transactionId:string,
-    requesterId?:string
-    status:friendshipStatus,
-}
-export const changeFriendOfferStatus = async ({transactionId,status,requesterId}:changeStatusParams)=>{
-    const user = await currentUser()
-
-    if(!user){
-        return {error:'You need to be athorize!'}
-    };
-    try {
-        await db.friendShip.update({
-            where:{
-                transactionId:transactionId
-            },
-            data:{
-                status:status
-            }
-        });
-        
-        
-        return {success:true,message:`You are, ${status} offer!`}
-    } catch (error) {
-        return {error:error}
-    }
+    userId:string,
 };
 
 
@@ -125,12 +211,11 @@ export type getPublicFriendsPromise ={
     error?:string
 }
 export const getProfileFriends = async (userId:string):Promise<getPublicFriendsPromise>=>{
-    console.log(userId)
     if(!userId){
         return {error:'Profile is not found'}
     }
     try {
-            const userFriendsListLeft = await db.friendShip.findMany({
+            const userFriendsList:FriendsOffer[] = await db.friendShip.findMany({
                 where:{
                     AND:[
                         {requesterId:userId},
@@ -165,22 +250,13 @@ export const getProfileFriends = async (userId:string):Promise<getPublicFriendsP
                 }
             })
     
-            const profileFirendsList = [...userFriendsListLeft,...userFriendsListRight]
-            // console.log("LEFT",userFriendsListLeft)
-            // console.log("Right",userFriendsListRight)
-            
-    
-    
-          
-        return {success:true,profileFirendsList:profileFirendsList}
+            userFriendsList.push(...userFriendsListRight)
+        return {success:true,profileFirendsList:userFriendsList}
     } catch (error) {
         return {error:error}
     }
-   
-
 };
  
-
 export type getPrivateFriendsPromise = {
     userFriendsList?:FriendsOffer[],
     message?:string,
@@ -193,7 +269,7 @@ export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
         return {error:'Error user not found!'}
     }
     try {
-        const userFriendsListLeft = await db.friendShip.findMany({
+        const userFriendsList:FriendsOffer[] = await db.friendShip.findMany({
             where:{
                 AND:[
                     {requesterId:user.id},
@@ -228,12 +304,7 @@ export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
             }
         })
 
-        const userFriendsList = [...userFriendsListLeft,...userFriendsListRight]
-        // console.log("LEFT",userFriendsListLeft)
-        // console.log("Right",userFriendsListRight)
-        
-
-
+         userFriendsList.push(...userFriendsListRight)
         return {success:true ,userFriendsList:userFriendsList }
     } catch (error) {
         return {error:error}
@@ -242,29 +313,4 @@ export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
 
 
 
-export type deleteFriendParams = {
-    transactionId:string,
-    status:friendshipStatus
-}
-
-export const deleteFriend = async ({transactionId,status}:deleteFriendParams)=>{
-    const user = currentUser()
-    if(!user){
-        return {error:'You need to be authorize!'}
-    }
-    if(!transactionId){
-        return {error:'Unacceptable behavior!'}
-    };
-    try {
-        await db.friendShip.update({
-            where:{transactionId:transactionId},
-            data:{
-                status:status
-            }
-        });
-        return {succes:true}
-    } catch (error) {
-        return {error:error}
-    }
-  
-}
+///filter friends list and infinite loading 
