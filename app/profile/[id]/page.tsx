@@ -18,7 +18,7 @@ export default  function PublicProfileParams({ params }) {
   
   const getProfile= async()=>{
 
-    
+    console.log(params.id)
     try {
       const profile = await getPublicProfile(params.id)
       setProfile(profile)

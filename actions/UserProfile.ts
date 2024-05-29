@@ -111,35 +111,18 @@ export const updateUserProfile = async (values: Profile)=>{
 
 
 export const getPublicProfile = async (userId:string)=>{
+  console.log(userId)
     const user = await currentUser()
   
     if(!userId){
       return {error: 'userId is required'}
     }
-    const ExtendedProfile = await db.user.findFirst({
-      where: {
-        id: userId
-      },
-      select: {
-        image: true,  // Assuming the image is stored directly in the user record
-      }
-    });
-  
-    if (!ExtendedProfile) {
-      return { error: "User not found" };
-    }
-   console.log(user)
- 
-   try {
-    const existingProfile = await db.profile.findFirst({
-      where:{
-        userId:userId,
-      }, 
-    });
-    console.log('adresat:',userId,'reqestner:',user.id)
     let relation:relation
-    if(user){
+  
+   console.log(user)
+   if(user){
     try {
+    
       const relationsFrom = await db.friendShip.findFirst({
         where:{
             AND:[
@@ -174,26 +157,33 @@ export const getPublicProfile = async (userId:string)=>{
     } catch (error) {
       return {error:'Error with profile FR.relation'}
     }
-     
-   }
+   
+ }
+   
+    const existingProfile = await db.profile.findFirst({
+      where:{
+        userId:userId,
+      }, 
+    });
+
+    console.log(existingProfile)
+
+    if(!existingProfile){
+      return {error: 'Profile not found'}
+    }
+
+  
 
 
    
-    console.log(relation)
   
-    console.log(existingProfile)
-
-      if(!existingProfile){
-        return {error: 'Profile not found'}
-      }
-      
+  
+   
+      console.log(existingProfile)
        return {
       profile: existingProfile,
-      userImage: ExtendedProfile.image,
       friendStatus: relation
     };
-  } catch (error) {
-    return {error:error}
-  }
+
   }
 

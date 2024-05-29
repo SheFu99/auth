@@ -3,9 +3,10 @@ import { FaPhone } from "react-icons/fa";
 import { MdElderly, MdLocationCity } from "react-icons/md";
 import GenderIcon from "../functions/GenderIcon";
 import { Profile } from "@/actions/UserProfile";
+import { ProfileData } from "@/components/types/globalTs";
 
 type PublicAccordionProps ={
-    profile:Profile,
+    profile:ProfileData,
     className?:string
 }
 

@@ -23,10 +23,10 @@ const RepostHeader :React.FC<RepostHeaderParams> = ({userId,userName,userImage,t
     
     return ( 
         <div className={`${className} flex item-center space-x-2`}>
-                       <Link href={`/profile/${userId}`}>
+                       <Link href={`/profile/${userId}`} title="Go to this page">
                             {/* <AvatarWithFallback src={userImage} width={40} height={40} alt="Author"/> */}
                             <Avatar>
-                                <AvatarImage src={userImage}/>
+                                <AvatarImage src={userImage} alt={userImage}/>
                                 <AvatarFallback>
                                     <FaUser color="white"/>
                                 </AvatarFallback>

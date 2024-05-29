@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { MdElderly, MdLocationCity } from "react-icons/md";
 import { BounceLoader, FadeLoader } from "react-spinners";
-import { Profile, relation } from "@/actions/UserProfile";
+import {  relation } from "@/actions/UserProfile";
 import { useCurrentUser } from "@/hooks/use-current-user";
 const PublicProfileFriends = React.lazy(()=> import ('./friends/publicProfileFriends'))
 // import PublicProfileFriends from "./friends/publicProfileFriends";
@@ -18,22 +18,22 @@ import FriendStatusButton from "./friends/function/publicFriendButton";
 import ListSkeleton from "./friends/FriendSkeleton";
 import { getProfileFriends } from "@/actions/friends";
 import PublicAccordion from "./post/public/profileAccordion";
+import { ProfileData } from "../types/globalTs";
 
 
 const UserPostList = React.lazy(()=>import('./post/private/UserPostList'))
 // import UserPostList from "./forms/UserPostList";
 
-export interface ProfileData{
-    profile:Profile
-    userImage:string;
-    friendStatus:relation
-    
+export interface Profile{
+    profile:profileProps,
 }
 interface profileProps {
     profile:ProfileData;
+    friendStatus:relation
+
 }
 
-const  PublicProfile =  ({profile}:profileProps) => {
+const  PublicProfile =  ({profile}:Profile) => {
 const [updateState, setUpdate] = useState<boolean>(false)
 const [isLoading, setIsLoading]=useState<boolean>(true)
 const [totalPostCount,setTotalCount]=useState<number>(0)
@@ -46,7 +46,7 @@ const isTheSameUser = user?.id === userId
   const gender = profile.profile?.gender
 
   
-                      
+                      console.log(profile)
 
 
   const getListOfFriends = async (userId:string)=>{
@@ -90,7 +90,7 @@ const isTheSameUser = user?.id === userId
                        
                 <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-30 -bottom-15 left-0 p-[1rem] justify-center ">
                                 <AvatarWithFallback
-                                 src={profile.userImage}
+                                 src={profile?.profile?.image}
                                  width={100}
                                  height={100}
                                  alt={profile?.profile?.firstName}
