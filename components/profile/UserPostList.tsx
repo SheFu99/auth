@@ -10,7 +10,6 @@ import { FaCommentDots } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
 import LikeButton from "./post/Like-button";
 import PostHeader from "./post/Post-header";
-import GetPost from "./post/functions/get-post";
 const InfiniteScroll = React.lazy(()=>import ('./post/functions/infinite-scroll'))
 // import InfiniteScroll from "./post/functions/infinite-scroll";
 import PostSkeleton from "./post/skeleton";
@@ -189,7 +188,6 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 DeleteUserPosts({
                     postId:post.PostId,
                     keys:post?.originPostId ? undefined:keys,
-                    originPostId:post.originPostId
                 })
                 .then((data)=>{
                     if(data.error){
