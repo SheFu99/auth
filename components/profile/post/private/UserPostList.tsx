@@ -8,10 +8,9 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import ImageGrid from "../Image-grid";
 import { FaCommentDots } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
-import LikeButton from "../Like-button";
-import PostHeader from "../Post-header";
-import GetPost from "../functions/get-post";
-const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
+import LikeButton from "./post/Like-button";
+import PostHeader from "./post/Post-header";
+const InfiniteScroll = React.lazy(()=>import ('./post/functions/infinite-scroll'))
 // import InfiniteScroll from "./post/functions/infinite-scroll";
 import PostSkeleton from "../skeleton";
 import { useSession } from "next-auth/react";
@@ -190,7 +189,6 @@ const debouncedGetPost = useCallback(debounce(()=>{
                 DeleteUserPosts({
                     postId:post.PostId,
                     keys:post?.originPostId ? undefined:keys,
-                    originPostId:post.originPostId
                 })
                 .then((data)=>{
                     if(data.error){

@@ -65,7 +65,6 @@ type originPost ={
 export type deletePostParams ={
   postId:string,
   keys:string[],
-  originPostId?:string
 }
 type author = {
   Name:string,

@@ -222,9 +222,12 @@ console.log(postsQuery)
     return { posts: postsWithLikeCounts, success: true,totalPostCount:totalPostCount };
 };
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> d1f01cedb8d24bdc372f1ac83b8b3cda3208bfdc
 export const DeleteUserPosts = async ({postId,keys}:deletePostParams):Promise<responsePromise>=>{
     const user = await currentUser()
     if(!user){
@@ -244,8 +247,42 @@ export const DeleteUserPosts = async ({postId,keys}:deletePostParams):Promise<re
         }
     }
 
+<<<<<<< HEAD
   
 
+=======
+    let currentPost
+
+try{
+     currentPost = await db.post.findFirst({
+        where:{PostId:postId}
+    })
+}catch(err){
+    return {error:err}
+}
+console.log(currentPost)
+
+     let originPostId = currentPost?.originPostId
+    console.log(originPostId)
+if(originPostId){
+    try {
+        await db.post.update({
+            where:{
+                PostId:originPostId
+            },
+            data:{
+                repostCount:{
+                    decrement:1
+                }
+            }
+        })
+        console.log("DECREMENT repostCOUNT")
+    } catch (error) {
+       return{error:'Error decrement repost count'} 
+    }
+}
+
+>>>>>>> d1f01cedb8d24bdc372f1ac83b8b3cda3208bfdc
     try {
         const currentPost = await db.post.findFirst({
             where:{PostId:postId},
