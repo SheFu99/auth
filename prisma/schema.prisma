@@ -70,21 +70,21 @@ enum FriendStatus {
 }
 
 model Post {
-  PostId    String    @id @default(cuid())
-  text      String?  
-  superText String?
-  timestamp DateTime  @default(now())
-  userId    String
-  originUserId String?
-  originPostId String?
-  originUserName String?
-  originAvatar String?
-  originTimeStamp DateTime?
+  PostId      String    @id @default(cuid())
+  timestamp   DateTime  @default(now())
+  superText   String?
+  text        String?
+  authorAvatar String?
+  authorName  String?  
+  userId      String
   repostCount Int? @default(0)
-  comments  Comment[]
-  image     Images[]
-  likes     Like[]
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  originPostId String?
+  originPost  Post? @relation("OriginalPost",fields: [originPostId],references: [PostId],onDelete: Cascade)
+  reposts     Post[] @relation("OriginalPost")
+  comments    Comment[]
+  image       Images[]
+  likes       Like[]
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Images {

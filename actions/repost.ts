@@ -26,13 +26,9 @@ export const repostAction = async ({postId,superText}:repostProps)=>{
         where:{
             PostId:postId
         },
-        
         include:{
-            image:{
-                select:{url:true}
-            },
-            
-            
+            image:{select:{url:true}}, 
+            originPost:{select:{userId:true}}
         }
     });
 
@@ -40,17 +36,7 @@ export const repostAction = async ({postId,superText}:repostProps)=>{
         return {error:'Post is not found!'}
     };
 
-    const originUser = await db.user.findFirst({
-        where:{id:post.originUserId?post.originUserId:post.userId},
-        select:{
-            image:true,
-            name:true
-        }
-    })
 
-    if(!originUser){
-        return {error:'Something wrong origin user not found!'}
-    }
 const isReposted = await db.post.findFirst({
     where:{
         userId:user.id,
@@ -58,31 +44,25 @@ const isReposted = await db.post.findFirst({
     },
     select:{repostCount:true}
 })
-let isSelfRepost
 
-if(post?.userId && post.originUserId){
-     isSelfRepost = user.id === post.originUserId? true: false
-}
+const  isSelfRepost = user.id === post.originPost?.userId||post.userId ? true: false
 
-console.log(`Self repost status: ${isSelfRepost}`)
+// console.log(`Self repost status: ${isSelfRepost}`)
 
 if(!isReposted&&!isSelfRepost){
     // console.log()
     try{
         await db.post.create({
             data:{
-                originUserId:post.originUserId ? post.originUserId: post.userId,
                 originPostId:post.originPostId? post.originPostId :post.PostId,
-
                 userId:user.id,
                 superText:superText,
                 text:post.text,
+                authorAvatar:user.image,
+                authorName:user.name,
                 image:{
                     create:post.image
                 },
-                originUserName:originUser.name,
-                originAvatar:originUser.image,
-                originTimeStamp:post.timestamp
                 
             }
             

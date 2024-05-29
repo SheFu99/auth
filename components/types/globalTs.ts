@@ -11,9 +11,7 @@ export interface ProfileData {
     error?:string;
     success?:string;
   };
-  export type gender = {
-    gender:"Male" | "Female" | "Undefined"|null;
-  };
+  
 export type friendRelation = {
   transactionId:string,
   requesterId:String,
@@ -35,33 +33,34 @@ export type FriendsOffer ={
 };
 
 export type friendshipStatus = "PENDING"|"ACCEPTED"|"DECLINED"|"BLOCKED" | undefined
+export type gender = "Male" | "Female" | "Undefined"|null;
+
+
 
 export type post ={
     PostId: string,
-
-    originPostId?:string,
-
+    authorAvatar?:string,
+    authorName:string,
     image?: image[],
-
     superText?:string,
-    
     text: string,
     timestamp: Date,
-    originTimeStamp?: Date,
     userId: string,
-    originUserId?:string,
     likes?:any[]
     likedByUser?:boolean,
     _count:_count,
-    author:author,
-
-    originUserName?:string,
-    originAvatar?:string,
-
     comments:any[],
     repostCount?:number,
-   
+    originPostId?:string,
+    originPost?:originPost,
 };
+
+type originPost ={
+  authorAvatar?:string,
+  authorName:string,
+  userId:string,
+  timestamp:Date
+}
 export type deletePostParams ={
   postId:string,
   keys:string[],

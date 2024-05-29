@@ -69,6 +69,8 @@ export const CreatePost= async(postCard:PostCard)=>{
     try{
         
     const postData = {
+        authorAvatar:user.image,
+        authorName:user.name,
         text:postCard.text,
         userId:user.id,
     } as any
@@ -102,22 +104,26 @@ export const CreatePost= async(postCard:PostCard)=>{
 };
 
 export const GetUserPostsById = async (userId: string,page:number):Promise<postPromise> => {
-    // console.log("GETUSERPOSTBYID",userId)
-   
+    console.log(userId)
+if(!userId){
+    return {error:'ID required!'}
+}
     const pageSize = 3;
     const skip = (page - 1) * pageSize; 
 
     const existingUser = await db.user.findFirst({
         where: { id: userId },
-    });
+    })
     if (!existingUser) {
         return { error: "User not found" };
-    }
+    };
+    console.log(existingUser)
+
     const user = await currentUser()
+
+
     const postsQuery={
-        where: {
-        userId: userId
-    },
+        where: {userId: userId},
     orderBy: [
         { timestamp: "desc" }  // Assuming 'createdAt' is the correct field for timestamping posts
     ],
@@ -156,10 +162,20 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
                     }
                 }
             }
+        },
+        originPost:{
+            select:{
+                authorAvatar:true,
+                authorName:true,
+                userId:true,
+                timestamp:true
+            }
+           
         }
     }
         
     } as any
+
     if (user) {
         postsQuery.include.likes = {
             where: { 
@@ -167,13 +183,15 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
             },
             select: { userId: true }
         };
-    }
+    };
+console.log(postsQuery)
+
     const [posts, totalPostCount] = await Promise.all([
      await db.post.findMany(postsQuery) as any,
      await db.post.count({where:{userId:userId}}),
     ])
   
-    // console.log(existingUser.name, existingUser.image)
+    console.log(posts)
     if (!posts.length||totalPostCount<=0) {
         return { error: "No posts found" };
     }
@@ -182,6 +200,8 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
     // Map posts to include like counts
     const postsWithLikeCounts = posts.map(post => {
         const likedByUser = user && post.likes && post.likes.some(like => like.userId === user.id);
+
+
         const commentsWithAuthor = post.comments.map(comment=>{
             const commentLikedByUser = user && comment.likes&& comment.likes.some(like=>like.userId===user.id)
             return{
@@ -190,25 +210,22 @@ export const GetUserPostsById = async (userId: string,page:number):Promise<postP
                 likedByUser: commentLikedByUser ?? false
             }
         });
-        ///TODO: use another method to determinate author of post
+        console.log(likedByUser,commentsWithAuthor)
         return {
             ...post,
-            author:{
-                name:existingUser.name,
-                image:existingUser.image,
-                id:existingUser.id
-            },
             likedByUser: likedByUser ?? false ,
             comments:commentsWithAuthor
             
         };
     });
-    // console.log(postsWithLikeCounts)
 
     return { posts: postsWithLikeCounts, success: true,totalPostCount:totalPostCount };
 };
 
-export const DeleteUserPosts = async ({postId,keys,originPostId}:deletePostParams):Promise<responsePromise>=>{
+
+
+
+export const DeleteUserPosts = async ({postId,keys}:deletePostParams):Promise<responsePromise>=>{
     const user = await currentUser()
     if(!user){
         return {error:"You need to be autorize!"}
@@ -227,25 +244,26 @@ export const DeleteUserPosts = async ({postId,keys,originPostId}:deletePostParam
         }
     }
 
-///FIX_ERROR-handle case where is repost post repost again 
+  
 
-try {
-    await db.post.update({
-        where:{
-            PostId:originPostId
-        },
-        data:{
-            repostCount:{
-                decrement:1
-            }
-        }
-    })
-    console.log("DECREMENT repostCOUNT")
-} catch (error) {
-   return{error:'Error decrement repost count'} 
-}
-    ////
     try {
+        const currentPost = await db.post.findFirst({
+            where:{PostId:postId},
+            select:{originPostId:true}
+        })
+        if(currentPost.originPostId){
+            await db.post.update({
+                where:{
+                    PostId:currentPost.originPostId
+                },
+                data:{
+                    repostCount:{
+                        decrement:1
+                    }
+                }
+            })
+        }
+
         await db.post.delete({
             where:{PostId:postId}
         })

@@ -5,23 +5,23 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import React, {  Profiler, useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import ImageGrid from "./post/Image-grid";
+import ImageGrid from "../Image-grid";
 import { FaCommentDots } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
-import LikeButton from "./post/Like-button";
-import PostHeader from "./post/Post-header";
-import GetPost from "./post/functions/get-post";
-const InfiniteScroll = React.lazy(()=>import ('./post/functions/infinite-scroll'))
+import LikeButton from "../Like-button";
+import PostHeader from "../Post-header";
+import GetPost from "../functions/get-post";
+const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
 // import InfiniteScroll from "./post/functions/infinite-scroll";
-import PostSkeleton from "./post/skeleton";
+import PostSkeleton from "../skeleton";
 import { useSession } from "next-auth/react";
-import CommentForm from "./forms/CommentForm";
+import CommentForm from "../../forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import {debounce} from 'lodash'
-import { comments, post } from "../types/globalTs";
+import { comments, post } from "../../../types/globalTs";
 import { repostAction, repostProps } from "@/actions/repost";
-import RepostHeader from "./post/Repost-author-header";
-const RepostModalForm = React.lazy(()=>import ('./post/repostForm'))
+import RepostHeader from "../Repost-author-header";
+const RepostModalForm = React.lazy(()=>import ('../repostForm'))
 // import RepostForm from "./post/repostForm"
 
 
@@ -46,6 +46,7 @@ const [page,setPage]=useState<number>(1)
 
 const user = useCurrentUser()
 
+// useEffect(()=>{console.log(posts)},[posts])
 
 ///load user post from server 
 const debouncedGetPost = useCallback(debounce(()=>{
@@ -281,19 +282,29 @@ const debouncedGetPost = useCallback(debounce(()=>{
 
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">
-            <PostSkeleton isLoading={!posts?.length}/>
+              {!posts&&(
+                    <div className="w-full flex justify-center py-10 items-center align-middle">
+                        <p className=" text-neutral-500">The user has no posts...</p>
+                    </div>
+                )}
             <InfiniteScroll loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
+            
             {posts?.map((post,index)=>(
                 <>
                 {/* <Profiler onRender={console.log(post)}></Profiler> */}
                 {/* TODO: Need to pass key to parent component  */}
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
                 
-                    <PostHeader author={post.author} timestamp={post.timestamp}/>
+                    <RepostHeader 
+                        userId={post.userId}
+                        userName={post.authorName}
+                        userImage={post.authorAvatar}
+                        timestamp={post.timestamp}
+                    />
                     {post?.superText&&(
                         <p className="px-10 mt-2">{post.superText}</p>
                     )}
-                    {post?.originUserName&&post?.originAvatar&&(
+                    {post?.originPost?.authorName &&post?.originPost?.authorAvatar&&(
                     <>
                         <div className="py-2 px-5">
                             <BiRepost color="white" className="scale-150"/>
@@ -301,10 +312,10 @@ const debouncedGetPost = useCallback(debounce(()=>{
                   
                         <div className=" px-5 ">
                             <RepostHeader  
-                                originUserId={post.originUserId}
-                                originUserName={post.originUserName}
-                                originAvatar={post.originAvatar}
-                                timestamp={post.originTimeStamp}
+                                userId={post.originPost.userId}
+                                userName={post.originPost.authorName}
+                                userImage={post.originPost.authorAvatar}
+                                timestamp={post.originPost.timestamp}
                                 
                                 />
                         </div>
