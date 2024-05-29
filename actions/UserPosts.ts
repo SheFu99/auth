@@ -222,12 +222,6 @@ console.log(postsQuery)
     return { posts: postsWithLikeCounts, success: true,totalPostCount:totalPostCount };
 };
 
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> d1f01cedb8d24bdc372f1ac83b8b3cda3208bfdc
 export const DeleteUserPosts = async ({postId,keys}:deletePostParams):Promise<responsePromise>=>{
     const user = await currentUser()
     if(!user){
@@ -247,10 +241,6 @@ export const DeleteUserPosts = async ({postId,keys}:deletePostParams):Promise<re
         }
     }
 
-<<<<<<< HEAD
-  
-
-=======
     let currentPost
 
 try{
@@ -282,7 +272,6 @@ if(originPostId){
     }
 }
 
->>>>>>> d1f01cedb8d24bdc372f1ac83b8b3cda3208bfdc
     try {
         const currentPost = await db.post.findFirst({
             where:{PostId:postId},

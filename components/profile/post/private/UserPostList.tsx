@@ -8,9 +8,9 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import ImageGrid from "../Image-grid";
 import { FaCommentDots } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
-import LikeButton from "./post/Like-button";
-import PostHeader from "./post/Post-header";
-const InfiniteScroll = React.lazy(()=>import ('./post/functions/infinite-scroll'))
+import LikeButton from "../Like-button";
+import PostHeader from "../Post-header";
+const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
 // import InfiniteScroll from "./post/functions/infinite-scroll";
 import PostSkeleton from "../skeleton";
 import { useSession } from "next-auth/react";
@@ -276,7 +276,9 @@ const debouncedGetPost = useCallback(debounce(()=>{
          
             
         }
-
+            useEffect(()=>{
+                console.log(isOpen)
+            },[isOpen])
 
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">
@@ -335,15 +337,17 @@ const debouncedGetPost = useCallback(debounce(()=>{
                                 </div>
                             </button>
 
-                            
+                            <div  onClick={()=>setIsOpen(true)}>
                             <RepostModalForm 
                                 ButtonTitle="Repost"
                                 postId={post.PostId}
                                 isOpen={isOpen}
                                 repostCount={post?.repostCount}
-                                onClick={()=>setIsOpen(!isOpen)}
-                                callBack={()=>setIsOpen(!isOpen)}
+                               
+                                callBack={()=>setIsOpen(false)}
                                 />
+                            </div>
+                            
                         </div>
                     </div>
 

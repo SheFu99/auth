@@ -45,9 +45,15 @@ const isReposted = await db.post.findFirst({
     select:{repostCount:true}
 })
 
-const  isSelfRepost = user.id === post.originPost?.userId||post.userId ? true: false
+const  isSelfRepost = user.id === post.originPost?.userId||user.id===post.userId ? true: false
+console.log(user)
+console.log(post)
 
-// console.log(`Self repost status: ${isSelfRepost}`)
+const isCurrentuserHavePost = user.id ===post.userId
+console.log(isCurrentuserHavePost)
+
+
+console.log(`Self repost status: ${isSelfRepost}`)
 
 if(!isReposted&&!isSelfRepost){
     // console.log()

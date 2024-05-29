@@ -1,7 +1,6 @@
 import { repostAction, repostProps } from "@/actions/repost";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { startTransition, useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import {  useState, useTransition } from "react";
 import { BiRepost } from "react-icons/bi";
 import { toast } from "sonner";
 
@@ -10,8 +9,8 @@ interface RepostFormProps {
     postId:string,
     isOpen:boolean,
     repostCount:number,
-    onClick:()=>void,
-    callBack:()=>void
+    // onClick:()=>void,
+    callBack:()=>void,
 }
 
 const RepostModalForm = ({postId,isOpen,repostCount,callBack,ButtonTitle}:RepostFormProps) => {
@@ -26,28 +25,32 @@ const RepostModalForm = ({postId,isOpen,repostCount,callBack,ButtonTitle}:Repost
                 if(response.success){
                     toast.success('Now this post will display on your page')
                 }else{
+                    
                     toast.error(`Something went wrong: ${response.error}`)
                 }
             })
             .catch(error=>{
                 toast.error(error)
+            }).finally(()=>{
+                callBack()
             })
 
         })
-            
-        callBack()
+        
+        console.log(isOpen)
     }
     return (
         <>
-        {!isOpen && (
-                <Dialog>
+        
+                <Dialog >
                     <DialogTrigger >
                             <div className="flex gap-2 items-center justify-center align-middle text-white bg-neutral-900 px-3 rounded-md p-2 " title={`${ButtonTitle?ButtonTitle:'Repost'}`}>
                                 <BiRepost className="scale-150"/>
                                 {repostCount>0&&(<p>{repostCount}</p>)}
                             </div>
                     </DialogTrigger>
-                    <DialogContent>
+                    {isOpen && (
+                    <DialogContent >
                         <div className="relative p-6 rounded shadow-lg z-[101] " >
                             <div  className="grid grid-cols-1 space-y-5">
                                 <label htmlFor="superText" className="justify-center flex absolute -top-1 left-0 right-0">Add your comment, or repost as it is!</label>
@@ -63,8 +66,9 @@ const RepostModalForm = ({postId,isOpen,repostCount,callBack,ButtonTitle}:Repost
                             </div>
                         </div>
                     </DialogContent>
+                       )}
                 </Dialog>
-            )}
+         
        
         </>
       );
