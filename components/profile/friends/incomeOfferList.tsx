@@ -40,6 +40,7 @@ const IncomeOfferList = () => {
         .then(response=>{
             if(response.success){
                 toast.success(response.message)
+                update()
             }
             if(response.error){
                 toast.error(response.error)

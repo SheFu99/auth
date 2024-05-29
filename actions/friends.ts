@@ -20,12 +20,18 @@ export const sendFriendShipOffer = async (userId:string)=> {
         }
         const requester = await db.friendShip.findFirst({
             where:{
-                    requesterId:user.id,
+                AND:[
+                    {requesterId:user.id},
+                    {adresseedId:userId},
+                ]
             }
         });
         const adresser = await db.friendShip.findFirst({
             where:{
-                adresseedId:user.id
+                AND:[
+                    { adresseedId:user.id},
+                    { requesterId:userId}
+                ]
             }
         }) ;
         const notFound = adresser ===null && requester ===null

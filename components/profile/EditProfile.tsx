@@ -35,6 +35,7 @@ const  EditProfile =  () => {
   const [friendsOfferLength,setOfferLength] =useState<number>()
   // const {upload , switchUpload} = useUpdateProfileTrigger(); //use redux and localstorage for store
   const [profile, setProfile] = useState<ProfileData>()
+  const [totalPostCount,setTotalCount]=useState<number>(0)
 
   const {update} = useSession() ///replace to updateProfile redux hook 
   const [avatarUploading, setAvatarUloading] = useState(false);
@@ -230,7 +231,7 @@ const  EditProfile =  () => {
 
         <Tabs defaultId="tab1" >
             <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
-                <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/>Posts</TabsTrigger>
+                <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/><p className="text-sm text-neutral-300">{totalPostCount}</p> Posts</TabsTrigger>
                 <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/>Friends</TabsTrigger>
                 <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiGalleryFill/>Gallery</TabsTrigger>
             </TabsList>
@@ -239,7 +240,7 @@ const  EditProfile =  () => {
                 
             <div className='col-span-12 space-y-5'>
                 <PostModal/>
-                <UserPostList/>  
+                <UserPostList profile={user.id} setTotalCount={setTotalCount} totalPostCount={totalPostCount}/>  
             </div>
                     
             </TabsContent>

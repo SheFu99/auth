@@ -39,6 +39,8 @@ interface profileProps {
 const  PublicProfile =  ({profile}:profileProps) => {
 const [updateState, setUpdate] = useState<boolean>(false)
 const [isLoading, setIsLoading]=useState<boolean>(true)
+const [totalPostCount,setTotalCount]=useState<number>(0)
+
 const [isPending,startTransition]=useTransition()
 const [friendsLength,setFriendsLength] = useState<number>(0)
 const user = useCurrentUser()
@@ -161,7 +163,7 @@ const isTheSameUser = user?.id === userId
 
         <Tabs defaultId="tab1" >
             <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
-                <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/>Posts</TabsTrigger>
+                <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/><p className="text-sm text-neutral-300">{totalPostCount}</p> Posts</TabsTrigger>
                 <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/> {friendsLength}  Friends</TabsTrigger>
                 <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiGalleryFill/>Gallery</TabsTrigger>
             </TabsList>
@@ -170,7 +172,7 @@ const isTheSameUser = user?.id === userId
                 
             <div className='col-span-12 space-y-5'>
             <Suspense fallback={<div className="flex justify-center align-middle items-center mt-10"><BounceLoader color="white"/></div>}> 
-                <UserPostList profile={profile.profile?.userId}/>  
+                <UserPostList profile={profile.profile?.userId} setTotalCount={setTotalCount} totalPostCount={totalPostCount}/>  
             </Suspense>
             </div>
                     

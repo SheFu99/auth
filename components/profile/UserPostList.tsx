@@ -1,6 +1,6 @@
 
 "use clinet"
-import { DeleteUserPosts, LikePost } from "@/actions/UserPosts";
+import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import React, {  Profiler, useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -27,8 +27,13 @@ const RepostModalForm = React.lazy(()=>import ('./post/repostForm'))
 
 export const awsBaseUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
 
-const UserPostList  = (profile:any) => {
+type userListProps ={
+    profile?:string;
+    totalPostCount:number;
+    setTotalCount:(count:number)=>void
+}
 
+const UserPostList :React.FC<userListProps> = ({profile,totalPostCount,setTotalCount}) => {
 const [posts, setPosts]=useState<post[]>()
 const [comment,setComment]=useState<comments>()
 const [isOpen,setIsOpen]=useState<boolean>(false)
@@ -38,14 +43,13 @@ const {update}=useSession()
 
 const [hasMore,setHasMore]= useState<boolean>(true)
 const [page,setPage]=useState<number>(1)
-const [totalPostCount,setTotalCount]=useState<number>(0)
 
 const user = useCurrentUser()
 
 
 ///load user post from server 
 const debouncedGetPost = useCallback(debounce(()=>{
-    GetPost(profile, user?.id,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts)})
+    GetUserPostsById(profile,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts)})
 },1000),[])
     useEffect(()=>{
         debouncedGetPost()
@@ -206,19 +210,17 @@ const debouncedGetPost = useCallback(debounce(()=>{
         };
         const fetchMoreData = async ()=>{
             ///gettFrom server posts.lenght 
-            if(posts.length>=totalPostCount){
+            if(posts?.length>=totalPostCount){
                 setHasMore(false)
                 return
             }
-                try {
-                    await GetPost(profile,user?.id,page+1).then(posts=>setPosts(prev=>[...prev,...posts?.posts])).finally(()=>setPage(page+1))
-                    
-                } catch (error) {
-                    console.log(error)
-                    return
-                }
-           
-            
+
+            GetUserPostsById(profile,page)
+            .then(posts=>setPosts(prev=>[...prev,...posts?.posts]))
+            .catch(err=>{
+                toast.error(err)
+            })
+            .finally(()=>setPage(page+1))
         };
         const openComentForm = (postIndex:number)=>{
             const isTwice = addComent.filter(item=>item ===postIndex)

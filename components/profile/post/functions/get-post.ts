@@ -8,13 +8,15 @@ interface GetPostProps {
 
 export default async function GetPost(profile,user,page) {
 //    console.log("GET_____POST___INSIDE")
-   
     try{
-        if(profile.profile){
+        if(profile){
+   console.log(profile)
+
             const posts = await GetUserPostsById(profile.profile,page)
             return posts
 
         }else{
+   console.log(user)
            
             const posts = await GetUserPostsById(user,page)
             
