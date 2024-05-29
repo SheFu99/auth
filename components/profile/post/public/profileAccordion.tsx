@@ -19,27 +19,27 @@ const PublicAccordion:React.FC<PublicAccordionProps> = ({profile,className}) => 
                         <AccordionContent>
                             <div className='grid grid-cols-12 '>
 
-                                {profile.phoneNumber&&(
+                                {profile?.phoneNumber&&(
                                     <div className='g-f:col-span-12 g-f:mt-2 col-start-1 sm:col-span-6 flex space-x-2 border border-black rounded-md p-3'>
                                         <FaPhone color='black'/>
                                         <p className='text-black col-span-12 md:text-md g-f:text-sm'>{`${profile?.phoneNumber}`}</p>
                                     </div>
                                 )}
 
-                                {profile.adres&&(
+                                {profile?.adres&&(
                                     <div className='g-f:col-span-12 g-f:mt-2 sm:ml-1 sm:col-span-6 sm:col-start-7 flex items-center p-3 space-x-2 border border-black rounded-md'>
                                         <MdLocationCity color='black'/>
                                         <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`${profile?.adres}`}</p>
                                     </div>
                                 )}
 
-                                {profile.age&&(
+                                {profile?.age&&(
                                     <div className='g-f:col-span-12  mt-2 sm:col-span-6  col-start-1 flex items-center p-3 space-x-2 col-span-6 border border-black rounded-md'>
                                         <MdElderly color='black'/>
                                         <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Age: ${profile?.age}`}</p>    
                                     </div>
                                 )}
-                                {profile.gender&&(
+                                {profile?.gender&&(
                                     <div className='g-f:col-span-12 sm:ml-1 mt-2 sm:col-start-7 sm:col-span-6   flex items-center p-3 space-x-2 border border-black rounded-md'>
                                         <i className='text-black col-span-1 md:text-md'><GenderIcon gender={profile?.gender}/></i>
                                         <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Gender: ${profile?.gender}`}</p>
