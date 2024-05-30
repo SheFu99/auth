@@ -1,11 +1,11 @@
 "use server"
 
-import { s3Client } from "@/app/api/s3-upload/route"
+
 import { deletePostParams } from "@/components/types/globalTs"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { UserPost } from "@/schemas"
-import { DeleteObjectsCommand } from "@aws-sdk/client-s3"
+import { DeleteObjectsCommand, S3Client } from "@aws-sdk/client-s3"
 import * as z from "zod"
 
 export type userPost = z.infer<typeof UserPost>
@@ -37,7 +37,13 @@ type PostCard = {
 }
 
 
-
+const s3Client = new S3Client({
+    region: process.env.NEXT_PUBLIC_S3_REGION as string,
+    credentials:{
+        accessKeyId: process.env.NEXT_PUBLIC_S3_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.NEXT_PUBLIC_S3_SECRET_KEY as string,
+    }
+});
 export const CreatePost= async(postCard:PostCard)=>{
   
     const user= await currentUser()
