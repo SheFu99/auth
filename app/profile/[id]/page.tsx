@@ -61,13 +61,13 @@ export default async function PublicProfileParams({ params }) {
       
          <PublicProfile profile={profile}  /> 
               {userPostList&&userfriendsList&&(
-
+                  <Suspense fallback={<ListSkeleton/>}>
                   <TabSwitch 
                   chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
                   chilldrenPosts={<PublicPostList postList={userPostList.posts} totalCount={userPostList.totalPostCount} userId={params.id}/>}
                   postTotal={userPostList.totalPostCount}
                   />
-    
+                  </Suspense>
               )}
          
 

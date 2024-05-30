@@ -63,8 +63,8 @@ import { useEffect } from "react"
                     variant={pathname === "/admin" ? "default" : "outline"}
                     className="w-full"
                 > 
-                    <Link href="/admin" className="grid grid-cols-6"
-                    ><MdAdminPanelSettings  className="col-start-1 h-5 w-5"/><p className="col-start-3">Admin</p></Link>
+                    <a href="/admin" className="grid grid-cols-6"
+                    ><MdAdminPanelSettings  className="col-start-1 h-5 w-5"/><p className="col-start-3">Admin</p></a>
                 </Button>
                 </>
            )}
@@ -74,8 +74,8 @@ import { useEffect } from "react"
                     variant={pathname === "/settings/profile" ? "default" : "outline"}
                     className="w-full"
                 > 
-                    <Link href="/settings/profile" className="grid grid-cols-6"
-                    ><ImProfile className="col-start-1"/><p className="col-start-3">Profile</p></Link>
+                    <a href="/settings/profile" className="grid grid-cols-6"
+                    ><ImProfile className="col-start-1"/><p className="col-start-3">Profile</p></a>
                 </Button>
 {role === 'ADMIN' &&(
                 <>
@@ -84,10 +84,10 @@ import { useEffect } from "react"
                     variant={pathname === "/server" ? "default" : "outline"}
                     className="w-full"
                 > 
-                    <Link href="/server" className="grid grid-cols-6">
+                    <a href="/server" className="grid grid-cols-6">
                         <FiServer className="col-start-1"/>
                         <p className="col-start-3">Server</p>
-                    </Link>
+                    </a>
                 </Button>
                 </> 
                 )}
@@ -96,8 +96,8 @@ import { useEffect } from "react"
                     variant={pathname === "/settings" ? "default" : "outline"}
                     className="w-full"
                 > 
-                    <Link href="/settings" className="grid grid-cols-6"
-                    ><FiSettings className="col-start-1"/><p className="col-start-3 ml-[-2px]">Settings</p></Link>
+                    <a href="/settings" className="grid grid-cols-6"
+                    ><FiSettings className="col-start-1"/><p className="col-start-3 ml-[-2px]">Settings</p></a>
                 </Button>
 
                

@@ -21,7 +21,7 @@ const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
 
       if (scrollTop > lastScrollTop && scrollTop + clientHeight +50 >= scrollHeight -10 && hasMore) {
         if (isFetching && hasMore) {
-          loadMore().finally(() => setIsFetching(false));
+          loadMore().then(() => setIsFetching(false));
         }
         setIsFetching(true);
       }

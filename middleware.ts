@@ -3,7 +3,7 @@ import {adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from './routes';
 import authConfig from "./auth.config"
 import NextAuth from "next-auth"
 import { currentRole } from './lib/auth';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 
 const {auth} =NextAuth(authConfig)
@@ -47,45 +47,45 @@ const path = nextUrl.pathname;
 
 
 ///cosutom error handler 
-    if (url.pathname.startsWith('/auth/login')) {
-      if (url.searchParams.get('error') === 'OAuthAccountNotLinked') {
-          return NextResponse.error();
-      }
-    }
-    if (url.searchParams.get('error') === 'OAuthAccountNotLinked') {
-    return Response.redirect(new URL('/auth/login?error=OAuthAccountNotLinked', nextUrl));
-    }
+if (url.pathname.startsWith('/auth/login')) {
+  if (url.searchParams.get('error') === 'OAuthAccountNotLinked') {
+      return null;
+  }
+}
+if (url.searchParams.get('error') === 'OAuthAccountNotLinked') {
+ return Response.redirect(new URL('/auth/login?error=OAuthAccountNotLinked', nextUrl));
+}
 ///cosutom error handler  
 
-// if(isApiAuthRoute){
-//   return null
-// }
+if(isApiAuthRoute){
+  return null
+}
 
-    if (isAuthRoute){
-      if(isLoggedIn ){
-        let callbackUrl = nextUrl.pathname
-        const encodedCallbackUrl = encodeURIComponent(callbackUrl)
-        return Response.redirect(new URL(
-        `/settings/profile`,
-        nextUrl))
-      }
+if (isAuthRoute){
+  if(isLoggedIn ){
+    let callbackUrl = nextUrl.pathname
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl)
+    return Response.redirect(new URL(
+    `/settings/profile`,
+    nextUrl))
+  }
 
-      return null
-    }
-    if(!isLoggedIn&& !isPublicRoute){
-      let callbackUrl = nextUrl.pathname
-      if(nextUrl.search){
-        callbackUrl +=nextUrl.search
-      }
-      const encodedCallbackUrl = encodeURIComponent(callbackUrl)
-      return Response.redirect(new URL(
-      `/auth/login?callbackUrl=${encodedCallbackUrl}`,
-      nextUrl
-    ))
-    }
-    if(userRole !=="ADMIN" && isAdminRoute) {
-      return Response.redirect(new URL('/settings',nextUrl))
-    }
+  return null
+}
+if(!isLoggedIn&& !isPublicRoute){
+  let callbackUrl = nextUrl.pathname
+  if(nextUrl.search){
+    callbackUrl +=nextUrl.search
+  }
+  const encodedCallbackUrl = encodeURIComponent(callbackUrl)
+  return Response.redirect(new URL(
+  `/auth/login?callbackUrl=${encodedCallbackUrl}`,
+  nextUrl
+))
+}
+if(userRole !=="ADMIN" && isAdminRoute) {
+  return Response.redirect(new URL('/settings',nextUrl))
+}
 
 
 return null
@@ -94,4 +94,6 @@ return null
 // Optionally, don't invoke Middleware on some paths
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  // matcher: ["/settings", "/api"],
+
 }

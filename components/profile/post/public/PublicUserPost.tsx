@@ -56,11 +56,11 @@ const fetchMoreData = async ()=>{
     }
 
     GetUserPostsById(userId,page)
-    .then(posts=>{setPosts(prev=>[...prev,...posts?.posts])})
+    .then(posts=>{setPosts(prev=>[...prev,...posts?.posts]),setPage(page+1)})
     .catch(err=>{
         toast.error(err)
     })
-    .finally(()=>setPage(page+1))
+   
 };
   
     const postLikeAction = (postId:string)=>{
