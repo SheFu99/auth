@@ -283,7 +283,7 @@ if(originPostId){
             where:{PostId:postId},
             select:{originPostId:true}
         })
-        if(currentPost.originPostId){
+        if(currentPost?.originPostId){
             await db.post.update({
                 where:{
                     PostId:currentPost.originPostId
