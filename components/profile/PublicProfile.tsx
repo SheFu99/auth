@@ -15,8 +15,8 @@ export interface Profile{
     profile:profileProps,
 }
 interface profileProps {
-    profile:ProfileData;
-    friendStatus:relation
+    profile?:ProfileData;
+    friendStatus?:relation
 
 }
 

@@ -4,7 +4,7 @@ export interface ProfileData {
     coverImage?: string | null;
     image?:string | null;
     gender?: gender;
-    age?: string | null;
+    age?: number | null;
     phoneNumber?: string | null;
     regionCode?: string | null;
     adres?: string | null;

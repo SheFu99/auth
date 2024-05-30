@@ -6,8 +6,9 @@ import CoverPlaceHolder from "../lib/coverPlaceHolder";
 
 
 type CoverProps = {
-    url:string | null ,
+    url?:string | null ,
     className?: string,
+    editable?: boolean
 }
 
 
