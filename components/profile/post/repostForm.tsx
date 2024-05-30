@@ -8,7 +8,7 @@ interface RepostFormProps {
     ButtonTitle?:string,
     postId:string,
     isOpen?:boolean,
-    repostCount:number,
+    repostCount?:number,
     // onClick:()=>void,
     callBack?:()=>void,
 }
@@ -51,7 +51,7 @@ const RepostModalForm = ({postId,repostCount,ButtonTitle}:RepostFormProps) => {
                             >
 
                                 <BiRepost className="scale-150"/>
-                                {repostCount>0&&(<p>{repostCount}</p>)}
+                                {(repostCount || 0) > 0 && (<p>{repostCount}</p>)}
                             </div>
                     </DialogTrigger>
                     {isOpen ===1 && (

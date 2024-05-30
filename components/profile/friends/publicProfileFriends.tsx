@@ -1,47 +1,21 @@
 'use client'
 
-import { getProfileFriends, getPublicFriendsPromise } from "@/actions/friends";
 import { FriendsOffer } from "@/components/types/globalTs";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import Link from "next/link";
-import {  startTransition, useEffect, useState } from "react";
 import { FaUser } from "react-icons/fa";
 
 interface props {
-    userId:string,
-    setFriendsLength:any,
+    friendsList:FriendsOffer[],
 }
-const PublicProfileFriends:React.FC<props> = ({userId,setFriendsLength}) => {
-    
-    const [friendsList,setFriendList]=useState<FriendsOffer[]>()
-    const [refresh,setRefresh]=useState<boolean>(false)
-
-    useEffect(()=>{
-        getFriends()
-    },[userId]) 
-    
-    useEffect(()=>{
-        console.log(friendsList?.length)
-        setFriendsLength(friendsList?.length)
-    },[friendsList])
-
-    const getFriends = ()=>{
-        startTransition(()=>{
-            getProfileFriends(userId)
-            .then(response=>{
-                setFriendList(response.profileFirendsList)
-               
-            })
-        })
- 
-    }
+const PublicProfileFriends:React.FC<props> = ({friendsList}) => {
+    ///TEST: in production check how is work <Link with next auth session 
+   
     return ( 
         <div className=" w-full space-y-2">
-            {/* <button title="refresh" onClick={()=>setRefresh(!refresh)}>Refresh</button> */}
-            {/* <p className="text-white">{`User have: ${friendsList?.length} friends`}</p> */}
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full" key={index}> 
-                 
+                
                 <Link  href={`/profile/${user?.addressee?.userId||user?.requester?.userId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
                    <Avatar>
                         <AvatarImage 

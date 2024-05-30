@@ -20,7 +20,9 @@ const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
       if (scrollTop > lastScrollTop && scrollTop + clientHeight +50 >= scrollHeight -10 && hasMore) {
-        
+        if (isFetching && hasMore) {
+          loadMore().finally(() => setIsFetching(false));
+        }
         setIsFetching(true);
       }
       setLastScrollTop(scrollTop);
@@ -28,7 +30,7 @@ const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
 
     };
 
-    const handleTouchMove = (event) => {
+    const handleTouchMove = () => {
       handleScroll(); // Delegate to handleScroll to maintain consistent behavior
     };
 
@@ -59,11 +61,11 @@ const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
     };
   }, [hasMore, lastScrollTop]);
 
-  useEffect(() => {
-    if (isFetching && hasMore) {
-      loadMore().then(() => setIsFetching(false));
-    }
-  }, [isFetching, hasMore, loadMore]);
+  // useEffect(() => {
+  //   if (isFetching && hasMore) {
+  //     loadMore().finally(() => setIsFetching(false));
+  //   }
+  // }, [isFetching, hasMore, loadMore]);
 
   return (
     <div className='space-y-5'>

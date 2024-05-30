@@ -4,13 +4,13 @@ import { db } from "./db";
 
 export const currentUser = async () =>{
     const session = await auth()
-
+    console.log('CURRENT_USER_HOOK')
     return session?.user
 }
 
 export const currentRole = async () =>{
     const session = await auth()
-    console.log("CurrentRole",session?.user.role)
+    console.log("CurrentRole")
     return session?.user.role
 }
 

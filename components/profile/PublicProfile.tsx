@@ -1,20 +1,14 @@
 "use client"
-import React, {  Suspense, useState } from "react";
-import {  FaUser } from "react-icons/fa";
-import {  RiProfileLine } from 'react-icons/ri';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import {  FadeLoader } from "react-spinners";
-import {  relation } from "@/actions/UserProfile";
+import React from "react";
+import { ProfileData } from "../types/globalTs";
+import { relation } from "@/actions/UserProfile";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import AvatarWithFallback from "../ui/AvatarCoustom";
 import FriendStatusButton from "./friends/function/publicFriendButton";
-
-import ListSkeleton from "./friends/FriendSkeleton";
 import PublicAccordion from "./post/public/profileAccordion";
-import { ProfileData } from "../types/globalTs";
-const Cover = React.lazy(() => import("./Cover"))
-const PublicProfileFriends = React.lazy(()=> import ('./friends/publicProfileFriends'))
-const UserPostList = React.lazy(()=>import('./post/private/UserPostList'))
+import CoverPublic from "./post/public/publicCover";
+
+
 
 
 export interface Profile{
@@ -28,29 +22,12 @@ interface profileProps {
 
 const  PublicProfile =  ({profile}:Profile) => {
 
-const [totalPostCount,setTotalCount]=useState<number>(0)
-const [friendsLength,setFriendsLength] = useState<number>(0)
+
 const user = useCurrentUser()
 const userId = profile?.profile?.userId
 const isTheSameUser = user?.id === userId
 
-                      console.log(profile)
-
-
-//   const getListOfFriends =useCallback(()=>{
-//     getProfileFriends(userId)
-//         .then(response=>{
-//             console.log(response)
-//         })
-//         ///need to retrieve profile list length
-//   },[profile?.profile?.userId]) 
-//   useEffect(()=>{
-//     getListOfFriends()
-//   },[getListOfFriends])
-
- if(!profile){
-    return <FadeLoader/>
- }
+console.log(profile)
 
   return (
     
@@ -58,7 +35,7 @@ const isTheSameUser = user?.id === userId
         <div className=''>
         
         <div>
-                <Cover 
+                <CoverPublic
                     url={profile?.profile?.coverImage} 
                     editable={false} 
                     className="z-1 rounded-md shadow-xs col-span-12"
@@ -92,33 +69,7 @@ const isTheSameUser = user?.id === userId
               <PublicAccordion profile={profile?.profile}/>
             </div>
 
-        <Tabs defaultId="tab2" >
-            <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
-                <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center"><RiProfileLine className="-ml-2"/>{totalPostCount} Posts</TabsTrigger>
-                <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center"><FaUser/>{friendsLength}  Friends</TabsTrigger>
-                {/* <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center"><RiGalleryFill/>Gallery</TabsTrigger> */}
-            </TabsList>
-
-            <TabsContent id="tab2" className="grid grid-cols-12 ">
-                <div className='col-span-12 space-y-5'>
-                    <Suspense fallback={<ListSkeleton/>}> 
-                        <UserPostList profile={profile.profile?.userId} setTotalCount={setTotalCount} totalPostCount={totalPostCount}/>  
-                    </Suspense>
-                </div>
-            </TabsContent>
-
-            <TabsContent id="tab1" className="p-4">
-
-            <Suspense fallback={<ListSkeleton/>}>
-              <PublicProfileFriends userId={profile?.profile?.userId} setFriendsLength={setFriendsLength}/>
-            </Suspense>
-
-            </TabsContent>
-            <TabsContent id="tab3" className="p-4">
-                <h1>Content for Tab Three</h1>
-                <p>This is the detailed content for Tab Three.</p>
-            </TabsContent>
-        </Tabs>
+       
       
     </div>
 

@@ -85,7 +85,7 @@ export const {
     },
 
     async session({token , session}) {
-    
+  console.log("CALL_SESSIOn")
         if(token.sub&&session.user){
           session.user.id = token.sub
         }
@@ -109,7 +109,7 @@ export const {
         }
         const existingUser = await getUserById(token?.sub!)
         if(!existingUser){
-          return null
+          throw new Error("User does not exist.");
         }
      return session;
      

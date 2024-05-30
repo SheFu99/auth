@@ -8,6 +8,7 @@ import CoverModal from "./cropper/Cover-modal";
 import Image from "next/image";
 import { S3Response } from "@/app/api/s3-upload/route";
 import { AspectRatio } from "../ui/aspect-ratio";
+import CoverPlaceHolder from "./post/lib/coverPlaceHolder";
 
 type CoverProps = {
     url?:string | null ,
@@ -16,22 +17,13 @@ type CoverProps = {
     className?: string,
 }
 
-type Response = {
-  error?: string | undefined;
-  success?: string | undefined;
-  imageUrl?:string ;
-
-}
-
 
 export default function Cover({url,editable,onChange, className}:CoverProps) {
   const {update} = useSession()
-console.log('Render_Cover')
-  // const {upload,switchUpload} = useCurrentProfile()
 
   const [isUploading,setIsUploading] = useState(false);
   const [modal ,setModal] = useState<boolean>(false)
-  const [ratio, setRatio]=useState<number>(4/1)
+
   async function updateCover(croppedImageBlob: Blob) {
     console.log(croppedImageBlob)
     const formData = new FormData();
@@ -74,23 +66,6 @@ console.log('Render_Cover')
     setIsUploading(!isUploading)
   },[url]) 
 
-  useEffect(() => {
-    const updateSize = () => {
-        const width = window.innerWidth;
-        if (width < 640) {
-            setRatio(4/1);
-        } else if (width >= 640 && width < 1024) {
-            setRatio(4/1);
-        } else {
-            setRatio(5/1);
-        }
-    };
-
-    window.addEventListener('resize', updateSize);
-    updateSize();  // Initialize size on first render
-
-    return () => window.removeEventListener('resize', updateSize);
-}, []);
  
   return (
     
@@ -103,83 +78,33 @@ console.log('Render_Cover')
             </div>
           </div>
 
-          <svg width="2100" height="150" xmlns="http://www.w3.org/2000/svg">
-
-            <rect width="100%" height="100%" fill="#87CEEB"/>
-            <circle cx="1850" cy="30" r="30" fill="#FFD700"/>
-            <polygon points="300,150 600,50 900,150" fill="#BDB76B"/>
-            <polygon points="1300,150 1600,50 1900,150" fill="#BDB76B"/>
-
-          </svg>
+          <CoverPlaceHolder/>
           
         </div>
           )}
 
       {url&&(
        
-          //  <div className="flex justify-center align-middle items-center">
-        <AspectRatio ratio={ratio} className="w-full h-0 ">
           <Image src={url} alt="cover"
-          width={800}
-          height={200}
-          objectFit="cover"
-          layout="responsive" 
-          className={`${className} xl:-mt-[2rem] w-full h-full bg-blend-overlay g-f:w-auto ${!isUploading?'block':'hidden'}`}
-          onLoadStart={()=>setIsUploading(true)}
-          onLoadingComplete={()=>setIsUploading(false)}
-          
+            width={800}
+            height={200}
+            objectFit="cover"
+            layout="responsive" 
+            className={`${className} xl:-mt-[2rem] w-full h-full bg-blend-overlay g-f:w-auto aspect-6/1  md:aspect-4/1 ${!isUploading?'block':'hidden'}`}
+            onLoadStart={()=>setIsUploading(true)}
+            onLoadingComplete={()=>setIsUploading(false)}
           /> 
-          </AspectRatio>
-        // </div>
           
       )}
 
       {!url && !isUploading&&(
-    <div>
-      <style>
-        {`
-          .dynamic-circle {
-            cx: var(--circle-cx, 650); /* Default cx value */
-          }
-          
-          @media (max-width: 768px) { /* Responsive adjustments */
-            .dynamic-circle {
-              --circle-cx: 750; /* Smaller screens */
-            }
-          }
-
-          @media (max-width: 640px) {
-            .dynamic-circle {
-              --circle-cx: 300; /* Even smaller screens */
-            }
-          }
-        `}
-      </style>
-      <svg width="1000" height="100" viewBox="0 0 1000 100" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1000" height="100" fill="#2b2b2b"/>
-          <circle className="dynamic-circle" cx="800" cy="30" r="20" fill="#f2f2f2"/>
-          <path d="M0,70 Q125,30 250,70 T500,70 T750,70 T1000,70 V100 H0 Z" fill="#1a1a1a"/>
-          <path d="M0,80 Q125,50 250,80 T500,80 T750,80 T1000,80 V100 H0 Z" fill="#0d0d0d"/>
-          <circle cx="150" cy="30" r="2" fill="#f2f2f2"/>
-          <circle cx="180" cy="20" r="1.5" fill="#f2f2f2"/>
-          <circle cx="210" cy="40" r="1.2" fill="#f2f2f2"/>
-          <circle cx="240" cy="25" r="1.8" fill="#f2f2f2"/>
-          <circle cx="270" cy="15" r="1" fill="#f2f2f2"/>
-
-
-          <circle cx="450" cy="45" r="2" fill="#f2f2f2"/>
-          <circle cx="480" cy="40" r="1.5" fill="#f2f2f2"/>
-          <circle cx="510" cy="40" r="1.2" fill="#f2f2f2"/>
-          <circle cx="540" cy="25" r="1.8" fill="#f2f2f2"/>
-
-      </svg>
-     </div>
+        <CoverPlaceHolder/>
       )}
      
+
     {editable &&(
       <div className="absolute right-0 bottom-0 m-2">
           <label className="flex items-center gap-1 bg-white py-1 px-2 rounded-md shadow-md shadow-black cursor-pointer ">
-            {/* <input type="file" onChange={updateCover} className="hidden" /> */}
             <button onClick={()=>setModal(!modal)} title="Change cover image"></button>
            
             <HiPhotograph fill="black" className="scale-150"/>
