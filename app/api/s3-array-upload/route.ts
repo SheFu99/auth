@@ -1,10 +1,11 @@
 
 // import { createPresignedPost } from '@aws-sdk/s3-presigned-post'; 
 import { NextResponse } from "next/server";
-import { s3Client } from "../s3-upload/route";
+
 import { currentUser } from '@/lib/auth';
 import { Readable } from "stream";
 import { Upload } from '@aws-sdk/lib-storage'
+import { S3Client } from "@aws-sdk/client-s3";
 
 interface File {
     buffer: Buffer;
@@ -16,7 +17,13 @@ function bufferToStream(buffer:Buffer) {
     stream.push(null); // No more data to write
     return stream;
 }
-
+const s3Client = new S3Client({
+    region: process.env.NEXT_PUBLIC_S3_REGION as string,
+    credentials:{
+        accessKeyId: process.env.NEXT_PUBLIC_S3_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.NEXT_PUBLIC_S3_SECRET_KEY as string,
+    }
+});
 
 
 async function uploadFileToS3(file:File):Promise<string> {
