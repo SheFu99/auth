@@ -10,9 +10,9 @@ import { S3Response } from "@/app/api/s3-upload/route";
 import { AspectRatio } from "../ui/aspect-ratio";
 
 type CoverProps = {
-    url:string | undefined,
+    url?:string | null ,
     editable:boolean,
-    onChange:()=>void,
+    onChange?:()=>void,
     className?: string,
 }
 
@@ -26,7 +26,7 @@ type Response = {
 
 export default function Cover({url,editable,onChange, className}:CoverProps) {
   const {update} = useSession()
-
+console.log('Render_Cover')
   // const {upload,switchUpload} = useCurrentProfile()
 
   const [isUploading,setIsUploading] = useState(false);

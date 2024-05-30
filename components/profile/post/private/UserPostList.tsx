@@ -33,11 +33,12 @@ type userListProps ={
 }
 
 const UserPostList :React.FC<userListProps> = ({profile,totalPostCount,setTotalCount}) => {
+    console.log('rednder')
 const [posts, setPosts]=useState<post[]>()
-const [comment,setComment]=useState<comments>()
 const [isOpen,setIsOpen]=useState<boolean>(false)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
+
 const {update}=useSession()
 
 const [hasMore,setHasMore]= useState<boolean>(true)
@@ -45,15 +46,17 @@ const [page,setPage]=useState<number>(1)
 
 const user = useCurrentUser()
 
-// useEffect(()=>{console.log(posts)},[posts])
+useEffect(()=>{console.log(posts)},[posts])
 
 ///load user post from server 
-const debouncedGetPost = useCallback(debounce(()=>{
+const debouncedGetPost = useCallback(()=>{
     GetUserPostsById(profile,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts)})
-},1000),[])
+    console.log('GET_ON_SERVER')
+},[profile])
+
     useEffect(()=>{
         debouncedGetPost()
-    },[update])
+    },[profile])
 ///
   
     const postLikeAction = (postId:string)=>{
@@ -282,7 +285,7 @@ const debouncedGetPost = useCallback(debounce(()=>{
 
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">
-              {!posts&&(
+              {!posts&&profile&&(
                     <div className="w-full flex justify-center py-10 items-center align-middle">
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>
@@ -337,16 +340,11 @@ const debouncedGetPost = useCallback(debounce(()=>{
                                 </div>
                             </button>
 
-                            <div  onClick={()=>setIsOpen(true)}>
                             <RepostModalForm 
                                 ButtonTitle="Repost"
                                 postId={post.PostId}
-                                isOpen={isOpen}
                                 repostCount={post?.repostCount}
-                               
-                                callBack={()=>setIsOpen(false)}
                                 />
-                            </div>
                             
                         </div>
                     </div>

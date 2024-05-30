@@ -2,42 +2,36 @@
 "use client"
 
 import PublicProfile from "@/components/profile/PublicProfile";
-import { getPublicProfile, getProfileById } from "@/actions/UserProfile";
+import { getPublicProfile } from "@/actions/UserProfile";
 import { useCallback, useEffect, useState } from "react";
 import {  FadeLoader } from "react-spinners";
-import {  currentUser } from "@/lib/auth";
 
-interface Props {
-      id?: string;
-  };
+
 
 export default  function PublicProfileParams({ params }) {
-
   const [profile,setProfile]=useState<any>({})
   
   
   const getProfile= async()=>{
-
-    console.log(params.id)
     try {
-      const profile = await getPublicProfile(params.id)
-      setProfile(profile)
-      return profile
+      const dataFromDb = await getPublicProfile(params.id)
+      setProfile(dataFromDb)
+      return 
     } catch (error) {
       console.log(error)
       setProfile(undefined)
-      return undefined
+      return 
     }
-   
-  }
+  };
 
-    const getMemoProfile = useCallback(()=>{
-      getProfile()
+
+    const getMemoProfile = useCallback(async ()=>{
+       await getProfile()
+      console.log('Get_Profile')
     },[params])
     
     useEffect(()=>{
       getMemoProfile()
-      console.log(profile)
     },[getMemoProfile])
 
 

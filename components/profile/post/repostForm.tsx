@@ -1,22 +1,23 @@
 import { repostAction, repostProps } from "@/actions/repost";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import {  useState, useTransition } from "react";
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {  useRef, useState, useTransition } from "react";
 import { BiRepost } from "react-icons/bi";
 import { toast } from "sonner";
 
 interface RepostFormProps {
     ButtonTitle?:string,
     postId:string,
-    isOpen:boolean,
+    isOpen?:boolean,
     repostCount:number,
     // onClick:()=>void,
-    callBack:()=>void,
+    callBack?:()=>void,
 }
 
-const RepostModalForm = ({postId,isOpen,repostCount,callBack,ButtonTitle}:RepostFormProps) => {
+const RepostModalForm = ({postId,repostCount,ButtonTitle}:RepostFormProps) => {
     const [superText,setSuperText]=useState<string>('')
     const [isPending,startTransition]=useTransition()
-
+    const [isOpen,setIsOpen]=useState(0)
+    const DialogRef = useRef(null)
     const repost = ({postId,superText}:repostProps)=>{
         startTransition(()=>{
 
@@ -32,24 +33,28 @@ const RepostModalForm = ({postId,isOpen,repostCount,callBack,ButtonTitle}:Repost
             .catch(error=>{
                 toast.error(error)
             }).finally(()=>{
-                callBack()
+                setIsOpen(0)
             })
 
         })
         
-        console.log(isOpen)
+        console.log(DialogRef.current)
     }
     return (
         <>
         
                 <Dialog >
-                    <DialogTrigger >
-                            <div className="flex gap-2 items-center justify-center align-middle text-white bg-neutral-900 px-3 rounded-md p-2 " title={`${ButtonTitle?ButtonTitle:'Repost'}`}>
+                    <DialogTrigger translate="yes"  onClick={()=>setIsOpen(1)}>
+                            <div className="flex gap-2 items-center justify-center align-middle text-white bg-neutral-900 px-3 rounded-md p-2 " 
+                            title={`${ButtonTitle?ButtonTitle:'Repost'}`}
+                            // onClick={()=>setIsOpen(true)}
+                            >
+
                                 <BiRepost className="scale-150"/>
                                 {repostCount>0&&(<p>{repostCount}</p>)}
                             </div>
                     </DialogTrigger>
-                    {isOpen && (
+                    {isOpen ===1 && (
                     <DialogContent >
                         <div className="relative p-6 rounded shadow-lg z-[101] " >
                             <div  className="grid grid-cols-1 space-y-5">
