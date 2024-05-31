@@ -45,7 +45,7 @@ const [page,setPage]=useState<number>(2)
 
 const user = sessionUser
 
-let PostCache=page
+let PostCache
 console.log(PostCache)
 
 const fetchMoreData = useCallback(async ()=>{
@@ -66,7 +66,7 @@ const fetchMoreData = useCallback(async ()=>{
     })
     .catch(err=>{
         toast.error(err)
-    })
+    }).finally(()=>PostCache=page)
     
 },[page]);
 
