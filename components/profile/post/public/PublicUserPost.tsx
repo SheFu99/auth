@@ -46,17 +46,23 @@ const [page,setPage]=useState<number>(2)
 const user = sessionUser
 
 
+
 const fetchMoreData = useCallback(async ()=>{
     if(posts?.length>=totalCount){
         setHasMore(false)
         return
     }
+    
+
     GetUserPostsById(userId,page)
-    .then(posts=>{setPosts(prev=>[...prev,...posts?.posts]),setPage(page+1)})
+    .then(posts=>{
+        setPosts(prev=>[...prev,...posts?.posts])
+        setPage(prev=>prev+1)
+    })
     .catch(err=>{
         toast.error(err)
     })
-   
+    
 },[page]);
 
 console.log('PublicPostRender')

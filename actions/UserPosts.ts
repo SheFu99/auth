@@ -113,26 +113,26 @@ let PostsCacheKey = {
     userId:undefined,
     page:null,
     time:undefined,
-   
+    posts:undefined,
+    success:undefined,
+    totalPostCount:undefined
+    
 }
 export const GetUserPostsById = async (userId: string,page:number):Promise<postPromise> => {
-    // console.log(page)
+    console.log(page)
     // const time = new Date()
     // let now = time.getTime()
     // console.log(now,PostsCacheKey.time)
     // let cacheId = PostsCacheKey.userId === userId
     // let cachePage = PostsCacheKey.page ===page
-    // let cacheTime = PostsCacheKey.time > now - 1000
+    // let cacheTime = PostsCacheKey.time > now - 2000
   
     // if(cacheId===cachePage===cacheTime){
     //     console.log('Retrive from cache')
-    //     return {success:true}
+
+    //     return {success:true, posts: PostsCacheKey.posts ,totalPostCount:PostsCacheKey.totalPostCount}
     // }
-    // PostsCacheKey= {
-    //     userId:userId,
-    //     page:page,
-    //     time:now
-    // }
+   
 if(!userId){
     return {error:'ID required!'}
 }
@@ -246,7 +246,14 @@ if(!userId){
             
         };
     });
-
+    // PostsCacheKey= {
+    //     userId:userId,
+    //     page:page,
+    //     time:now,
+    //     posts: postsWithLikeCounts,
+    //     success: true,
+    //     totalPostCount:totalPostCount
+    // }
     return { posts: postsWithLikeCounts, success: true,totalPostCount:totalPostCount };
 };
 
