@@ -45,11 +45,15 @@ const [page,setPage]=useState<number>(2)
 
 const user = sessionUser
 
-
+let PostCache=page
+console.log(PostCache)
 
 const fetchMoreData = useCallback(async ()=>{
     if(posts?.length>=totalCount){
         setHasMore(false)
+        return
+    }
+    if(PostCache === page){
         return
     }
     console.log('Handle Infinite fetch with page:',page)
