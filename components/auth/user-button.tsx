@@ -41,8 +41,9 @@ import { currentUser } from "@/lib/auth"
             {user ?(
             <DropdownMenuTrigger title="User interface">
 
-          
-            <PostHeader author={user} />
+                <div className="w-[35px] h-[35px]">
+                    <PostHeader author={user} />
+                </div>
 
             </DropdownMenuTrigger>
             ):(
