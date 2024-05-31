@@ -16,7 +16,7 @@ type CoverProps = {
 
 export default function CoverPublic({url, className}:CoverProps) {
 
-  const [isUploading,setIsUploading] = useState(false);
+  const [isUploading,setIsUploading] = useState(true);
 
   return (
     
@@ -31,7 +31,6 @@ export default function CoverPublic({url, className}:CoverProps) {
             objectFit="cover"
             layout="responsive" 
             className={`${className} xl:-mt-[2rem] w-full h-full bg-blend-overlay g-f:w-auto aspect-6/1  md:aspect-4/1`}
-            onLoadStart={()=>setIsUploading(true)}
             onLoadingComplete={()=>setIsUploading(false)}
           /> 
         </div>

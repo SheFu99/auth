@@ -42,12 +42,12 @@ interface CommentFormProps {
 
 
 const CommentForm:React.FC<CommentFormProps> = ({postId,userId}) => {
-  
+  console.log(userId)
     const { isUploading,
             setIsUploading,
             uploadImages}=useUploadImages()
     const {shouldAnimate,onError}=useOnError()
-    const {update}=useSession()
+    // const {update}=useSession()
     const [manager]=useState(new BlobImageManager());
     const [images,setImageFiles]=useState<File[]>([]);
     const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([])
@@ -126,7 +126,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,userId}) => {
                     toast.error(data.error)
                 }
                 if(!data.error){
-                    update() ///update session
+                    // update() ///update session
                     toast.success("Your post has been send")
                 }
             })

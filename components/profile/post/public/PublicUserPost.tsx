@@ -38,16 +38,14 @@ const [posts, setPosts]=useState<post[]>(postList)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
 
-const {update}=useSession()
+// const {update}=useSession()
 
 const [hasMore,setHasMore]= useState<boolean>(true)
 const [page,setPage]=useState<number>(2)
 
 const user = sessionUser
-
+console.log(sessionUser)
 let PostCache
-console.log(PostCache)
-
 const fetchMoreData = useCallback(async ()=>{
     if(posts?.length>=totalCount){
         setHasMore(false)
@@ -56,7 +54,6 @@ const fetchMoreData = useCallback(async ()=>{
     if(PostCache === page){
         return
     }
-    console.log('Handle Infinite fetch with page:',page)
     PostCache=page
     GetUserPostsById(userId,page)
     .then(posts=>{
@@ -127,7 +124,7 @@ console.log('PublicPostRender')
             postLikeAction(postId);
         } catch (error) {
             console.error("Failed to update like status on the server:", error);
-            update()
+            // update()
             toast.error("Error updating post like. Please try again.");
         }
         // }finally{
@@ -187,7 +184,7 @@ console.log('PublicPostRender')
             commentLikeAction(commentId);
         } catch (error) {
             console.error("Failed to update like status on the server:", error);
-            update()
+            // update()
             toast.error("Error updating post like. Please try again.");
         }
     };
@@ -220,7 +217,7 @@ console.log('PublicPostRender')
                 
             });
        
-            update()
+            // update()
         return 
         
         };   
@@ -253,7 +250,7 @@ console.log('PublicPostRender')
                 .then((data)=>{
                     if(data.success){
                         toast.success(data.success)
-                        update()
+                        // update()
                     }
                     if(data.error){
                         toast.success(data.error)

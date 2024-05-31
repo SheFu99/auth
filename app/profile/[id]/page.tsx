@@ -13,13 +13,15 @@ import UserPostList from "@/components/profile/post/private/UserPostList";
 import PublicPostList from "@/components/profile/post/public/PublicUserPost";
 import ListSkeleton from "@/components/profile/friends/FriendSkeleton";
 import { currentUser } from "@/lib/auth";
+import { auth } from "@/auth";
 
 
 
 export default async function PublicProfileParams({ params }) {
 
   console.log('render!@')
-      const sessionUser = await currentUser()
+      const session = await auth()
+      const sessionUser =session.user
       const profile = await getPublicProfile(params.id)
       const userPostList = await GetUserPostsById(params.id,1)
       const userfriendsList = await getProfileFriends(params.id)
@@ -29,12 +31,12 @@ export default async function PublicProfileParams({ params }) {
     return (
       <div>
       
-         <PublicProfile profile={profile} sessionUser={sessionUser}/> 
+         <PublicProfile profile={profile}  sessionUser={sessionUser}/> 
               {userPostList&&userfriendsList&&(
                   // <Suspense fallback={<ListSkeleton/>}>
                   <TabSwitch 
-                  chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList} /> }
-                  chilldrenPosts={<PublicPostList postList={userPostList.posts} totalCount={userPostList.totalPostCount} userId={params.id}  sessionUser={sessionUser}/>}
+                  chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
+                  chilldrenPosts={<PublicPostList postList={userPostList.posts} totalCount={userPostList.totalPostCount} userId={params.id} sessionUser={sessionUser}/>}
                   postTotal={userPostList.totalPostCount}
                   />
                   // </Suspense>

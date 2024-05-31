@@ -70,6 +70,7 @@ const UserFriends = () => {
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full row-span-1" key={index}> 
                     <Link  href={`/profile/${user?.addressee?.userId||user?.requester?.userId}`} className="col-span-10 flex items-center gap-1 cursor-pointer">
+                   <a>
                     <Avatar>
                         <AvatarImage 
                             src={user.addressee?.image || user.requester?.image } 
@@ -81,6 +82,8 @@ const UserFriends = () => {
                         </AvatarFallback>
                    </Avatar>
                     <p className="text-white ml-2">{user?.addressee?.firstName||user?.requester?.firstName}</p>
+                   </a>
+
                     </Link>
 
                     <div className="md:col-start-11 md:col-span-2 col-span-3 col-start-12 flex justify-end items-center allign-middle space-x-1 row-start-1">

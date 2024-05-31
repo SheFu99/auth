@@ -19,7 +19,8 @@ const PublicProfileLayout = async ({children}:any) => {
 
     return ( 
         
-        <SessionProvider session={session}>
+        // <SessionProvider session={session}>
+                <>
                 
                 <Navbar/>
                     <div className="col-span-12 col-start-1 row-span-2">
@@ -32,9 +33,9 @@ const PublicProfileLayout = async ({children}:any) => {
                             </div>
                         </div>
                     </div>
-
-        </SessionProvider>
+                    </>
      );
-}
+     {/* </SessionProvider> */}
+    }
  
 export default PublicProfileLayout;
