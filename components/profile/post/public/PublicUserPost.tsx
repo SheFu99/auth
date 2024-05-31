@@ -52,12 +52,13 @@ const fetchMoreData = useCallback(async ()=>{
         setHasMore(false)
         return
     }
-    
+    console.log('Handle Infinite fetch with page:',page)
 
     GetUserPostsById(userId,page)
     .then(posts=>{
+        setPage(prev=>prev+1),
         setPosts(prev=>[...prev,...posts?.posts])
-        setPage(prev=>prev+1)
+       
     })
     .catch(err=>{
         toast.error(err)
