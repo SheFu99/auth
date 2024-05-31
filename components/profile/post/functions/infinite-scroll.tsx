@@ -1,5 +1,5 @@
 import { ArrowBigDownDash } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 
 interface Props {
@@ -7,13 +7,14 @@ interface Props {
   hasMore: boolean;
   children: React.ReactNode;
   isloaded: boolean;
+  page:number;
 }
 
-const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
+const InfiniteScroll = ({ loadMore, hasMore, children,isloaded,page }: Props) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [lastScrollTop, setLastScrollTop] = useState<number>(0);
  
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
     if (scrollTop > lastScrollTop && scrollTop + clientHeight +50 >= scrollHeight -10 && hasMore) {
@@ -25,7 +26,7 @@ const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
     setLastScrollTop(scrollTop);
 
 
-  };
+  },[page])
   useEffect(() => {
     console.log(isFetching , lastScrollTop)
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;

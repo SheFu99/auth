@@ -48,7 +48,7 @@ const user = sessionUser
 let PostCache
 console.log(PostCache)
 
-const fetchMoreData = useCallback(async ()=>{
+const fetchMoreData = async ()=>{
     if(posts?.length>=totalCount){
         setHasMore(false)
         return
@@ -68,7 +68,7 @@ const fetchMoreData = useCallback(async ()=>{
         toast.error(err)
     }).finally(()=>PostCache=page)
     
-},[page]);
+};
 
 console.log('PublicPostRender')
 
@@ -270,7 +270,7 @@ console.log('PublicPostRender')
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>
                 )}
-            <InfiniteScroll loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
+            <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
             
             {posts?.map((post,index)=>(
                 <>
