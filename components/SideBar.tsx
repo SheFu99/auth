@@ -17,7 +17,7 @@ interface SideBarProps{
 
 const SideBar :React.FC<SideBarProps>= async ({className}) => {
     const session = await auth()
-    console.log("ROLE_FETCH")
+    console.log("ROLE_FETCH_SideBar_Render")
     // const pathname = usePathname();
     const role = session?.user?.role
     

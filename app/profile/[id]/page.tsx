@@ -21,11 +21,11 @@ export default async function PublicProfileParams({ params }) {
 
   console.log('render!@')
       const session = await auth()
-      const sessionUser =session.user
+      const sessionUser =session?.user
       const profile = await getPublicProfile(params.id)
       const userPostList = await GetUserPostsById(params.id,1)
       const userfriendsList = await getProfileFriends(params.id)
-
+      
 
 
     return (
