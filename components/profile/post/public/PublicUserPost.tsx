@@ -48,7 +48,7 @@ const user = sessionUser
 let PostCache
 console.log(PostCache)
 
-const fetchMoreData = async ()=>{
+const fetchMoreData = useCallback(async ()=>{
     if(posts?.length>=totalCount){
         setHasMore(false)
         return
@@ -57,7 +57,7 @@ const fetchMoreData = async ()=>{
         return
     }
     console.log('Handle Infinite fetch with page:',page)
-
+    PostCache=page
     GetUserPostsById(userId,page)
     .then(posts=>{
         setPage(prev=>prev+1),
@@ -66,9 +66,9 @@ const fetchMoreData = async ()=>{
     })
     .catch(err=>{
         toast.error(err)
-    }).finally(()=>PostCache=page)
+    })
     
-};
+},[page]);
 
 console.log('PublicPostRender')
 
