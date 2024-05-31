@@ -7,7 +7,7 @@ interface Props {
   hasMore: boolean;
   children: React.ReactNode;
   isloaded: boolean;
-  page:number;
+  page?:number;
 }
 
 const InfiniteScroll = ({ loadMore, hasMore, children,isloaded,page }: Props) => {
