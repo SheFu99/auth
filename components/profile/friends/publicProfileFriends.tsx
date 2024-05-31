@@ -23,7 +23,7 @@ const PublicProfileFriends:React.FC<props> = ({friendsList}) => {
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full" key={index}> 
                 
-                <Link 
+                <a 
                     href={`/profile/${user?.addressee?.userId||user?.requester?.userId}`} 
                     className="col-span-10 flex items-center gap-1 cursor-pointer"
                 // scroll={false}
@@ -42,7 +42,7 @@ const PublicProfileFriends:React.FC<props> = ({friendsList}) => {
                    
                    
                     <p className="text-white ml-2">{user?.addressee?.firstName||user?.requester?.firstName}</p>
-                </Link>
+                </a>
                 </div>
             ))}
         </div>
