@@ -111,7 +111,7 @@ export const updateUserProfile = async (values: Profile)=>{
 
 
 export const getPublicProfile = async (userId:string)=>{
-  console.log(userId)
+  console.log("TRIGGER SESSION fetch")
     const user = await currentUser()
   
     if(!userId){

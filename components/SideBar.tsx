@@ -2,10 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiSettings } from "react-icons/fi";
-import { MdAdminPanelSettings, MdOutlineSecurity } from "react-icons/md";
+import { MdAdminPanelSettings } from "react-icons/md";
 import { RiAccountBoxFill } from "react-icons/ri";
 
 interface SideBarProps{
@@ -15,6 +14,7 @@ interface SideBarProps{
 
 
 const SideBar :React.FC<SideBarProps>= ({className}) => {
+    console.log("ROLE_FETCH")
     const pathname = usePathname();
     const role = useCurrentRole()
 

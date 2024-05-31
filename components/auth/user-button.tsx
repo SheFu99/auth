@@ -1,4 +1,4 @@
-"use client"
+"use Server"
 
 import { FaUser } from "react-icons/fa"
 
@@ -19,15 +19,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { SlLogin } from "react-icons/sl";
 import { LoginButton } from "./loginButton"
 import { useEffect } from "react"
+import PostHeader from "../profile/post/Post-header"
+import { currentUser } from "@/lib/auth"
 // import { useEffect } from "react"
 
 
- const UserButton =  ()=>{
- 
-    const pathname = usePathname()
-    const user = useCurrentUser()
+ const UserButton = async ()=>{
+ console.log("TRIGGER_ROLE_FETCH")
+    // const pathname = usePathname()
+    const user = await currentUser()
     const userImage = user?.image || ""
-    const role = useCurrentRole()
+    const role = user?.role
 
     // useEffect(()=>{
     //     console.log(userImage)
@@ -38,12 +40,10 @@ import { useEffect } from "react"
         <DropdownMenu>
             {user ?(
             <DropdownMenuTrigger title="User interface">
-                <Avatar>
-                    <AvatarImage src={userImage} alt="User Menu Button" />
-                    <AvatarFallback className="bg-sky-500">
-                        <FaUser className="text-white"/>
-                    </AvatarFallback>
-                </Avatar>
+
+          
+            <PostHeader author={user} />
+
             </DropdownMenuTrigger>
             ):(
                 <div className="p-2 px-5 cursor-pointer" >
@@ -58,47 +58,47 @@ import { useEffect } from "react"
             <DropdownMenuContent className="w-12" align="end">
 {role === 'ADMIN' &&(
                 <>
-                <Button
+                {/* <Button
                     asChild
                     variant={pathname === "/admin" ? "default" : "outline"}
                     className="w-full"
-                > 
+                >  */}
                     <a href="/admin" className="grid grid-cols-6"
                     ><MdAdminPanelSettings  className="col-start-1 h-5 w-5"/><p className="col-start-3">Admin</p></a>
-                </Button>
+                {/* </Button> */}
                 </>
            )}
           
-                <Button
+                {/* <Button
                     asChild
                     variant={pathname === "/settings/profile" ? "default" : "outline"}
                     className="w-full"
-                > 
+                >  */}
                     <a href="/settings/profile" className="grid grid-cols-6"
                     ><ImProfile className="col-start-1"/><p className="col-start-3">Profile</p></a>
-                </Button>
+                {/* </Button> */}
 {role === 'ADMIN' &&(
                 <>
-                <Button
+                {/* <Button
                     asChild
                     variant={pathname === "/server" ? "default" : "outline"}
                     className="w-full"
-                > 
+                >  */}
                     <a href="/server" className="grid grid-cols-6">
                         <FiServer className="col-start-1"/>
                         <p className="col-start-3">Server</p>
                     </a>
-                </Button>
+                {/* </Button> */}
                 </> 
                 )}
-                <Button
+                {/* <Button
                     asChild
                     variant={pathname === "/settings" ? "default" : "outline"}
                     className="w-full"
-                > 
+                >  */}
                     <a href="/settings" className="grid grid-cols-6"
                     ><FiSettings className="col-start-1"/><p className="col-start-3 ml-[-2px]">Settings</p></a>
-                </Button>
+                {/* </Button> */}
 
                
                 

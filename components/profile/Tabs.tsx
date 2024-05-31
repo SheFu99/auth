@@ -15,7 +15,6 @@ type TabSwitchProps ={
 }
 
 const TabSwitch = ({chilldrenPosts,chilldrenFriends,friendsTotal,postTotal,className}:TabSwitchProps) => {
-    console.log(postTotal)
     return ( 
         <div className={`${className}`}>
          <Tabs defaultId="tab2" >
@@ -35,9 +34,9 @@ const TabSwitch = ({chilldrenPosts,chilldrenFriends,friendsTotal,postTotal,class
 
             <TabsContent id="tab1" className="p-4">
 
-            <Suspense fallback={<ListSkeleton/>}>
+            {/* <Suspense fallback={<ListSkeleton/>}> */}
                 {chilldrenFriends}
-            </Suspense>
+            {/* </Suspense> */}
 
             </TabsContent>
             <TabsContent id="tab3" className="p-4">

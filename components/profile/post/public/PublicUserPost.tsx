@@ -4,7 +4,7 @@
 
 import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import React, {  useState, useTransition } from "react";
+import React, {  useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import ImageGrid from "../Image-grid";
@@ -13,13 +13,12 @@ import { BiRepost } from "react-icons/bi";
 import LikeButton from "../Like-button";
 import PostHeader from "../Post-header";
 const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
-// import InfiniteScroll from "./post/functions/infinite-scroll";
 import { useSession } from "next-auth/react";
 import CommentForm from "../../forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import { comments, post } from "../../../types/globalTs";
-import { repostProps } from "@/actions/repost";
 import RepostHeader from "../Repost-author-header";
+import { ExtendedUser } from "@/next-auth";
 const RepostModalForm = React.lazy(()=>import ('../repostForm'))
 // import RepostForm from "./post/repostForm"
 
@@ -31,10 +30,10 @@ type userListProps ={
     postList:post[];
     totalCount:number;
     userId:string;
+    sessionUser?:ExtendedUser;
 }
 
-const PublicPostList :React.FC<userListProps> = ({postList,totalCount,userId}) => {
-    console.log('rednder')
+const PublicPostList :React.FC<userListProps> = ({postList,totalCount,userId,sessionUser}) => {
 const [posts, setPosts]=useState<post[]>(postList)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
@@ -44,24 +43,24 @@ const {update}=useSession()
 const [hasMore,setHasMore]= useState<boolean>(true)
 const [page,setPage]=useState<number>(2)
 
-const user = useCurrentUser()
+const user = sessionUser
 
-const fetchMoreData = async ()=>{
-    ///gettFrom server posts.lenght 
+
+const fetchMoreData = useCallback(async ()=>{
     if(posts?.length>=totalCount){
-        // console.log(posts.length)
-        
         setHasMore(false)
         return
     }
-
     GetUserPostsById(userId,page)
     .then(posts=>{setPosts(prev=>[...prev,...posts?.posts]),setPage(page+1)})
     .catch(err=>{
         toast.error(err)
     })
    
-};
+},[page]);
+
+console.log('PublicPostRender')
+
   
     const postLikeAction = (postId:string)=>{
         startTransition(()=>{
@@ -264,7 +263,6 @@ const fetchMoreData = async ()=>{
             
             {posts?.map((post,index)=>(
                 <>
-                {/* <Profiler onRender={console.log(post)}></Profiler> */}
                 {/* TODO: Need to pass key to parent component  */}
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
                 
@@ -339,7 +337,9 @@ const fetchMoreData = async ()=>{
                         </div>
                     ))}
                     {isPostCommentOpen(index)&&(
-                            <CommentForm postId={post?.PostId}/>
+                      
+                            <CommentForm postId={post?.PostId} userId={user?.id}/>
+                     
                     )}
                    
                 </div>

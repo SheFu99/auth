@@ -12,6 +12,8 @@ interface CardWrapperProps {
     showSocial?:boolean;
 };
 
+///TODO: backButtonRegister
+
 export const CardWrapper = ({children,headerLable,backButtonLabel,backButtonHref,showSocial}: CardWrapperProps)=>{
     return(
         <Card className="w-50 shadow-md">

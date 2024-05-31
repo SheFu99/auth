@@ -1,3 +1,5 @@
+import { UserRole } from "@prisma/client";
+
 export interface ProfileData {
     firstName?: string | null;
     lastName?: string | null;
@@ -95,3 +97,11 @@ export type profileOfferDetail = {
   firstName: string;
   image?: string;
 };
+///EXTENDED_USER
+// export type sessionUser = {
+//   id:string,
+//   name:string,
+//   email?:string,
+//   image?:string,
+//   role:UserRole,
+// }

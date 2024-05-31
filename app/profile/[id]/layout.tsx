@@ -15,7 +15,7 @@ interface ProtecteedLayoutProps{
 const PublicProfileLayout = async ({children}:any) => {
 
     const session = await auth()
-    console.log('Render_Layout')
+    console.log('Render_SSSION_TRIGGERED')
 
     return ( 
         

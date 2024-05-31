@@ -13,6 +13,8 @@ type FriendStatusButtonProps = {
 }
 
 export default function FriendStatusButton({ friendStatus, userId }: FriendStatusButtonProps) {
+    
+console.log("RENDER_FriendStatusButton")
     const [friendStatusValue, setFriendStatus] = useState<friendshipStatus>(
         friendStatus?.relationFrom?.status || friendStatus?.relationTo?.status || undefined
     );
@@ -88,8 +90,6 @@ export default function FriendStatusButton({ friendStatus, userId }: FriendStatu
                 }
             });
     };
-
-    console.log(friendStatus);
 
     const renderButton = () => {
     if(friendStatus?.relationFrom){

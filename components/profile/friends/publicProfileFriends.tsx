@@ -2,32 +2,30 @@
 
 import { FriendsOffer } from "@/components/types/globalTs";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-// import Link from "next/link";
 import { FaUser } from "react-icons/fa";
-import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import Link from "next/link";
 
 
 interface props {
     friendsList:FriendsOffer[],
 }
 const PublicProfileFriends:React.FC<props> = ({friendsList}) => {
+    console.log("RENDER")
     ///TEST: in production check how is work <Link with next auth session 
-   const router = useRouter()
-   const linkRef= useRef()
-    const handleRoute = (userId)=>{
-        router.push(`/profile/${userId}`)
-    }
+//    const router = useRouter()
+//    const linkRef= useRef()
+//     const handleRoute = (userId)=>{
+//         router.push(`/profile/${userId}`)
+//     }
 
     return ( 
         <div className=" w-full space-y-2">
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full" key={index}> 
                 
-                <a ref={linkRef}
-                onClick={()=>handleRoute(user?.addressee?.userId||user?.requester?.userId)}
-                href={`/profile/${user?.addressee?.userId||user?.requester?.userId}`} 
-                className="col-span-10 flex items-center gap-1 cursor-pointer"
+                <Link 
+                    href={`/profile/${user?.addressee?.userId||user?.requester?.userId}`} 
+                    className="col-span-10 flex items-center gap-1 cursor-pointer"
                 // scroll={false}
                 // replace={false}
                 // prefetch={false}
@@ -44,7 +42,7 @@ const PublicProfileFriends:React.FC<props> = ({friendsList}) => {
                    
                    
                     <p className="text-white ml-2">{user?.addressee?.firstName||user?.requester?.firstName}</p>
-                </a>
+                </Link>
                 </div>
             ))}
         </div>

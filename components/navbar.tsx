@@ -12,7 +12,6 @@ import UserButton from "./auth/user-button";
   
 
  const Navbar = ()=>{
-  
     return(
         <nav className=" bg-opacity-30 bg-neutral-900  col-start-1 col-span-12 row-span-1  rounded-xs md:w-full h-auto grid grid-cols-12">
             <Sheet>

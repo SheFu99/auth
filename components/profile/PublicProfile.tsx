@@ -7,27 +7,28 @@ import AvatarWithFallback from "../ui/AvatarCoustom";
 import FriendStatusButton from "./friends/function/publicFriendButton";
 import PublicAccordion from "./post/public/profileAccordion";
 import CoverPublic from "./post/public/publicCover";
+import { ExtendedUser } from "@/next-auth";
 
 
 
 
 export interface Profile{
     profile:profileProps,
+    sessionUser?:ExtendedUser;
+
 }
 interface profileProps {
     profile?:ProfileData;
-    friendStatus?:relation
-
+    friendStatus?:relation;
 }
 
-const  PublicProfile =  ({profile}:Profile) => {
+const  PublicProfile =  ({profile,sessionUser}:Profile) => {
 
 
-const user = useCurrentUser()
+const user = sessionUser
 const userId = profile?.profile?.userId
 const isTheSameUser = user?.id === userId
 
-console.log(profile)
 
   return (
     

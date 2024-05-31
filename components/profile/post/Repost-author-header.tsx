@@ -1,6 +1,4 @@
 
-import AvatarWithFallback from "@/components/ui/AvatarCoustom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import Link from "next/link";
 import React from 'react';
@@ -23,31 +21,31 @@ const RepostHeader :React.FC<RepostHeaderParams> = ({userId,userName,userImage,t
     
     return ( 
         <div className={`${className} flex item-center space-x-2`}>
-                       <Link href={`/profile/${userId}`} title="Go to this page">
-                            {/* <AvatarWithFallback src={userImage} width={40} height={40} alt="Author"/> */}
-                            <Avatar>
-                                <AvatarImage src={userImage} alt={userImage}/>
-                                <AvatarFallback>
-                                    <FaUser color="white"/>
-                                </AvatarFallback>
-                            </Avatar>
-                                {/* <Image
-                                src={userImage}
-                                width={40}
-                                height={40}
-                                alt="AuthorIcon"
-                                className="rounded-full"
-                                /> */}
-                            
-                        </Link>
-                            <div className="grid-rows-5">
-                                <p className="text-white font-bold row-span-4 ">{userName}</p>
-                                <div className="text-gray-300 text-xs wf row-start-4 row-span-1">
-                                    <TimeAgo date={timestamp}  formatter={formatter}/>
-                                </div>
-                            </div>
+          {userImage?(
+            <Link href={`/profile/${userId}`} title="Go to this page">
+                <Image
+                    src={userImage}
+                    width={40}
+                    height={40}
+                    alt={userName||`Author`}
+                    className="rounded-full"
+                />
+            
+            </Link>
+          ):(
+            <div className="flex justify-center align-middle items-center border-2 rounded-full w-[40px] h-[40px]">
+                <FaUser color="white" className="scale-110 "/>
+            </div>
+        )}
+                     
+           <div className="grid-rows-5">
+              <p className="text-white font-bold row-span-4 ">{userName}</p>
+               <div className="text-gray-300 text-xs wf row-start-4 row-span-1">
+                  <TimeAgo date={timestamp}  formatter={formatter}/>
+                </div>
+            </div>
                         
-                    </div>
+       </div>
      );
 }
  

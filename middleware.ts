@@ -10,12 +10,13 @@ const {auth} =NextAuth(authConfig)
 const debouncedPaths = ['/api/auth/session'];
 
 const rateLimiter = new RateLimiterMemory({
-  points: 15, // 10 requests
+  points: 5, // 10 requests
   duration: 1, // per 1 second by IP
 });
 
 
 export default auth(async (req) => {
+  // console.log(req)
   const ipAddr = req.headers.get('x-forwarded-for') || req.ip || '127.0.0.1';
   if (debouncedPaths.includes(req.nextUrl.pathname)) {
     try {

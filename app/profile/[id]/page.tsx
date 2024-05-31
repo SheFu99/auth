@@ -12,62 +12,32 @@ import PublicProfileFriends from "@/components/profile/friends/publicProfileFrie
 import UserPostList from "@/components/profile/post/private/UserPostList";
 import PublicPostList from "@/components/profile/post/public/PublicUserPost";
 import ListSkeleton from "@/components/profile/friends/FriendSkeleton";
+import { currentUser } from "@/lib/auth";
 
 
 
 export default async function PublicProfileParams({ params }) {
-  // const [profile,setProfile]=useState<any>({})
-  
-  
-  // const getProfile= async()=>{
-    // try {
+
+  console.log('render!@')
+      const sessionUser = await currentUser()
       const profile = await getPublicProfile(params.id)
       const userPostList = await GetUserPostsById(params.id,1)
       const userfriendsList = await getProfileFriends(params.id)
 
-      console.log(userfriendsList)
-
-      console.log(userPostList)
-      // setProfile(dataFromDb)
-      // return 
-    // } catch (error) {
-      // console.log(error)
-      // setProfile(undefined)
-      // return 
-    // }
-  // };
 
 
-    // const getMemoProfile = useCallback(async ()=>{
-    //    await getProfile()
-    //   console.log('Get_Profile')
-    // },[params])
-    
-    // useEffect(()=>{
-    //   getMemoProfile()
-    // },[getMemoProfile])
-
-
-// if(!profile){
-//   return <FadeLoader color="white"/>
-// }
-
-// if(profile?.error){
-//   return <p>Profile not found</p>
-// }
- 
     return (
       <div>
       
-         <PublicProfile profile={profile}  /> 
+         <PublicProfile profile={profile} sessionUser={sessionUser}/> 
               {userPostList&&userfriendsList&&(
-                  <Suspense fallback={<ListSkeleton/>}>
+                  // <Suspense fallback={<ListSkeleton/>}>
                   <TabSwitch 
-                  chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
-                  chilldrenPosts={<PublicPostList postList={userPostList.posts} totalCount={userPostList.totalPostCount} userId={params.id}/>}
+                  chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList} /> }
+                  chilldrenPosts={<PublicPostList postList={userPostList.posts} totalCount={userPostList.totalPostCount} userId={params.id}  sessionUser={sessionUser}/>}
                   postTotal={userPostList.totalPostCount}
                   />
-                  </Suspense>
+                  // </Suspense>
               )}
          
 

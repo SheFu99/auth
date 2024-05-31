@@ -68,7 +68,7 @@ export const CreatePost= async(postCard:PostCard)=>{
         });
         
         if (existingPost) {
-            console.log(existingPost)
+            // console.log(existingPost)
             return {error:"A post with this content already exists."}
         }
 
@@ -108,9 +108,31 @@ export const CreatePost= async(postCard:PostCard)=>{
         
         
 };
-
+///add cache 
+let PostsCacheKey = {
+    userId:undefined,
+    page:null,
+    time:undefined,
+   
+}
 export const GetUserPostsById = async (userId: string,page:number):Promise<postPromise> => {
-    console.log(userId)
+    // console.log(page)
+    // const time = new Date()
+    // let now = time.getTime()
+    // console.log(now,PostsCacheKey.time)
+    // let cacheId = PostsCacheKey.userId === userId
+    // let cachePage = PostsCacheKey.page ===page
+    // let cacheTime = PostsCacheKey.time > now - 1000
+  
+    // if(cacheId===cachePage===cacheTime){
+    //     console.log('Retrive from cache')
+    //     return {success:true}
+    // }
+    // PostsCacheKey= {
+    //     userId:userId,
+    //     page:page,
+    //     time:now
+    // }
 if(!userId){
     return {error:'ID required!'}
 }
@@ -123,7 +145,7 @@ if(!userId){
     if (!existingUser) {
         return { error: "User not found" };
     };
-    console.log(existingUser)
+    // console.log(existingUser)
 
     const user = await currentUser()
 
@@ -190,14 +212,14 @@ if(!userId){
             select: { userId: true }
         };
     };
-console.log(postsQuery)
+// console.log(postsQuery)
 
     const [posts, totalPostCount] = await Promise.all([
      await db.post.findMany(postsQuery) as any,
      await db.post.count({where:{userId:userId}}),
     ])
   
-    console.log(posts)
+    // console.log(posts)
     if (!posts.length||totalPostCount<=0) {
         return { error: "No posts found" };
     }
@@ -216,7 +238,7 @@ console.log(postsQuery)
                 likedByUser: commentLikedByUser ?? false
             }
         });
-        console.log(likedByUser,commentsWithAuthor)
+        // console.log(likedByUser,commentsWithAuthor)
         return {
             ...post,
             likedByUser: likedByUser ?? false ,
@@ -256,10 +278,10 @@ try{
 }catch(err){
     return {error:err}
 }
-console.log(currentPost)
+// console.log(currentPost)
 
      let originPostId = currentPost?.originPostId
-    console.log(originPostId)
+    // console.log(originPostId)
 if(originPostId){
     try {
         await db.post.update({
@@ -272,7 +294,7 @@ if(originPostId){
                 }
             }
         })
-        console.log("DECREMENT repostCOUNT")
+        // console.log("DECREMENT repostCOUNT")
     } catch (error) {
        return{error:'Error decrement repost count'} 
     }
@@ -330,7 +352,7 @@ if(originPostId){
                 const deleteResult = await s3Client.send(deleteCommand);
                 return {success:true,result:deleteResult}
             } catch (error) {
-                console.log('Error',error)
+                // console.log('Error',error)
                 return {error:'Something was wrong!'}
             }
         };

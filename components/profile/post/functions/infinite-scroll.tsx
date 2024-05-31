@@ -12,23 +12,25 @@ interface Props {
 const InfiniteScroll = ({ loadMore, hasMore, children,isloaded }: Props) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [lastScrollTop, setLastScrollTop] = useState<number>(0);
+ 
+  const handleScroll = () => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
+    if (scrollTop > lastScrollTop && scrollTop + clientHeight +50 >= scrollHeight -10 && hasMore) {
+      if (isFetching && hasMore) {
+        loadMore().then(() => setIsFetching(false));
+      }
+      setIsFetching(true);
+    }
+    setLastScrollTop(scrollTop);
+
+
+  };
   useEffect(() => {
+    console.log(isFetching , lastScrollTop)
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-      if (scrollTop > lastScrollTop && scrollTop + clientHeight +50 >= scrollHeight -10 && hasMore) {
-        if (isFetching && hasMore) {
-          loadMore().then(() => setIsFetching(false));
-        }
-        setIsFetching(true);
-      }
-      setLastScrollTop(scrollTop);
-
-
-    };
+    handleScroll()
 
     const handleTouchMove = () => {
       handleScroll(); // Delegate to handleScroll to maintain consistent behavior
