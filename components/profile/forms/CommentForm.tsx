@@ -63,7 +63,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     const [textState,setTextState]=useState<string>('')
     const [error,setError] =useState<string| undefined>()
     const [focus, setFocus] = useState<boolean>(false) 
-    const [createdComment,setCreatedComment]=useState<Comment>()
+    const [createdComment,setCreatedComment]=useState<Comment[]>([])
     // const forwardedRef = useRef(null)
    
    
@@ -138,7 +138,7 @@ useEffect(()=>{
                 }
                 if(data.CommentId){
                     // update() ///update session
-                    setCreatedComment(data)
+                    setCreatedComment(prev=>[...prev,data])
                     toast.success("Your post has been send")
                 }
             })
@@ -269,12 +269,12 @@ useEffect(()=>{
                     </div>
                 </div>
             )}
-            {createdComment&&(
-                    <div className="border-b p-5 hover:bg-neutral-900">
-                        <OneComment comment={createdComment} user={user}/> 
+            {createdComment.map((com,index)=>(
+                    <div key={index} className="border-b p-5 hover:bg-neutral-900">
+                        <OneComment comment={com} commentState={createdComment} setComment={setCreatedComment} user={user}/> 
                     </div>
 
-                    )}
+                    ))}
         </div>
            
 
