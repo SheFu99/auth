@@ -7,10 +7,9 @@ interface AvatarProps {
   alt: string;
   width:number;
   height:number;
-  type: "header" | "post" | "comment"
 }
 
-const HeaderAvatar = ({ src, alt,width,height,type }: AvatarProps) => {
+const HeaderAvatar = ({ src, alt,width,height }: AvatarProps) => {
   const [hasError, setHasError] = useState(false);
 
   return (
