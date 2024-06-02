@@ -8,6 +8,8 @@ import PublicProfileFriends from "@/components/profile/friends/publicProfileFrie
 import PublicPostList from "@/components/profile/post/public/PublicUserPost";
 import { auth } from "@/auth";
 import { isProfileExist } from "./isProfileExist";
+import { getProfileFriends } from "@/actions/friends";
+import { GetUserPostsById } from "@/actions/UserPosts";
 
 
 
@@ -17,8 +19,10 @@ export default async function PublicProfileParams({ params }) {
       const session = await auth()
       const sessionUser =session?.user
       const profile = await getPublicProfile(params.id)
-    
-     const {userPostList,userfriendsList} = await isProfileExist(profile)
+      const userPostList = await GetUserPostsById(profile?.profile?.userId,1)
+      const userfriendsList = await getProfileFriends(profile?.profile?.userId)
+  
+    //  const {userPostList,userfriendsList} = await isProfileExist(profile)
      
 
     return (
@@ -27,13 +31,13 @@ export default async function PublicProfileParams({ params }) {
         {!profile.error?(
           <>
             <PublicProfile profile={profile}  sessionUser={sessionUser}/> 
-            {userPostList&&userfriendsList&&(
+          
                 <TabSwitch 
                 chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
                 chilldrenPosts={<PublicPostList postList={userPostList.posts} totalCount={userPostList.totalPostCount} userId={params.id} sessionUser={sessionUser}/>}
                 postTotal={userPostList.totalPostCount}
                 />
-            )}
+       
           </>
         ):(
           <div>
