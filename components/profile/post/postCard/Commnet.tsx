@@ -19,7 +19,6 @@ interface CommentProps {
 
 const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
     const [isPending,startTransition]=useTransition()
-    const [localState,setLocalState] = useState<Comment[]>([comment])
     const commentLikeAction = (CommentId:string)=>{
         startTransition(()=>{
             LikeComment(CommentId)
@@ -40,29 +39,7 @@ const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
             toast.error("You must be authorized");
             return;
         }
-        if(!commentState){
-            const updatedPosts = commentState.map((com) => {
-                if (com.CommentId !== commentId) {
-                    return com; // No changes for other comments
-                }
-              
-             
-                // Update the comment here
-                return {
-                    ...com,
-                    likedByUser: !com.likedByUser,
-                    _count: {
-                        ...com._count,
-                        likes: com.likedByUser ? com._count?.likes - 1 : com._count?.likes + 1
-                    }
-                };
-         
-            // Return the updated post with the updated comments
-          
-        });
-            setComment(updatedPosts);
-
-        }
+       
         
         if(commentState){
             const updatedPosts = commentState.map((com) => {
@@ -110,12 +87,7 @@ const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
                         })
                         setComment(filteredState)
                     }
-                    if(!commentState){
-                        const filteredState = localState?.CommentId == comment.CommentId ? undefined : localState
-                        console.log(commentState)
-                        setLocalState(filteredState)
-                        ////TODO: make some smart and cool here
-                    }
+                 
 
 
                     // update()
@@ -144,12 +116,9 @@ const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
                                 
                                 <ImageGrid images={comment?.image} className={' ml-[3rem]'}/>
                                 <div className=" ">
-                                    {commentState?(
+                                   
                                         <LikeButton className="bg-neutral-900 px-3 " post={comment} onLike={()=>CommentLike(comment)} isPending={isPending}/>
-                                    ):(
-                                        <LikeButton className="bg-neutral-900 px-3 " post={localState} onLike={()=>CommentLike(comment)} isPending={isPending}/>
-                                        
-                                    )}
+                                   
     
                                 </div>
                             </div>
