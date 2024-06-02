@@ -23,7 +23,7 @@ import {debounce} from 'lodash'
 const IncomeOfferList = React.lazy(()=> import ('./friends/incomeOfferList'))
 const UserFriends = React.lazy(()=> import ('./friends/privateUserFriends'))
 
-import AvatarWithFallback from "../ui/AvatarCoustom";
+import HeaderAvatar from "../ui/AvatarCoustom";
 import PostSkeleton from "./post/skeleton";
 import ListSkeleton from "./friends/FriendSkeleton";
 
@@ -168,7 +168,7 @@ const  EditProfile =  () => {
                       {avatarUploading?(
                         <BounceLoader color="white" className="md:-ml-[2px] mr-[1px]"/>
                         ):(
-                          <AvatarWithFallback
+                          <HeaderAvatar
                             src={sessionImage}
                             width={100}
                             height={100}

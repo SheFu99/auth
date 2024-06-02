@@ -1,8 +1,7 @@
 
 "use client"
 
-import { useSession } from "next-auth/react"
-import {  useRef, useState, useTransition } from "react"
+import {  RefObject, useEffect, useRef, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "../../ui/button"
 import { IoCreate, IoSendSharp } from "react-icons/io5";
@@ -10,7 +9,6 @@ import { Textarea } from "../../ui/textarea"
 import { MdAddPhotoAlternate } from "react-icons/md"
 import { BsEmojiSmile } from "react-icons/bs"
 import { IoMdClose } from "react-icons/io"
-import { useCurrentUser } from "@/hooks/use-current-user"
 import { Theme } from "emoji-picker-react"
 import Picker from 'emoji-picker-react'
 import useBlobImage from "./functions/useBlobImage";
@@ -22,6 +20,8 @@ import BlobImageManager from "./classes/BlobImageManager"
 import { LoginButton } from "@/components/auth/loginButton"
 import { SlLogin } from "react-icons/sl"
 import { RegisterButton } from "@/components/auth/RegisterButton"
+import { ExtendedUser } from "@/next-auth"
+import PostAvatar from "@/components/ui/PostAvatar"
 
 
 
@@ -37,12 +37,15 @@ export interface DataResponse{
 
 interface CommentFormProps {
     postId:string,
-    userId?:string
+    user?:ExtendedUser,
+    className?:string,
+    // ref?:RefObject<HTMLDivElement>
+    forwardedRef?: React.RefObject<HTMLTextAreaElement>;
 }
 
 
-const CommentForm:React.FC<CommentFormProps> = ({postId,userId}) => {
-  console.log(userId)
+const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwardedRef}) => {
+
     const { isUploading,
             setIsUploading,
             uploadImages}=useUploadImages()
@@ -51,19 +54,22 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,userId}) => {
     const [manager]=useState(new BlobImageManager());
     const [images,setImageFiles]=useState<File[]>([]);
     const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([])
-
     const [isPending,startTransition]=useTransition()
     const [isEmoji,setEmoji]=useState<boolean>(false)
     const [textState,setTextState]=useState<string>('')
     const [error,setError] =useState<string| undefined>()
+    const [focus, setFocus] = useState<boolean>(false) 
  
-    const TextInputRef = useRef(null)
+    // const forwardedRef = useRef(null)
    
    
     // const user=useCurrentUser()
-    // const userId = user?.id
+    const userId = user?.id
     const type = 'comment'
 
+    useEffect(()=>{
+        console.log(focus)
+    },[focus])
  
 
 
@@ -107,7 +113,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,userId}) => {
                 setImageFiles([])
                 setImagesBlobUrl(null)
                 setTextState(undefined)
-                TextInputRef.current.value = null
+                forwardedRef.current.value = null
                   
             }) 
         }) 
@@ -137,7 +143,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,userId}) => {
     };
     const handleReactionClick = (reaction)=>{
         setTextState(prevValue=>prevValue + reaction.emoji)
-        TextInputRef.current.value += reaction.emoji
+        forwardedRef.current.value += reaction.emoji
     };
 
     const AddImages = (event:React.ChangeEvent<HTMLInputElement>) => {
@@ -152,22 +158,39 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,userId}) => {
     };
 
     return (
-        <div className="md:p-5 mt-5">
+        <div className={`${className} -mb-2`}
+        
+        >
             {userId?(
                 <>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
                 {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[80vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
-                <form  onSubmit={submitPost}  className="px-4 border border-gray-500 rounded-md grid grid-cols-12 md:space-x-5 " >
 
+                       
+                <form  onSubmit={submitPost}   className="px-4  rounded-md grid grid-cols-12 md:space-x-5 "    >
+                    
+                    <div 
+                        className={` ${shouldAnimate ? 'animate-shake' : ''} col-span-12 flex justify-center items-center align-middle`}
+                    >
+
+                    <PostAvatar
+                        src={user.image}
+                        alt={user.name}
+                        className="col-span-1"
+                    />
+                        <Textarea 
+                         ref={forwardedRef}
+                         onFocus={()=>setFocus(true)}
                         
-                                            <Textarea 
-                                                ref={TextInputRef}
-                                                onChange={(e)=>setTextState(e.target.value)}
-                                                disabled={isUploading}
-                                                className={` ${shouldAnimate ? 'animate-shake' : ''} col-span-12 mt-5`}
-                                                placeholder="Type your message here." 
-                                            />
-                        <div className=" col-span-10">
+                         onChange={(e)=>setTextState(e.target.value)}
+                         disabled={isUploading}
+                         className={` col-span-10 mt-5`}
+                         placeholder="Type your message here."
+                         />
+                    </div>
+                    {focus&&(
+                        <>
+                         <div className=" col-span-5 col-start-1">
                                 <div  className="mt-3 md:col-start-11 md:col-span-1 col-span-11 col-start-1  flex justify-around align-middle items-center p-1 mb-2">
                                     <label title="Add image"  >
                                         <MdAddPhotoAlternate className="scale-150 cursor-pointer "  />
@@ -209,10 +232,13 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,userId}) => {
                                         ))}
                                     </div>
                         </div>
-                        <Button disabled={isUploading} type="submit" className="col-start-11 col-span-2 mt-2 h-10 " >
+                        <Button  disabled={isUploading} type="submit" className="md:col-start-10 md:col-span-3 col-start-9 col-span-4 mt-2 h-10 " >
                                     <IoSendSharp className="mr-2"/>
                             Send
                         </Button>
+                        </>
+                    )}
+                       
                             
                 </form>
                 </>

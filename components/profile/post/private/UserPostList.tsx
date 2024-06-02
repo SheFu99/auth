@@ -17,9 +17,10 @@ import { useSession } from "next-auth/react";
 import CommentForm from "../../forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import {debounce} from 'lodash'
-import { comments, post } from "../../../types/globalTs";
+import {  Comment, post } from "../../../types/globalTs";
 import { repostAction, repostProps } from "@/actions/repost";
 import RepostHeader from "../Repost-author-header";
+import Link from "next/link";
 const RepostModalForm = React.lazy(()=>import ('../repostForm'))
 // import RepostForm from "./post/repostForm"
 
@@ -133,7 +134,7 @@ const debouncedGetPost = useCallback(()=>{
             })
         })
     };
-    const CommentLike = async (comment:comments) => {
+    const CommentLike = async (comment:Comment) => {
         const commentId = comment.CommentId
         if (!user) {
             toast.error("You must be authorized");
@@ -241,7 +242,7 @@ const debouncedGetPost = useCallback(()=>{
                 return false
             }
         };
-        const DeleteCommentFunction = (comment:comments) =>{
+        const DeleteCommentFunction = (comment:Comment) =>{
             const keys:any = comment.image.map(item => {
                 const result = item.url.split(awsBaseUrl)[1];
                 return result
@@ -290,7 +291,7 @@ const debouncedGetPost = useCallback(()=>{
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>
                 )}
-            <InfiniteScroll loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
+            <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
             
             {posts?.map((post,index)=>(
                 <>
@@ -371,7 +372,7 @@ const debouncedGetPost = useCallback(()=>{
                     {isPostCommentOpen(index)&&(
                             <CommentForm postId={post?.PostId}/>
                     )}
-                   
+                
                 </div>
                
                 </>

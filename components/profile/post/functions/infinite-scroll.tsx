@@ -1,98 +1,62 @@
-import { ArrowBigDownDash } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 
-interface Props {
-  loadMore: () => Promise<void>;
-  hasMore: boolean;
-  children: React.ReactNode;
-  isloaded: boolean;
-  page?:number;
-}
+const InfiniteScroll = ({ loadMore, hasMore, children, isloaded, page }) => {
+  const [isFetching, setIsFetching] = useState(false);
 
-const InfiniteScroll =  ({ loadMore, hasMore, children,isloaded,page }: Props) => {
-  const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [lastScrollTop, setLastScrollTop] = useState<number>(0);
- 
   const handleScroll = async () => {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-console.log('HandleFetchParent')
-    if (scrollTop > lastScrollTop && scrollTop + clientHeight +50 >= scrollHeight -10 && hasMore) {
-      if (isFetching && hasMore) {
-       await loadMore().then(() => setIsFetching(false));
-       return
-      }
-      setIsFetching(true);
+    console.log('HandleFetchParent');
+    
+    // Check if we're near the bottom of the page and if more content is available
+    if (scrollTop + clientHeight + 50 >= scrollHeight - 10 && hasMore && !isFetching) {
+      setIsFetching(true); // Prevent further calls until the current one is resolved
+      await loadMore();
+      setIsFetching(false);
     }
-    setLastScrollTop(scrollTop);
+  };
 
-
-  }
   useEffect(() => {
-    console.log(isFetching , lastScrollTop)
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const debouncedHandleScroll = debounce(handleScroll, 100); // Debounce the scroll handler
 
-    handleScroll()
+    window.addEventListener('scroll', debouncedHandleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', debouncedHandleScroll);
+  }, [hasMore, loadMore]); // Ensure dependencies are correctly managed
 
-    const handleTouchMove = () => {
-      handleScroll(); // Delegate to handleScroll to maintain consistent behavior
+  // Debounce function to limit how often a function can fire
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
     };
-
-    const handleTouchEnd = () => {
-      // Optionally, force a scroll check on touch end to catch any final updates
-      handleScroll();
-    };
-
-    if (isTouchDevice) {
-
-      // Add touch-specific event listeners
-      window.addEventListener('touchmove', handleTouchMove,{passive:true});
-      window.addEventListener('touchend', handleTouchEnd,{passive:true});
-      window.addEventListener('touchcancel', handleTouchEnd,{passive:true});
-    } else {
-      // Non-touch devices use scroll events
-      window.addEventListener('scroll', handleScroll, { passive: true });
-    }
-
-    return () => {
-      if (isTouchDevice) {
-        window.removeEventListener('touchmove', handleTouchMove);
-        window.removeEventListener('touchend', handleTouchEnd);
-        window.removeEventListener('touchcancel', handleTouchEnd);
-      } else {
-        window.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, [hasMore, lastScrollTop]);
-
-  // useEffect(() => {
-  //   if (isFetching && hasMore) {
-  //     loadMore().finally(() => setIsFetching(false));
-  //   }
-  // }, [isFetching, hasMore, loadMore]);
+  }
 
   return (
     <div className='space-y-5'>
       {children}
-      {isFetching&&hasMore && (
+      {isFetching && hasMore && (
         <div className='flex w-full justify-center'>
-          <BeatLoader className='mb-5 scale-125' color='white'/>
+          <BeatLoader className='mb-5 scale-125' color='white' />
         </div>
       )}
-{isloaded ==true&&(
-  <div>
-      {hasMore ===true? (
-        <div className='flex w-full justify-center'>
-            {/* <ArrowBigDownDash color='white'/> */}
-          </div>
-      ):(
-        <div className='flex w-full justify-center mb-2'>
-          <p className='text-gray-300 text-sm '> No more post to upload!</p>
+      {isloaded && (
+        <div>
+          {hasMore ? (
+            <div className='flex w-full justify-center'>
+              {/* Visual indicator (like an arrow) can be re-enabled here if needed */}
+            </div>
+          ) : (
+            <div className='flex w-full justify-center mb-2'>
+              <p className='text-gray-300 text-sm'>No more posts to upload!</p>
+            </div>
+          )}
         </div>
       )}
-  </div>
-)}
-     
     </div>
   );
 };

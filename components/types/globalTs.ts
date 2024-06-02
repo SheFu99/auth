@@ -1,3 +1,4 @@
+import { ExtendedUser } from "@/next-auth";
 import { UserRole } from "@prisma/client";
 
 export interface ProfileData {
@@ -52,7 +53,7 @@ export type post ={
     likes?:any[]
     likedByUser?:boolean,
     _count:_count,
-    comments:any[],
+    comments?:Comment[],
     repostCount?:number,
     originPostId?:string,
     originPost?:originPost,
@@ -73,23 +74,25 @@ type author = {
   Image:string
 }
 type _count = {
-  comments:number,
+  comments?:number,
   likes:number,
 };
 type image ={
     url:string
-    inedx:number
+    inedx?:number
 };
-export type comments={
-  CommentId:string;
-  text:string;
-  timestamp:Date;
-  postId:string;
-  userId:string;
-  image?:image[];
-  likes?:any[]
-  _count?:_count,
-  likedByUser:boolean;
+export type Comment = {
+  likedByUser: boolean;
+  user: ExtendedUser;
+  image: { url?: string }[];
+  likes: { userId?: string }[];
+  _count: _count;
+  CommentId: string;
+  text: string;
+  timestamp: Date;
+  postId: string;
+  userId: string;
+  galleryId: string;
 };
 
 export type profileOfferDetail = {

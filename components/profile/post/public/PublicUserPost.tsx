@@ -16,9 +16,10 @@ const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
 import { useSession } from "next-auth/react";
 import CommentForm from "../../forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
-import { comments, post } from "../../../types/globalTs";
+import { Comment, post } from "../../../types/globalTs";
 import RepostHeader from "../Repost-author-header";
 import { ExtendedUser } from "@/next-auth";
+import Link from "next/link";
 const RepostModalForm = React.lazy(()=>import ('../repostForm'))
 // import RepostForm from "./post/repostForm"
 
@@ -34,6 +35,7 @@ type userListProps ={
 }
 
 const PublicPostList :React.FC<userListProps> = ({postList,totalCount,userId,sessionUser}) => {
+    console.log(sessionUser)
 const [posts, setPosts]=useState<post[]>(postList)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
@@ -44,7 +46,7 @@ const [hasMore,setHasMore]= useState<boolean>(true)
 const [page,setPage]=useState<number>(2)
 
 const user = sessionUser
-console.log(sessionUser)
+
 let PostCache
 const fetchMoreData = useCallback(async ()=>{
     if(posts?.length>=totalCount){
@@ -144,7 +146,7 @@ console.log('PublicPostRender')
             })
         })
     };
-    const CommentLike = async (comment:comments) => {
+    const CommentLike = async (comment:Comment) => {
         const commentId = comment.CommentId
         if (!user) {
             toast.error("You must be authorized");
@@ -238,7 +240,7 @@ console.log('PublicPostRender')
                 return false
             }
         };
-        const DeleteCommentFunction = (comment:comments) =>{
+        const DeleteCommentFunction = (comment:Comment) =>{
             const keys:any = comment?.image?.map(item => {
                 const result = item.url.split(awsBaseUrl)[1];
                 return result
@@ -273,7 +275,8 @@ console.log('PublicPostRender')
                 <>
                 {/* TODO: Need to pass key to parent component  */}
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
-                
+                <Link href={`/profile/${post.userId}/post/${post.PostId}`} className="z-[1]">
+                    <div className="z-[55]">
                     <RepostHeader 
                         userId={post.userId}
                         userName={post.authorName}
@@ -305,7 +308,7 @@ console.log('PublicPostRender')
                             {user?.id === post.userId&&(
                                 <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                             )}
-                                <ImageGrid images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3`} />
+                                <ImageGrid images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3 z-[100]`} />
                         <div className="flex gap-5 justify-between ">
                             <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 
@@ -346,10 +349,11 @@ console.log('PublicPostRender')
                     ))}
                     {isPostCommentOpen(index)&&(
                       
-                            <CommentForm postId={post?.PostId} userId={user?.id}/>
+                            <CommentForm postId={post?.PostId} user={user}/>
                      
-                    )}
-                   
+                        )}
+                        </div>
+                        </Link>
                 </div>
                
                 </>

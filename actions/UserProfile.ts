@@ -4,7 +4,7 @@ import * as z from "zod"
 import { db } from "@/lib/db"
 import { UserProfile } from "@/schemas"
 import { CurrentProfile, currentUser } from "@/lib/auth"
-import { friendshipStatus } from "@/components/types/globalTs"
+import { ProfileData, friendshipStatus } from "@/components/types/globalTs"
 
 
 // type UserProfile = z.infer<typeof UserProfile>
@@ -33,8 +33,6 @@ export const getProfileById = async (userId:string)=>{
     if(!existingProfile){
       return {error: 'Profile not found'}
     }
-    
-    // console.log(existingProfile)
     return  existingProfile
 }
 
@@ -54,7 +52,6 @@ export const createUserProfile = async (values: Profile) => {
   });
 
   if (!existingUser) {
-    // This case might indicate a more serious issue: the user is authenticated but not in the DB
     return { error: 'User not found in the database. Authorization mismatch.' };
   }
 
@@ -65,14 +62,13 @@ export const createUserProfile = async (values: Profile) => {
     const profile = await db.profile.create({
       data: {
         ...values,
-        userId: existingUser.id, // Directly using the ID from `existingUser`
+        userId: existingUser.id, 
       },
     });
 
     return profile; 
   } catch (error) {
     console.error('Failed to create user profile:', error);
- 
     return { error: 'Failed to create user profile.' };
   }
 };
@@ -104,14 +100,15 @@ export const updateUserProfile = async (values: Profile)=>{
     console.log("Failed updateUserProfile",error)
     return {error:'Failed to update user profile'}
   }
- 
-
-
 }
 
-
-export const getPublicProfile = async (userId:string)=>{
-  console.log("TRIGGER SESSION fetch")
+export type getProfilePromise ={
+  error?: string;
+  profile?: ProfileData;
+  friendStatus?: relation;
+}
+export const getPublicProfile = async (userId:string):Promise<getProfilePromise>=>{
+  console.log("Get_Public_Profile")
     const user = await currentUser()
   
     if(!userId){
@@ -119,10 +116,9 @@ export const getPublicProfile = async (userId:string)=>{
     }
     let relation:relation
   
-   console.log(user)
+  
    if(user){
     try {
-    
       const relationsFrom = await db.friendShip.findFirst({
         where:{
             AND:[
@@ -151,13 +147,10 @@ export const getPublicProfile = async (userId:string)=>{
         }
         
       });
-
       relation = relationsFrom !==null||undefined ? {relationFrom:relationsFrom}:{relationTo:relationsTo}
-      console.log(relation)
     } catch (error) {
       return {error:'Error with profile FR.relation'}
     }
-   
  }
    
     const existingProfile = await db.profile.findFirst({
@@ -165,25 +158,14 @@ export const getPublicProfile = async (userId:string)=>{
         userId:userId,
       }, 
     });
-
-    console.log(existingProfile)
-
-    if(!existingProfile){
-      return {error: 'Profile not found'}
-    }
-
-  
-
-
-   
-  
-  
-   
-      console.log(existingProfile)
+    
+      if(!existingProfile){
+        return {error: 'Profile not found'}
+      }
        return {
-      profile: existingProfile,
-      friendStatus: relation
-    };
+        profile: existingProfile,
+        friendStatus: relation
+      };
 
   }
 

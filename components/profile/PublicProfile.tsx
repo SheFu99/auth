@@ -3,7 +3,7 @@ import React from "react";
 import { ProfileData } from "../types/globalTs";
 import { relation } from "@/actions/UserProfile";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import AvatarWithFallback from "../ui/AvatarCoustom";
+import HeaderAvatar from "../ui/AvatarCoustom";
 import FriendStatusButton from "./friends/function/publicFriendButton";
 import PublicAccordion from "./post/public/profileAccordion";
 import CoverPublic from "./post/public/publicCover";
@@ -44,7 +44,7 @@ const isTheSameUser = user?.id === userId
         </div>
             <div className="flex items-center relative ">
                 <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-30 -bottom-15 left-0 p-[1rem] justify-center ">
-                                <AvatarWithFallback
+                                <HeaderAvatar
                                  src={profile?.profile?.image}
                                  width={100}
                                  height={100}

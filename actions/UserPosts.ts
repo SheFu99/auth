@@ -162,7 +162,7 @@ if(!userId){
         _count: {
             select: {
                 likes: true, 
-                comments:true // This will count the likes
+                comments:true 
             }
         },
         image:{
@@ -211,6 +211,12 @@ if(!userId){
             },
             select: { userId: true }
         };
+        postsQuery.include.comments.include.likes = {
+            where:{
+                userId:user.id
+            },
+            select:{userId:true}
+        }
     };
 // console.log(postsQuery)
 

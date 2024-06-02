@@ -9,7 +9,7 @@ import { Profiler, useEffect, useState } from "react";
 import { MdDoneOutline } from "react-icons/md";
 import { toast } from "sonner";
 import { TiCancel } from "react-icons/ti";
-import AvatarWithFallback from "@/components/ui/AvatarCoustom";
+import HeaderAvatar from "@/components/ui/AvatarCoustom";
 import { Avatar } from "@radix-ui/react-avatar";
 import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FaUser } from "react-icons/fa";

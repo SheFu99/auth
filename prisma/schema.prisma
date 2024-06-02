@@ -103,12 +103,15 @@ model Comment {
   postId    String?
   userId    String
   galleryId String?
+  originCommentId String?
   gallery   Gallery? @relation(fields: [galleryId], references: [imageId],onDelete: Cascade)
   post      Post?    @relation(fields: [postId], references: [PostId],onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id],onDelete: Cascade)
   image     Images[]
   likes     Like[]
-}
+  originComment Comment? @relation("OriginOfComentAnswers",fields: [originCommentId],references: [CommentId],onDelete: Cascade)
+  answers Comment[] @relation("OriginOfComentAnswers")
+ }
 
 model Gallery {
   imageId   String    @id @default(cuid())

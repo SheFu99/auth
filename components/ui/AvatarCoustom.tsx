@@ -7,16 +7,25 @@ interface AvatarProps {
   alt: string;
   width:number;
   height:number;
+  type: "header" | "post" | "comment"
 }
 
-const AvatarWithFallback = ({ src, alt,width,height }: AvatarProps) => {
+const HeaderAvatar = ({ src, alt,width,height,type }: AvatarProps) => {
   const [hasError, setHasError] = useState(false);
+
   return (
     <>
-      {src && !hasError ? (
+      {
+        src && !hasError ? (
         
-     <div className="flex justify-center relative rounded-full w-[65px] h-[65px] md:w-[100px] md:h-[100px] z-30">
-      <div className="bg-black rounded-full  flex justify-center items-center align-middle p-1 z-[50] ">
+      <div 
+      className="flex justify-center relative rounded-full 
+      w-[65px] h-[65px] md:w-[100px] md:h-[100px] 
+      z-30 ">
+       
+          <div className="bg-black rounded-full  flex justify-center items-center align-middle p-1 z-[50] ">
+
+      
               
           <Image
             src={src}
@@ -41,4 +50,4 @@ const AvatarWithFallback = ({ src, alt,width,height }: AvatarProps) => {
   );
 };
 
-export default AvatarWithFallback;
+export default HeaderAvatar;
