@@ -275,7 +275,7 @@ console.log('PublicPostRender')
                 <>
                 {/* TODO: Need to pass key to parent component  */}
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
-                <Link href={`/profile/${post.userId}/post/${post.PostId}`} className="z-[1]">
+                <Link href={`/post/${post.PostId}`} className="z-[1]">
                     <div className="z-[55]">
                     <RepostHeader 
                         userId={post.userId}
@@ -308,7 +308,7 @@ console.log('PublicPostRender')
                             {user?.id === post.userId&&(
                                 <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                             )}
-                                <ImageGrid images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3 z-[100]`} />
+                                <ImageGrid type="feed" images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3 z-[100]`} />
                         <div className="flex gap-5 justify-between ">
                             <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
 

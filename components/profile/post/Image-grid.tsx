@@ -11,9 +11,10 @@ import { PacmanLoader } from 'react-spinners';
 interface ImageGridProps {
     images?:any,
     className?:string,
+    type?: "feed" | 'post' | 'comment'
 }
 
-export default  function ImageGrid( {images,className}:ImageGridProps ) {
+export default  function ImageGrid( {images,className,type}:ImageGridProps ) {
     const [isOpen, setIsOpen] = useState(false);
     const [imageState , setImageState]= useState<number>()
 
@@ -40,7 +41,7 @@ export default  function ImageGrid( {images,className}:ImageGridProps ) {
 
     const getGridForImage = (index) => {
         switch (images?.length) {
-            case 1: return "col-span-6 aspect-2/1" ;
+            case 1: if(type==='feed'){return "col-span-6 aspect-2/1"} else {return "col-span-6 "}  ;
             case 2: return "col-span-3 aspect-1";
             case 3: return index === 0 ? "col-span-6" : "aspect-2/1 col-span-3";
             case 4: return (index===0) ? "col-span-6 aspect-2/1": "aspect-2/1 col-span-2 ";
