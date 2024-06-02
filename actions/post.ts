@@ -15,8 +15,9 @@ export const getPostById = async (PostId:string) => {
         return {error:"PostId is required!"}
     };
     const user = await currentUser()
-
-    const post = await db.post.findFirst({
+    let post 
+if(user){
+    post = await db.post.findFirst({
         where:{PostId:PostId},
         select:{
             PostId:true,
@@ -54,8 +55,43 @@ export const getPostById = async (PostId:string) => {
         }
       
     })
+}else{
+    post = await db.post.findFirst({
+        where:{PostId:PostId},
+        select:{
+            PostId:true,
+            authorAvatar:true,
+            authorName:true,
+            userId:true,
+            timestamp:true,
+            superText:true,
+            text:true,
+            repostCount:true,
+            _count:{
+                select:{
+                    likes:true,
+                    comments:true
+                }
+            },
+            image:{
+                select:{url:true},
+                take:5,
+            },
+            originPost:{
+                select:{
+                    authorAvatar:true,
+                    authorName:true,
+                    userId:true,
+                    timestamp:true,
+                }
+            },
+        }
+})
+}
+    
 
-    const hasLike = post.likes.length>0
+    const hasLike = post?.likes?.length>0
+    console.log(hasLike)
     const postWithLike  = {
         ...post,
         likedByUser:hasLike

@@ -161,7 +161,7 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
         <CommentForm 
             postId={post?.PostId} 
             user={user} 
-            className="mt-2"
+            className="mt-2 mb-1"
             forwardedRef={commentFormRef}
             />
        
