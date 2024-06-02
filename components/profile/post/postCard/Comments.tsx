@@ -113,7 +113,7 @@ const Comments: React.FC<commentsParams> = ({comments,user,commentsCount}) => {
         <>
         <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded={!!commentState}>
         {commentState.map((comment,index)=>(
-                        <div key={index} className="px-5 border-b  py-5 relative hover:bg-neutral-900">
+                        <div key={index} className="px-5 border-b mt-5 mb-2 relative hover:bg-neutral-900">
                             {user?.id === comment.userId&&(
                                 <button title="delete commetn" 
                                 className="text-black absolute right-5 top-6"
@@ -126,8 +126,8 @@ const Comments: React.FC<commentsParams> = ({comments,user,commentsCount}) => {
                                 
                             <p className="text-white ml-[3rem]">{comment?.text}</p>
                             
-                            <ImageGrid images={comment?.image} className={' ml-[3rem]'}/>
-                            <div className="mt-5 -mb-4">
+                            <ImageGrid images={comment?.image} className={' ml-[3rem] mb-2'}/>
+                            <div className="mb-3 ">
                                 <LikeButton className="bg-neutral-900 px-3 " post={comment} onLike={()=>CommentLike(comment)} isPending={isPending}/>
 
                             </div>

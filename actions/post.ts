@@ -47,7 +47,7 @@ export const getPostById = async (PostId:string) => {
             },
             likes:{
                 where:{
-                    userId:user.id
+                    userId:user?.id
                 },
                 select:{userId:true}
             }
@@ -102,7 +102,7 @@ export const getCommentByPost = async ({PostId, page}:getComentParams)=>{
         },
         likes:{
             where:{
-                userId:user.id
+                userId:user?.id
             },
             select:{userId:true}
         }

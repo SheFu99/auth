@@ -11,7 +11,7 @@ export const publicRoutes = [
     "/api/s3-array-upload",
     '/profile/',
     '/api/s3-delete',
-    '/post'
+    '/post/'
 ]
 /**
  * An Array of router thats are used for authentication

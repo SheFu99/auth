@@ -35,13 +35,13 @@ const path = nextUrl.pathname;
 
   console.log("Request Path:", path);  // Debugging output
   const isProfileRoute = path.startsWith('/profile');
-  const isApiPostRoute = path.startsWith('/api/posts/');
+  const isPostRoute = path.startsWith('/post/');
   const isApiAuthRoute = path.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(path);
   const isAuthRoute = authRoutes.includes(path);
   const isAdminRoute = adminRoutes.includes(path);
 
-  if (isProfileRoute) {
+  if (isProfileRoute||isPostRoute) {
     
     return NextResponse.next();  // Allow API posts route
   }
@@ -74,6 +74,7 @@ if (isAuthRoute){
   return null
 }
 if(!isLoggedIn&& !isPublicRoute){
+  console.log('NotPublicRoute')
   let callbackUrl = nextUrl.pathname
   if(nextUrl.search){
     callbackUrl +=nextUrl.search
