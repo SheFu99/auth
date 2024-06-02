@@ -82,10 +82,10 @@ type image ={
     inedx?:number
 };
 export type Comment = {
-  likedByUser: boolean;
+  likedByUser?: boolean;
   user: ExtendedUser;
   image: { url?: string }[];
-  likes: { userId?: string }[];
+  likes?: { userId?: string }[];
   _count: _count;
   CommentId: string;
   text: string;

@@ -15,24 +15,23 @@ import useBlobImage from "./functions/useBlobImage";
 import useUploadImages, { UploadImagesProps } from "./functions/uploadImages";
 import useOnError from "./functions/onError";
 import { postSchema } from "@/schemas";
-import { CreateComment } from "@/actions/commentsAction"
+import {  CreateComment } from "@/actions/commentsAction"
 import BlobImageManager from "./classes/BlobImageManager"
 import { LoginButton } from "@/components/auth/loginButton"
 import { SlLogin } from "react-icons/sl"
 import { RegisterButton } from "@/components/auth/RegisterButton"
 import { ExtendedUser } from "@/next-auth"
 import PostAvatar from "@/components/ui/PostAvatar"
+import Comments from "../post/postCard/Comments";
+import { Comment } from "@/components/types/globalTs";
+import OneComment from "../post/postCard/Commnet";
 
 
 
-export interface DataResponse{
-    PostId: string,
-    image: string[],
-    text: string,
-    timestamp: Date,
-    userId: string,
-    error: string,
-    success:string,
+export interface DataResponse extends Comment{
+  
+    error?: string,
+    success?:string,
 };
 
 interface CommentFormProps {
@@ -43,6 +42,11 @@ interface CommentFormProps {
     forwardedRef?: React.RefObject<HTMLTextAreaElement>;
 }
 
+export type CommentPrev = {
+    text:string,
+    image?:string | string[],
+    userId:string
+}
 
 const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwardedRef}) => {
 
@@ -59,7 +63,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     const [textState,setTextState]=useState<string>('')
     const [error,setError] =useState<string| undefined>()
     const [focus, setFocus] = useState<boolean>(false) 
- 
+    const [createdComment,setCreatedComment]=useState<Comment>()
     // const forwardedRef = useRef(null)
    
    
@@ -67,11 +71,10 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     const userId = user?.id
     const type = 'comment'
 
-    useEffect(()=>{
-        console.log(focus)
-    },[focus])
  
-
+useEffect(()=>{
+    console.log(createdComment)
+},[createdComment])
 
     const submitPost= async(event)=>{
         setEmoji(false)
@@ -104,7 +107,9 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                         text: textState,
                         image: data.imageUrls,
                         userId: userId
-                    })
+                    }) as CommentPrev
+
+                  
                 };
             })
             .finally(()=>{
@@ -122,17 +127,18 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     
     };
 
-    const Submit = (post)=>{
+    const Submit = (post:CommentPrev)=>{
         startTransition(()=>{
          console.log("COMMENTFORM")
             CreateComment(post,postId)
-            .then((data:DataResponse)=>{
+            .then((data:any)=>{
                 if(data.error){
                     setError(error);
                     toast.error(data.error)
                 }
-                if(!data.error){
+                if(data.CommentId){
                     // update() ///update session
+                    setCreatedComment(data)
                     toast.success("Your post has been send")
                 }
             })
@@ -159,7 +165,6 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
 
     return (
         <div className={`${className} -mb-2`}
-        
         >
             {userId?(
                 <>
@@ -167,7 +172,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                 {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[80vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
 
                        
-                <form  onSubmit={submitPost}   className="px-4  rounded-md grid grid-cols-12 md:space-x-5 "    >
+                <form  onSubmit={submitPost}   className="px-4 grid grid-cols-12 md:space-x-5  border-b"    >
                     
                     <div 
                         className={` ${shouldAnimate ? 'animate-shake' : ''} col-span-12 flex justify-center items-center align-middle`}
@@ -238,9 +243,11 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                         </Button>
                         </>
                     )}
+                   
                        
                             
                 </form>
+               
                 </>
             ):(
                 <div className="flex justify-center border-2 p-5 rounded-sm w-full flex-wrap space-y-5">
@@ -262,7 +269,12 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                     </div>
                 </div>
             )}
-           
+            {createdComment&&(
+                    <div className="border-b p-5 hover:bg-neutral-900">
+                        <OneComment comment={createdComment} user={user}/> 
+                    </div>
+
+                    )}
         </div>
            
 

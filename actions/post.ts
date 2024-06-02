@@ -91,7 +91,7 @@ if(user){
     
 
     const hasLike = post?.likes?.length>0
-    console.log(hasLike)
+
     const postWithLike  = {
         ...post,
         likedByUser:hasLike

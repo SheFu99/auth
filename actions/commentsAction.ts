@@ -50,9 +50,26 @@ export const CreateComment = async(commentCard,postId)=>{
             
             const createPost = await db.comment.create({
                 data: postData,
+                include:{
+                    image:{
+                        select:{url:true}
+                    },
+                    _count:{
+                        select:{
+                            likes:true
+                        }
+                    },
+                    user:{
+                        select:{
+                            image:true,
+                            name:true
+                        }
+                    }
+
+                }
               });
             //   console.log("after insert:", [...postCard.image])
-            // console.log("Post created", createPost)
+            console.log("Post created", createPost)
             return createPost
            
         }catch(error){

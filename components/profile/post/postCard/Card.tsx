@@ -102,70 +102,73 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
         }
 
     return ( 
-
-        <div className=" justify-between border-t border-b p-3  relative">
+<div>
+<div className=" justify-between border-t border-b p-3  relative">
                 
-        <RepostHeader 
-            userId={post.userId}
-            userName={post.authorName}
-            userImage={post.authorAvatar}
-            timestamp={post.timestamp}
-        />
-        {post?.superText&&(
-            <p className="px-10 mt-2">{post.superText}</p>
-        )}
-        {post?.originPost?.authorName &&post?.originPost?.authorAvatar&&(
-        <>
-            <div className="py-2 px-5">
-                <BiRepost color="white" className="scale-150"/>
-            </div>
-      
-            <div className=" px-5 ">
-                <RepostHeader  
-                    userId={post.originPost.userId}
-                    userName={post.originPost.authorName}
-                    userImage={post.originPost.authorAvatar}
-                    timestamp={post.originPost.timestamp}
-                    
-                    />
-            </div>
-        </>
-        )}
-
-        <div className="ml-[3rem] mr-[1rem]">
-            <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
-                {user?.id === post.userId&&(
-                    <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
+                <RepostHeader 
+                    userId={post.userId}
+                    userName={post.authorName}
+                    userImage={post.authorAvatar}
+                    timestamp={post.timestamp}
+                />
+                {post?.superText&&(
+                    <p className="px-10 mt-2">{post.superText}</p>
                 )}
-                    <ImageGrid images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3`} />
-            <div className="flex gap-5 justify-between ">
-      
-            </div>
-           
-        </div>
-
-        <div className="flex justify-between border-b border-t px-2 py-1 mt-5">
-                <LikeButton className=" bg-neutral-900 px-3" post={postState} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
-                <button title="comment" onClick={()=>handleCommentOpen()} className="text-white bg-neutral-900 px-3 rounded-md   ">
-                    <div className="flex gap-2 item-center justify-center align-middle">
-                        <FaCommentDots className="mt-1"/>
-                    {post._count.comments>0 &&(<p>{post?._count.comments}</p>)}
+                {post?.originPost?.authorName &&post?.originPost?.authorAvatar&&(
+                <>
+                    <div className="py-2 px-5">
+                        <BiRepost color="white" className="scale-150"/>
                     </div>
-                </button>
-                <RepostModalForm
-                    ButtonTitle="Repost"
-                    postId={post.PostId}
-                    repostCount={post?.repostCount}
+              
+                    <div className=" px-5 ">
+                        <RepostHeader  
+                            userId={post.originPost.userId}
+                            userName={post.originPost.authorName}
+                            userImage={post.originPost.authorAvatar}
+                            timestamp={post.originPost.timestamp}
+                            
+                            />
+                    </div>
+                </>
+                )}
+        
+                <div className="ml-[3rem] mr-[1rem]">
+                    <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
+                        {user?.id === post.userId&&(
+                            <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
+                        )}
+                            <ImageGrid images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3`} />
+                    <div className="flex gap-5 justify-between ">
+              
+                    </div>
+                   
+                </div>
+        
+                <div className="flex justify-between border-b border-t px-2 py-1 mt-5">
+                        <LikeButton className=" bg-neutral-900 px-3" post={postState} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
+                        <button title="comment" onClick={()=>handleCommentOpen()} className="text-white bg-neutral-900 px-3 rounded-md   ">
+                            <div className="flex gap-2 item-center justify-center align-middle">
+                                <FaCommentDots className="mt-1"/>
+                            {post._count.comments>0 &&(<p>{post?._count.comments}</p>)}
+                            </div>
+                        </button>
+                        <RepostModalForm
+                            ButtonTitle="Repost"
+                            postId={post.PostId}
+                            repostCount={post?.repostCount}
+                            />
+                </div>
+                
+               
+                </div>
+                <CommentForm 
+                    postId={post?.PostId} 
+                    user={user} 
+                    className="mt-2 mb-1"
+                    forwardedRef={commentFormRef}
                     />
-        </div>
-        <CommentForm 
-            postId={post?.PostId} 
-            user={user} 
-            className="mt-2 mb-1"
-            forwardedRef={commentFormRef}
-            />
+</div>
        
-    </div>
      );
 };
  
