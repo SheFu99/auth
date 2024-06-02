@@ -15,7 +15,7 @@ import { GetUserPostsById } from "@/actions/UserPosts";
 
 export default async function PublicProfileParams({ params }) {
 
-  console.log('render_public_profile')
+  console.log(params.id)
       const session = await auth()
       const sessionUser =session?.user
       const profile = await getPublicProfile(params.id)

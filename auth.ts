@@ -107,10 +107,7 @@ export const {
           
       
         }
-        const existingUser = await getUserById(token?.sub!)
-        if(!existingUser){
-          return session
-        }
+        
      return session;
      
     },
