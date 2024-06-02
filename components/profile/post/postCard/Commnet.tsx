@@ -92,6 +92,21 @@ const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
             .then((data)=>{
                 if(data.success){
                     toast.success(data.success)
+
+                    if(commentState){
+                        const filteredState = commentState.filter(com=>{
+                           return com.CommentId !== comment.CommentId
+                        })
+                        setComment(filteredState)
+                    }
+                    if(!commentState){
+                        const filteredState = singleCommentState?.CommentId == comment.CommentId ? undefined : singleCommentState
+                        console.log(commentState)
+                        setCommentState(filteredState)
+                        ////TODO: make some smart and cool here
+                    }
+
+
                     // update()
                 }
                 if(data.error){
@@ -102,7 +117,7 @@ const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
 
     };
     return ( 
-        <div className="relative">
+        <div className="relative ">
              {user?.id === comment.userId&&(
                                 <button title="delete commetn" 
                                 className="text-black absolute right-1"
@@ -116,7 +131,7 @@ const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
                             <p className="text-white ml-[3rem]">{comment?.text}</p>
                             
                             <ImageGrid images={comment?.image} className={' ml-[3rem]'}/>
-                            <div className="mt-5 -mb-2">
+                            <div className="mt-5 ">
                                 {commentState?(
                                     <LikeButton className="bg-neutral-900 px-3 " post={comment} onLike={()=>CommentLike(comment)} isPending={isPending}/>
                                 ):(
