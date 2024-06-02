@@ -116,7 +116,7 @@ const Comments: React.FC<commentsParams> = ({comments,user,commentsCount}) => {
                         <div key={index} className="px-5 border-b  py-5 relative hover:bg-neutral-900">
                             {user?.id === comment.userId&&(
                                 <button title="delete commetn" 
-                                className="text-black absolute right-0"
+                                className="text-black absolute right-5 top-6"
                                 onClick={()=>DeleteCommentFunction(comment)}
                                 >
                                     <RiDeleteBin5Line color="white"/>
