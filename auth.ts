@@ -109,7 +109,7 @@ export const {
         }
         const existingUser = await getUserById(token?.sub!)
         if(!existingUser){
-          throw new Error("User does not exist.");
+          return session
         }
      return session;
      
