@@ -1,9 +1,9 @@
-import { comments, post } from "@/components/types/globalTs";
+import { Comment, post } from "@/components/types/globalTs";
 import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 
 interface LikeButtonProps {
     onLike:()=>void,
-    post:post | comments,
+    post:post | Comment,
     isPending:boolean,
     className?:string
 }
