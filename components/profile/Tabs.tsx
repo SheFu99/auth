@@ -7,8 +7,8 @@ import { RiProfileLine } from "react-icons/ri";
 import { FaUser } from "react-icons/fa";
 
 type TabSwitchProps ={
-    chilldrenPosts?:React.ReactNode,
-    chilldrenFriends?:React.ReactNode,
+    chilldrenPosts?:React.ReactNode|React.ReactNode[],
+    chilldrenFriends?:React.ReactNode|React.ReactNode[],
     friendsTotal?:number,
     postTotal?:number,
     className?:string

@@ -29,7 +29,6 @@ import OneComment from "../post/postCard/Commnet";
 
 
 export interface DataResponse extends Comment{
-  
     error?: string,
     success?:string,
 };
@@ -38,7 +37,6 @@ interface CommentFormProps {
     postId:string,
     user?:ExtendedUser,
     className?:string,
-    // ref?:RefObject<HTMLDivElement>
     forwardedRef?: React.RefObject<HTMLTextAreaElement>;
 }
 
@@ -72,9 +70,9 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     const type = 'comment'
 
  
-useEffect(()=>{
-    console.log(createdComment)
-},[createdComment])
+// useEffect(()=>{
+//     console.log(createdComment)
+// },[createdComment])
 
     const submitPost= async(event)=>{
         setEmoji(false)
@@ -129,7 +127,7 @@ useEffect(()=>{
 
     const Submit = (post:CommentPrev)=>{
         startTransition(()=>{
-         console.log("COMMENTFORM")
+
             CreateComment(post,postId)
             .then((data:any)=>{
                 if(data.error){
@@ -175,7 +173,7 @@ useEffect(()=>{
                 <form  onSubmit={submitPost}   className="px-4 grid grid-cols-12 md:space-x-5  border-b"    >
                     
                     <div 
-                        className={` ${shouldAnimate ? 'animate-shake' : ''} col-span-12 flex justify-center items-center align-middle`}
+                        className={` ${shouldAnimate ? 'animate-shake' : ''} col-span-12 flex justify-center mb-4 items-center align-middle`}
                     >
 
                     <PostAvatar

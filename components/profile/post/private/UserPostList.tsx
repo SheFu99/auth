@@ -1,8 +1,9 @@
 
 "use clinet"
+
 import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import React, {  Profiler, useCallback, useEffect, useState, useTransition } from "react";
+import React, {  Profiler, useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import ImageGrid from "../Image-grid";
@@ -21,6 +22,7 @@ import {  Comment, post } from "../../../types/globalTs";
 import { repostAction, repostProps } from "@/actions/repost";
 import RepostHeader from "../Repost-author-header";
 import Link from "next/link";
+import { changeLikeCount } from "../postCard/lib/changeLikeCount";
 const RepostModalForm = React.lazy(()=>import ('../repostForm'))
 // import RepostForm from "./post/repostForm"
 
@@ -30,12 +32,13 @@ export const awsBaseUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.
 type userListProps ={
     profile?:string;
     totalPostCount:number;
-    setTotalCount:(count:number)=>void
+    setTotalCount?:(count:number)=>void;
+    serverPosts?:post
 }
 
-const UserPostList :React.FC<userListProps> = ({profile,totalPostCount,setTotalCount}) => {
+const UserPostList :React.FC<userListProps> = ({profile,totalPostCount,serverPosts,setTotalCount}) => {
     console.log('rednder')
-const [posts, setPosts]=useState<post[]>()
+const [posts, setPosts]=useState<post[]>([serverPosts])
 const [isOpen,setIsOpen]=useState<boolean>(false)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
@@ -47,7 +50,7 @@ const [page,setPage]=useState<number>(1)
 
 const user = useCurrentUser()
 
-useEffect(()=>{console.log(posts)},[posts])
+// useEffect(()=>{console.log(posts)},[posts])
 
 ///load user post from server 
 const debouncedGetPost = useCallback(()=>{
@@ -55,9 +58,9 @@ const debouncedGetPost = useCallback(()=>{
     console.log('GET_ON_SERVER')
 },[profile])
 
-    useEffect(()=>{
-        debouncedGetPost()
-    },[profile])
+    // useEffect(()=>{
+    //     debouncedGetPost()
+    // },[profile])
 ///
   
     const postLikeAction = (postId:string)=>{
@@ -84,26 +87,27 @@ const debouncedGetPost = useCallback(()=>{
         const newPosts = posts?.map(post => {
             if (post.PostId === postId) {
                 
-
+                const changedCount = changeLikeCount(post)
+                return changedCount
                 // Toggle like status and adjust like count optimistically
-                if (post?.likedByUser===true) {
+                // if (post?.likedByUser===true) {
                    
-                    return { 
-                        ...post, 
-                        likedByUser: false, 
-                            _count:{
-                                ...post._count,
-                                likes: post._count.likes - 1 
-                            } 
-                        };
-                    } else {
-                        return { ...post, likedByUser: true, 
-                            _count:{
-                            ...post._count,
-                            likes: post._count.likes + 1 
-                            }  
-                        };
-                    }
+                //     return { 
+                //         ...post, 
+                //         likedByUser: false, 
+                //             _count:{
+                //                 ...post._count,
+                //                 likes: post._count.likes - 1 
+                //             } 
+                //         };
+                //     } else {
+                //         return { ...post, likedByUser: true, 
+                //             _count:{
+                //             ...post._count,
+                //             likes: post._count.likes + 1 
+                //             }  
+                //         };
+                //     }
             }
             return post;
         });
@@ -280,9 +284,7 @@ const debouncedGetPost = useCallback(()=>{
          
             
         }
-            useEffect(()=>{
-                console.log(isOpen)
-            },[isOpen])
+       
 
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">

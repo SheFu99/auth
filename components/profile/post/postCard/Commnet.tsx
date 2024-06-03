@@ -14,10 +14,12 @@ interface CommentProps {
     user?:ExtendedUser,
     comment?:Comment,
     commentState?:Comment[],
-    setComment?: (comments:Comment[])=>void
+    setComment?: (comments:Comment[])=>void,
+    className?:string,
+    index?:number,
 }
 
-const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
+const OneComment = ({user,comment,commentState,setComment,className,index}:CommentProps) => {
     const [isPending,startTransition]=useTransition()
     const commentLikeAction = (CommentId:string)=>{
         startTransition(()=>{
@@ -100,7 +102,7 @@ const OneComment = ({user,comment,commentState,setComment}:CommentProps) => {
 
     };
     return ( 
-        <div className="relative -mt-5 py-5">
+        <div className={`${className} relative -mt-5 py-5`} key={index||1}>
              {user?.id === comment.userId&&(
                                 <button title="delete commetn" 
                                 className="text-black absolute right-1"

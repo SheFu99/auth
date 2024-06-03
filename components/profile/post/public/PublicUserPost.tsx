@@ -3,7 +3,6 @@
 "use client"
 
 import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
-import { useCurrentUser } from "@/hooks/use-current-user";
 import React, {  useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RiDeleteBin5Line } from "react-icons/ri";
@@ -12,14 +11,14 @@ import { FaCommentDots } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
 import LikeButton from "../Like-button";
 import PostHeader from "../Post-header";
-const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
-import { useSession } from "next-auth/react";
 import CommentForm from "../../forms/CommentForm";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import { Comment, post } from "../../../types/globalTs";
 import RepostHeader from "../Repost-author-header";
 import { ExtendedUser } from "@/next-auth";
 import Link from "next/link";
+import OneComment from "../postCard/Commnet";
+const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
 const RepostModalForm = React.lazy(()=>import ('../repostForm'))
 // import RepostForm from "./post/repostForm"
 
@@ -35,7 +34,7 @@ type userListProps ={
 }
 
 const PublicPostList :React.FC<userListProps> = ({postList,totalCount,userId,sessionUser}) => {
-    console.log(sessionUser)
+    ///make wraper for setComment with setPost.map
 const [posts, setPosts]=useState<post[]>(postList)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
@@ -261,6 +260,20 @@ console.log('PublicPostRender')
             })
 
         };
+
+    const commentStateWrapper = (postId,newComment)=>{
+        const newPostState = posts.map(post=>{
+            if(post.PostId === postId) {
+                return {
+                    ...post,
+                    comments:newComment
+                }
+            }else{
+                return post
+            }
+        })
+        setPosts(newPostState)
+    }
            
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">
@@ -275,7 +288,7 @@ console.log('PublicPostRender')
                 <>
                 {/* TODO: Need to pass key to parent component  */}
                 <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
-                <Link href={`/post/${post.PostId}`} className="z-[1]">
+                {/* <Link href={`/post/${post.PostId}`} className="z-[1]"> */}
                     <div className="z-[55]">
                     <RepostHeader 
                         userId={post.userId}
@@ -328,32 +341,29 @@ console.log('PublicPostRender')
                         </div>
                     </div>
 
-
-                    {post?.comments.map((comment,index)=>(
-                        <div key={index} className="md:px-20 px-10 mt-5">
-                            {user?.id === comment.userId&&(
-                                <button title="delete commetn" 
-                                className="text-black absolute md:right-20 right-10"
-                                onClick={()=>DeleteCommentFunction(comment)}
-                                >
-                                    <RiDeleteBin5Line color="white"/>
-                                </button>
-                            )}
-                            <PostHeader author={comment?.user} timestamp={comment?.timestamp}/>
-                                
-                            <p className="text-white ml-[3rem]">{comment?.text}</p>
-                            
-                            <ImageGrid images={comment?.image} className={'max-w-[300px] ml-[3rem]'}/>
-                            <LikeButton className="bg-neutral-900 px-3" post={comment} onLike={()=>CommentLike(comment)} isPending={isPending}/>
-                        </div>
-                    ))}
+                    <div className="mt-5">
                     {isPostCommentOpen(index)&&(
                       
-                            <CommentForm postId={post?.PostId} user={user}/>
-                     
-                        )}
+                      <CommentForm postId={post?.PostId} user={user}/>
+               
+                  )}
+                    {post?.comments.map((comment,index)=>(
+                 
+                    <div className="px-10 ml-4  hover:bg-neutral-900">
+                        <OneComment 
+                            index={index}
+                            user={user} 
+                            comment={comment} 
+                            commentState={post.comments} 
+                            setComment={(newComments)=>commentStateWrapper(post.PostId,newComments)} 
+                            />
                         </div>
-                        </Link>
+                    ))}
+                    </div>
+                    
+                    
+                        </div>
+                        {/* </Link> */}
                 </div>
                
                 </>

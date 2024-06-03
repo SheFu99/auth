@@ -103,7 +103,7 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
 
     return ( 
 <div>
-<div className=" justify-between border-t border-b p-3  relative">
+<div className=" justify-between border-t p-3  relative">
                 
                 <RepostHeader 
                     userId={post.userId}
@@ -144,7 +144,7 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
                    
                 </div>
         
-                <div className="flex justify-between border-b border-t px-2 py-1 mt-5">
+                <div className="flex justify-between border-b border-t px-2 py-3 mt-2">
                         <LikeButton className=" bg-neutral-900 px-3" post={postState} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
                         <button title="comment" onClick={()=>handleCommentOpen()} className="text-white bg-neutral-900 px-3 rounded-md   ">
                             <div className="flex gap-2 item-center justify-center align-middle">
@@ -165,7 +165,7 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
                     user={user} 
                     postId={post?.PostId} 
                     forwardedRef={commentFormRef}
-                    className="mt-2 mb-5"
+                    className=" mb-5"
                     />
 </div>
        
