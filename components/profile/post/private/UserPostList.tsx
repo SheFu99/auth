@@ -40,24 +40,24 @@ type userListProps ={
 const UserPostList :React.FC<userListProps> = ({profile,totalPostCount,serverPosts,setTotalCount}) => {
     console.log('rednder')
 const [posts, setPosts]=useState<post[]>()
-const [isOpen,setIsOpen]=useState<boolean>(false)
+const [isOpen,setIsOpen]=useState(false)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
 
 const {update}=useSession()
 
-const [hasMore,setHasMore]= useState<boolean>(true)
-const [page,setPage]=useState<number>(1)
-
+const [hasMore,setHasMore]= useState(true)
+const [page,setPage]=useState(2)
+const [isloading,setIsLoading] = useState(true)
 const user = useCurrentUser()
 
 // useEffect(()=>{console.log(posts)},[posts])
 
 ///load user post from server 
 const debouncedGetPost = useCallback(()=>{
-    GetUserPostsById(profile,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts)})
+    GetUserPostsById(profile,1).then(posts => {setTotalCount(posts?.totalPostCount),setPosts(posts?.posts),setIsLoading(false)})
     console.log('GET_ON_SERVER')
-},[profile])
+},[])
 
     useEffect(()=>{
         debouncedGetPost()
@@ -218,17 +218,32 @@ const debouncedGetPost = useCallback(()=>{
         };
         const fetchMoreData = async ()=>{
             ///gettFrom server posts.lenght 
-            if(posts?.length>=totalPostCount){
+            console.log("CALL_FETCH:",isloading)
+            if(isloading){
+                console.log("END_FUNCTIOn")
+                return
+            }
+            if(posts?.length>=totalPostCount ){
                 setHasMore(false)
                 return
             }
-
+            console.log(page)
+            setIsLoading(true)
             GetUserPostsById(profile,page)
-            .then(posts=>setPosts(prev=>[...prev,...posts?.posts]))
+            .then(posts=>{
+                console.log(posts)
+                if(posts.posts){
+                    setPosts(prev=>[...prev,...posts?.posts])
+                    setPage(prev=>prev+1); 
+
+                }
+            })
             .catch(err=>{
                 toast.error(err)
             })
-            .finally(()=>setPage(page+1))
+            .finally(()=>{
+                 setIsLoading(false)
+                })
         };
         const openComentForm = (postIndex:number)=>{
             const isTwice = addComent.filter(item=>item ===postIndex)
@@ -294,7 +309,7 @@ const debouncedGetPost = useCallback(()=>{
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>
                 )}
-            <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
+            <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded = {isloading}>
             {posts&&(
                  <PostList
                  // key={index}
