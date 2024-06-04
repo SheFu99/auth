@@ -18,6 +18,8 @@ import RepostHeader from "../Repost-author-header";
 import { ExtendedUser } from "@/next-auth";
 import Link from "next/link";
 import OneComment from "../postCard/Commnet";
+import PostCard from "../postCard/PostCard";
+import PostList from "../postCard/lists/PostList";
 const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
 const RepostModalForm = React.lazy(()=>import ('../repostForm'))
 // import RepostForm from "./post/repostForm"
@@ -34,12 +36,8 @@ type userListProps ={
 }
 
 const PublicPostList :React.FC<userListProps> = ({postList,totalCount,userId,sessionUser}) => {
-    ///make wraper for setComment with setPost.map
 const [posts, setPosts]=useState<post[]>(postList)
-const [isPending,startTransition]=useTransition()
-const [addComent,setComentState]=useState([])
 
-// const {update}=useSession()
 
 const [hasMore,setHasMore]= useState<boolean>(true)
 const [page,setPage]=useState<number>(2)
@@ -68,306 +66,26 @@ const fetchMoreData = useCallback(async ()=>{
     
 },[page]);
 
-console.log('PublicPostRender')
 
-  
-    const postLikeAction = (postId:string)=>{
-        startTransition(()=>{
-            LikePost(postId)
-            .then((data)=>{
-                setPosts(currentPosts=>
-                    currentPosts?.map(post=>
-                        post.PostId === postId?{ ...post,likeCount:data.likesCount}:post
-                    )
-                )
-                if(data.error){
-                    toast.error(data.error)
-                }
-            })
-        })
-    };
-    const Postlike = async (postId: string) => {
-        if (!user) {
-            toast.error("You must be authorized");
-            return;
-        }
-        // Optimistic UI Update
-        const newPosts = posts?.map(post => {
-            if (post.PostId === postId) {
-                
-
-                // Toggle like status and adjust like count optimistically
-                if (post?.likedByUser===true) {
-                   
-                    return { 
-                        ...post, 
-                        likedByUser: false, 
-                            _count:{
-                                ...post._count,
-                                likes: post._count.likes - 1 
-                            } 
-                        };
-                    } else {
-                        return { ...post, likedByUser: true, 
-                            _count:{
-                            ...post._count,
-                            likes: post._count.likes + 1 
-                            }  
-                        };
-                    }
-            }
-            return post;
-        });
-    
-        setPosts(newPosts);
-       
-        try {
-            postLikeAction(postId);
-        } catch (error) {
-            console.error("Failed to update like status on the server:", error);
-            // update()
-            toast.error("Error updating post like. Please try again.");
-        }
-        // }finally{
-        //     updatePost(!getPostTrigger)
-        // }
-    };
-    const commentLikeAction = (CommentId:string)=>{
-        startTransition(()=>{
-            LikeComment(CommentId)
-            .then((data)=>{
-                if(data.error){
-                    toast.error('Comment Like Error')
-                }
-                if(data.success){
-                    return
-                }
-            })
-        })
-    };
-    const CommentLike = async (comment:Comment) => {
-        const commentId = comment.CommentId
-        if (!user) {
-            toast.error("You must be authorized");
-            return;
-        }
-        const updatedPosts = posts?.map((post) => {
-            if (post.PostId !== comment.postId) {
-                return post; // No changes for posts that don't contain the comment
-            }
-    
-            // Find the comment within the post
-            const updatedComments = post.comments.map((com) => {
-                if (com.CommentId !== commentId) {
-                    return com; // No changes for other comments
-                }
-    
-                // Update the comment here
-                return {
-                    ...com,
-                    likedByUser: !com.likedByUser,
-                    _count: {
-                        ...com._count,
-                        likes: com.likedByUser ? com._count.likes - 1 : com._count.likes + 1
-                    }
-                };
-            });
-    
-            // Return the updated post with the updated comments
-            return {
-                ...post,
-                comments: updatedComments
-            };
-        });
-
-        setPosts(updatedPosts);
-        try {
-            commentLikeAction(commentId);
-        } catch (error) {
-            console.error("Failed to update like status on the server:", error);
-            // update()
-            toast.error("Error updating post like. Please try again.");
-        }
-    };
-        const deletePost=(post:post)=>{
-      
-        
-            const keys = post?.image?.map(item => {
-                const result = item.url.replace(awsBaseUrl,'');
-                return result
-              });
-              
-           
-            
-            startTransition(()=>{
-    
-                DeleteUserPosts({
-                    postId:post.PostId,
-                    keys:post?.originPostId ? undefined:keys,
-                })
-                .then((data)=>{
-                    if(data.error){
-                        toast.error(data.error)
-                    }
-        
-                    if(data.success){
-                        
-                        toast.success(data.message)
-                    }
-                })
-                
-            });
-       
-            // update()
-        return 
-        
-        };   
-        const openComentForm = (postIndex:number)=>{
-            const isTwice = addComent.filter(item=>item ===postIndex)
-            if(isTwice.length>0){
-                const isNotTwice = addComent.filter(item=>item !==postIndex);
-                setComentState(isNotTwice)
-            }else{
-                setComentState(prev=>[...prev,postIndex])
-            }
-        };
-        const isPostCommentOpen =(index:number)=>{
-            const isExistInArray = addComent.filter(item=>item ===index)
-            if(isExistInArray.length>0){
-                return true
-            }else{
-                return false
-            }
-        };
-        const DeleteCommentFunction = (comment:Comment) =>{
-            const keys:any = comment?.image?.map(item => {
-                const result = item.url.split(awsBaseUrl)[1];
-                return result
-              });
-
-
-            startTransition(()=>{
-                DeleteComment(comment.CommentId,keys)
-                .then((data)=>{
-                    if(data.success){
-                        toast.success(data.success)
-                        // update()
-                    }
-                    if(data.error){
-                        toast.success(data.error)
-                    }
-                })
-            })
-
-        };
-
-    const commentStateWrapper = (postId,newComment)=>{
-        const newPostState = posts.map(post=>{
-            if(post.PostId === postId) {
-                return {
-                    ...post,
-                    comments:newComment
-                }
-            }else{
-                return post
-            }
-        })
-        setPosts(newPostState)
-    }
            
     return ( 
-        <div className="bg-opacity-0  space-y-5 p-1">
+        <div className="bg-opacity-0  space-y-5 p-1 ">
               {!posts&&postList&&(
                     <div className="w-full flex justify-center py-10 items-center align-middle">
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>
                 )}
             <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
-            
-            {posts?.map((post,index)=>(
                 <>
                 {/* TODO: Need to pass key to parent component  */}
-                <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
-                {/* <Link href={`/post/${post.PostId}`} className="z-[1]"> */}
-                    <div className="z-[55]">
-                    <RepostHeader 
-                        userId={post.userId}
-                        userName={post.authorName}
-                        userImage={post.authorAvatar}
-                        timestamp={post.timestamp}
-                    />
-                    {post?.superText&&(
-                        <p className="px-10 mt-2">{post.superText}</p>
-                    )}
-                    {post?.originPost?.authorName &&post?.originPost?.authorAvatar&&(
-                    <>
-                        <div className="py-2 px-5">
-                            <BiRepost color="white" className="scale-150"/>
-                        </div>
-                  
-                        <div className=" px-5 ">
-                            <RepostHeader  
-                                userId={post.originPost.userId}
-                                userName={post.originPost.authorName}
-                                userImage={post.originPost.authorAvatar}
-                                timestamp={post.originPost.timestamp}
-                                
-                                />
-                        </div>
-                    </>
-                    )}
-                    <div className="ml-[3rem] mr-[1rem]">
-                        <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
-                            {user?.id === post.userId&&(
-                                <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
-                            )}
-                                <ImageGrid type="feed" images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3 z-[100]`} />
-                        <div className="flex gap-5 justify-between ">
-                            <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
-
-                            <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-3 rounded-md   ">
-                                <div className="flex gap-2 item-center justify-center align-middle">
-                                    <FaCommentDots className="mt-1"/>
-                                {post._count.comments>0 &&(<p>{post?._count.comments}</p>)}
-                                </div>
-                            </button>
-
-                            <RepostModalForm 
-                                ButtonTitle="Repost"
-                                postId={post.PostId}
-                                repostCount={post?.repostCount}
-                                />
-                            
-                        </div>
-                    </div>
-
-                    <div className="mt-5">
-                    {isPostCommentOpen(index)&&(
-                      
-                      <CommentForm postId={post?.PostId} user={user}/>
-               
-                  )}
-                    {post?.comments.map((comment,index)=>(
-                 
-                    <div className="px-10 ml-4  hover:bg-neutral-900">
-                        <OneComment 
-                            index={index}
-                            user={user} 
-                            comment={comment} 
-                            commentState={post.comments} 
-                            setComment={(newComments)=>commentStateWrapper(post.PostId,newComments)} 
-                            />
-                        </div>
-                    ))}
-                    </div>
-                    
-                    
-                        </div>
-                        {/* </Link> */}
-                </div>
-               
+                    <PostList 
+                        // key={index}
+                        setPost={setPosts}
+                        postState={posts} 
+                        user={user}
+                        />
+             
                 </>
-            ))}
            </InfiniteScroll>
 
         </div>

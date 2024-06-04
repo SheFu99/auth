@@ -16,32 +16,45 @@ import { DeleteUserPosts, LikePost, postPromise } from "@/actions/UserPosts";
 import { changeLikeCount } from "./lib/changeLikeCount";
 import { FaCommentDots } from "react-icons/fa";
 import CommentForm from "../../forms/CommentForm";
+import Comments from "./lists/Comments";
+import OneComment from "./Commnet";
 
-type PostCardProps={
-    post:post,
+type PostCardWithStateProps={
+    postState:post[],
     user?:ExtendedUser,
+    setPost?:(postState:post[])=>void
+    
 }
 
 
-const PostCard:React.FC<PostCardProps> = ({post,user}) => {
-    console.log(post.PostId)
-    const [postState,setPost] = useState<post>(post)
+const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => {
+    // const [postState,setPost] = useState<post>(post)
     const [isPending,startTransition]=useTransition()
     const commentFormRef = useRef<HTMLTextAreaElement>(null)
+
+
+    
     const postLikeAction = (postId:string)=>{
-        console.log(postId)
         startTransition(()=>{
             LikePost(postId)
             .then((data)=>{
-                setPost(prevState=>{
-
-                const newPost = {...prevState};
-
-                     newPost._count.likes = data.likesCount;
-                     newPost.likedByUser = data.hasLike;
-
-                     return newPost
-             });
+                if(data.success){
+                    const checkedState = postState.map(post=>{
+                        if(data.PostId === post.PostId){
+                            const likedPost = {
+                                ...post,
+                                likedByUser:data.hasLike,
+                                _count:{
+                                    likes:data.likesCount
+                                }
+                        }
+                        return  likedPost 
+                    }
+                    return post
+                    })
+                    
+                    setPost(checkedState)
+                }
                 if(data.error){
                     toast.error(data.error)
                 }
@@ -55,8 +68,15 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
             toast.error("You must be authorized");
             return;
         }
-            const newPost = changeLikeCount(postState)
-            setPost(newPost);
+        const newPosts = postState?.map(post => {
+            if(post.PostId===postId){
+                const changedCount = changeLikeCount(post)
+                return changedCount
+            }else{
+                return post
+            }
+        })
+            setPost(newPosts);
             postLikeAction(postId);
         
         // }finally{
@@ -83,6 +103,14 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
                         toast.error(data.error)
                     }
                     if(data.success){
+                        console.log(data)
+                        // const optimisticPostState = postState.filter(prev=>{
+                        //         return prev.PostId !==post.PostId
+                        // })
+                        // setPost(optimisticPostState)
+                       
+
+
                         toast.success(data.message)
                     }
                 })
@@ -101,9 +129,25 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
             }
         }
 
+        const commentStateWrapper = (postId,newComment)=>{
+            const newPostState = postState.map(post=>{
+                if(post.PostId === postId) {
+                    return {
+                        ...post,
+                        comments:newComment
+                    }
+                }else{
+                    return post
+                }
+            })
+            setPost(newPostState)
+        }
+
     return ( 
 <div>
-<div className=" justify-between border-t p-3  relative">
+    {postState.map((post,index)=>(
+        <div key={index}>
+            <div className=" justify-between border border-neutral-400 p-3  relative hover:bg-neutral-900 ">
                 
                 <RepostHeader 
                     userId={post.userId}
@@ -133,7 +177,7 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
                 )}
         
                 <div className="ml-[3rem] mr-[1rem]">
-                    <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
+                    <p className="text-white col-span-10 col-start-2 py-2 text-xl">{post.text}</p>
                         {user?.id === post.userId&&(
                             <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                         )}
@@ -144,12 +188,12 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
                    
                 </div>
         
-                <div className="flex justify-between border-b border-t px-2 py-3 mt-2">
-                        <LikeButton className=" bg-neutral-900 px-3" post={postState} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
+                <div className="flex justify-between  px-2 py-3 mt-2">
+                        <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
                         <button title="comment" onClick={()=>handleCommentOpen()} className="text-white bg-neutral-900 px-3 rounded-md   ">
                             <div className="flex gap-2 item-center justify-center align-middle">
                                 <FaCommentDots className="mt-1"/>
-                            {post._count.comments>0 &&(<p>{post?._count.comments}</p>)}
+                            {post?._count?.comments>0 &&(<p>{post?._count?.comments}</p>)}
                             </div>
                         </button>
                         <RepostModalForm
@@ -161,12 +205,31 @@ const PostCard:React.FC<PostCardProps> = ({post,user}) => {
                 
                
                 </div>
+
+
                 <CommentForm 
                     user={user} 
                     postId={post?.PostId} 
                     forwardedRef={commentFormRef}
-                    className=" mb-5"
+                    className=" mb-5  border-b border-t"
                     />
+
+       {/*  {post?.comments?.map((comment,index)=>(
+                        
+           <div className="px-10  hover:bg-neutral-900">
+            <OneComment 
+                index={index}
+                user={user} 
+                comment={comment} 
+                commentState={post.comments} 
+                setComment={(newComments)=>commentStateWrapper(post.PostId,newComments)} 
+              />
+           </div>
+        ))} */}
+
+        </div>
+    ))}
+                
 </div>
        
      );

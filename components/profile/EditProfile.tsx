@@ -233,7 +233,7 @@ const  EditProfile =  () => {
 
 
 
-        {/* <Tabs defaultId="tab1" >
+        <Tabs defaultId="tab1" >
             <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
                 <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><RiProfileLine/><p className="text-sm text-neutral-300">{totalPostCount}</p> Posts</TabsTrigger>
                 <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center"><FaUser/>Friends</TabsTrigger>
@@ -260,7 +260,7 @@ const  EditProfile =  () => {
                 <h1>Content for Tab Three</h1>
                 <p>This is the detailed content for Tab Three.</p>
             </TabsContent>
-        </Tabs> */}
+        </Tabs>
 
    
        

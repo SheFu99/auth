@@ -29,7 +29,7 @@ export default async function PublicProfileParams({ params }) {
       <div>
         
         {!profile.error?(
-          <>
+          <div className="border rounded-lg">
             <PublicProfile profile={profile}  sessionUser={sessionUser}/> 
           
                 <TabSwitch 
@@ -38,7 +38,7 @@ export default async function PublicProfileParams({ params }) {
                 postTotal={userPostList.totalPostCount}
                 />
        
-          </>
+          </div>
         ):(
           <div>
             <p>Profile is not found</p>

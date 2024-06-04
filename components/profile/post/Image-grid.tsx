@@ -54,7 +54,7 @@ export default  function ImageGrid( {images,className,type}:ImageGridProps ) {
     return (
         <div className={`${className} grid grid-cols-6  gap-2  ${images?.length === 0 ? 'grid-cols-1' : ''}`}>
             {images?.map((img, index) => (
-                <div key={index} className={`${getGridForImage(index)} relative cursor-pointer col-span-1 `} onClick={() => openLightbox(index)}>
+                <div key={index} className={`${getGridForImage(index)} md:max-h-[350px] max-h-[250px] relative cursor-pointer col-span-1 `} onClick={() => openLightbox(index)}>
                     <Image
                         key={index}
                         src={img.url}

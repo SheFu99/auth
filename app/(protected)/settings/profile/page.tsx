@@ -21,25 +21,25 @@ const ProfilePage = async () => {
     const post = await GetUserPostsById(user?.id,1)
     const totalPostCount = post?.totalPostCount
     const friends = await getUserFreinds()
-    
+    ////TODO: Compouse in one client component 
     return ( 
       
       
         <div className="">
 
             <EditProfile />
-            <TabSwitch 
+            {/* <TabSwitch 
                 friendsTotal={friends?.userFriendsList?.length}
                 postTotal={totalPostCount}
                 chilldrenPosts={[
                     <PostModal/>,
-                    // <UserPostList serverPosts={post} profile={user?.id} totalPostCount={totalPostCount}/>      
+                    <UserPostList serverPosts={post.posts} profile={user?.id} totalPostCount={totalPostCount}/>      
                 ]}
                 chilldrenFriends={[
                     <IncomeOfferList/>,
                     <UserFriends/>
                 ]}
-                />
+                /> */}
         </div>
 
       

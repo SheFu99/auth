@@ -4,9 +4,9 @@ import { ExtendedUser } from "@/next-auth";
 import {  useState } from "react";
 import { toast } from "sonner";
 import { Comment } from "@/components/types/globalTs";
-import InfiniteScroll from "../functions/infinite-scroll";
+import InfiniteScroll from "../../functions/infinite-scroll";
 import { getCommentByPost } from "@/actions/post";
-import OneComment from "./Commnet";
+import OneComment from "../Commnet";
 
 type commentsParams = {
     comments:Comment[];

@@ -3,7 +3,7 @@
 
 import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import React, {  Profiler, useCallback, useState, useTransition } from "react";
+import React, {  Profiler, useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import ImageGrid from "../Image-grid";
@@ -23,6 +23,7 @@ import { repostAction, repostProps } from "@/actions/repost";
 import RepostHeader from "../Repost-author-header";
 import Link from "next/link";
 import { changeLikeCount } from "../postCard/lib/changeLikeCount";
+import PostList from "../postCard/lists/PostList";
 const RepostModalForm = React.lazy(()=>import ('../repostForm'))
 // import RepostForm from "./post/repostForm"
 
@@ -38,7 +39,7 @@ type userListProps ={
 
 const UserPostList :React.FC<userListProps> = ({profile,totalPostCount,serverPosts,setTotalCount}) => {
     console.log('rednder')
-const [posts, setPosts]=useState<post[]>([serverPosts])
+const [posts, setPosts]=useState<post[]>()
 const [isOpen,setIsOpen]=useState<boolean>(false)
 const [isPending,startTransition]=useTransition()
 const [addComent,setComentState]=useState([])
@@ -58,10 +59,10 @@ const debouncedGetPost = useCallback(()=>{
     console.log('GET_ON_SERVER')
 },[profile])
 
-    // useEffect(()=>{
-    //     debouncedGetPost()
-    // },[profile])
-///
+    useEffect(()=>{
+        debouncedGetPost()
+    },[profile])
+
   
     const postLikeAction = (postId:string)=>{
         startTransition(()=>{
@@ -294,91 +295,15 @@ const debouncedGetPost = useCallback(()=>{
                     </div>
                 )}
             <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded = {!!posts}>
-            
-            {posts?.map((post,index)=>(
-                <>
-                {/* <Profiler onRender={console.log(post)}></Profiler> */}
-                {/* TODO: Need to pass key to parent component  */}
-                <div key={index} className=" justify-between border border-white rounded-md p-3  relative">
-                
-                    <RepostHeader 
-                        userId={post.userId}
-                        userName={post.authorName}
-                        userImage={post.authorAvatar}
-                        timestamp={post.timestamp}
-                    />
-                    {post?.superText&&(
-                        <p className="px-10 mt-2">{post.superText}</p>
-                    )}
-                    {post?.originPost?.authorName &&post?.originPost?.authorAvatar&&(
-                    <>
-                        <div className="py-2 px-5">
-                            <BiRepost color="white" className="scale-150"/>
-                        </div>
-                  
-                        <div className=" px-5 ">
-                            <RepostHeader  
-                                userId={post.originPost.userId}
-                                userName={post.originPost.authorName}
-                                userImage={post.originPost.authorAvatar}
-                                timestamp={post.originPost.timestamp}
-                                
-                                />
-                        </div>
-                    </>
-                    )}
-                    <div className="ml-[3rem] mr-[1rem]">
-                        <p className="text-white col-span-10 col-start-2 py-2">{post.text}</p>
-                            {user?.id === post.userId&&(
-                                <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
-                            )}
-                                <ImageGrid type="feed" images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3`} />
-                        <div className="flex gap-5 justify-between ">
-                            <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
-
-                            <button title="coment" onClick={()=>openComentForm(index)} className="text-white  bg-neutral-900 px-3 rounded-md   ">
-                                <div className="flex gap-2 item-center justify-center align-middle">
-                                    <FaCommentDots className="mt-1"/>
-                                {post._count.comments>0 &&(<p>{post?._count.comments}</p>)}
-                                </div>
-                            </button>
-
-                            <RepostModalForm 
-                                ButtonTitle="Repost"
-                                postId={post.PostId}
-                                repostCount={post?.repostCount}
-                                />
-                            
-                        </div>
-                    </div>
-
-
-                    {post?.comments.map((comment,index)=>(
-                        <div key={index} className="md:px-20 px-10 mt-5">
-                            {user?.id === comment.userId&&(
-                                <button title="delete commetn" 
-                                className="text-black absolute md:right-20 right-10"
-                                onClick={()=>DeleteCommentFunction(comment)}
-                                >
-                                    <RiDeleteBin5Line color="white"/>
-                                </button>
-                            )}
-                            <PostHeader author={comment?.user} timestamp={comment?.timestamp}/>
-                                
-                            <p className="text-white ml-[3rem]">{comment?.text}</p>
-                            
-                            <ImageGrid images={comment?.image} className={'max-w-[300px] ml-[3rem]'}/>
-                            <LikeButton className="bg-neutral-900 px-3" post={comment} onLike={()=>CommentLike(comment)} isPending={isPending}/>
-                        </div>
-                    ))}
-                    {isPostCommentOpen(index)&&(
-                            <CommentForm postId={post?.PostId}/>
-                    )}
-                
-                </div>
-               
-                </>
-            ))}
+            {posts&&(
+                 <PostList
+                 // key={index}
+                 setPost={setPosts}
+                 postState={posts} 
+                 user={user}
+                 />
+            )}
+           
            </InfiniteScroll>
 
         </div>

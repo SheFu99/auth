@@ -102,7 +102,7 @@ const OneComment = ({user,comment,commentState,setComment,className,index}:Comme
 
     };
     return ( 
-        <div className={`${className} relative -mt-5 py-5`} key={index||1}>
+        <div className={`${className} relative -mt-5 py-5 px-4`} key={index||1}>
              {user?.id === comment.userId&&(
                                 <button title="delete commetn" 
                                 className="text-black absolute right-1"

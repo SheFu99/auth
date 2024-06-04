@@ -22,7 +22,7 @@ import { SlLogin } from "react-icons/sl"
 import { RegisterButton } from "@/components/auth/RegisterButton"
 import { ExtendedUser } from "@/next-auth"
 import PostAvatar from "@/components/ui/PostAvatar"
-import Comments from "../post/postCard/Comments";
+import Comments from "../post/postCard/lists/Comments";
 import { Comment } from "@/components/types/globalTs";
 import OneComment from "../post/postCard/Commnet";
 
@@ -162,7 +162,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     };
 
     return (
-        <div className={`${className} -mb-2`}
+        <div className={`${className} -mb-2 `}
         >
             {userId?(
                 <>
@@ -170,7 +170,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                 {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[80vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
 
                        
-                <form  onSubmit={submitPost}   className="px-4 grid grid-cols-12 md:space-x-5  border-b"    >
+                <form  onSubmit={submitPost}   className="px-7 grid grid-cols-12 md:space-x-5 "    >
                     
                     <div 
                         className={` ${shouldAnimate ? 'animate-shake' : ''} col-span-12 flex justify-center mb-4 items-center align-middle`}
@@ -268,8 +268,8 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                 </div>
             )}
             {createdComment.map((com,index)=>(
-                    <div key={index} className="border-b p-5 hover:bg-neutral-900">
-                        <OneComment comment={com} commentState={createdComment} setComment={setCreatedComment} user={user}/> 
+                    <div key={index} className="border-t px-10 hover:bg-neutral-900">
+                        <OneComment comment={com} commentState={createdComment} setComment={setCreatedComment} user={user} className="mt-1"/> 
                     </div>
 
                     ))}

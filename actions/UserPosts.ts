@@ -370,7 +370,7 @@ if(originPostId){
             }
         };
 
-export const LikePost = async (postId: string):Promise<postPromise> => {
+export const LikePost = async (postId: string) => {
     const user = await currentUser();
     if (!user) {
         return { error: "You need to be authorized!" };
@@ -393,16 +393,15 @@ export const LikePost = async (postId: string):Promise<postPromise> => {
         await db.like.delete({
             where: { likeId: existingLike.likeId }  // Assuming 'id' is the identifier for likes
         });
-        return { success: true, message: "Like removed", likesCount: existingPost.likes.length - 1,hasLike:false };
+        return { success: true, message: "Like removed", likesCount: existingPost.likes.length - 1,hasLike:false ,PostId:existingPost.PostId};
     } else {
-        // User has not liked this post before, add a new like
         await db.like.create({
             data: {
                 userId: user.id,
                 postId: postId
             }
         });
-        return { success: true, message: "Post liked", likesCount: existingPost.likes.length + 1,hasLike:true };
+        return { success: true, message: "Post liked", likesCount: existingPost.likes.length + 1,hasLike:true ,PostId:existingPost.PostId};
         // return {error:"400"}
     }
 };
