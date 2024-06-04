@@ -263,6 +263,7 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
                  <div 
                     className="border-t border-neutral-500 px-10 hover:bg-neutral-900 mb-1 cursor-pointer"
                     onClick={(e)=>handleCommentClick(e,comment.postId)}
+                    key={index}
                     >
                                     
                     <div className="relative mt-5 ">
