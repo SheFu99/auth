@@ -21,8 +21,12 @@ if(user){
         where:{PostId:PostId},
         select:{
             PostId:true,
-            authorAvatar:true,
-            authorName:true,
+            user:{
+                select:{
+                    name:true,
+                    image:true,
+                }
+            },
             userId:true,
             timestamp:true,
             superText:true,
@@ -40,8 +44,12 @@ if(user){
             },
             originPost:{
                 select:{
-                    authorAvatar:true,
-                    authorName:true,
+                    user:{
+                        select:{
+                            name:true,
+                            image:true,
+                        }
+                    },
                     userId:true,
                     timestamp:true,
                 }
@@ -58,33 +66,66 @@ if(user){
 }else{
     post = await db.post.findFirst({
         where:{PostId:PostId},
-        select:{
-            PostId:true,
-            authorAvatar:true,
-            authorName:true,
-            userId:true,
-            timestamp:true,
-            superText:true,
-            text:true,
-            repostCount:true,
+        // select:{
+        //     PostId:true,
+        //     userId:true,
+        //     timestamp:true,
+        //     superText:true,
+        //     text:true,
+        //     repostCount:true,
+        //     _count:{
+        //         select:{
+        //             likes:true,
+        //             comments:true
+        //         }
+        //     },
+        //     image:{
+        //         select:{url:true},
+        //         take:5,
+        //     },
+        //     originPost:{
+        //         select:{
+        //             user:{
+        //                 select:{
+        //                     name:true,
+        //                     image:true,
+        //                 }
+        //             },
+        //             userId:true,
+        //             timestamp:true,
+        //         }
+        //     },
+        // },
+        include:{
+            user:{
+                select:{
+                    name:true,
+                    image:true,
+                }
+            },
             _count:{
-                select:{
-                    likes:true,
-                    comments:true
-                }
-            },
-            image:{
-                select:{url:true},
-                take:5,
-            },
-            originPost:{
-                select:{
-                    authorAvatar:true,
-                    authorName:true,
-                    userId:true,
-                    timestamp:true,
-                }
-            },
+                    select:{
+                     likes:true,
+                     comments:true
+                    }
+                    },
+                    image:{
+                        select:{url:true},
+                        take:5,
+                    },
+                    originPost:{
+                                select:{
+                                    user:{
+                                        select:{
+                                            name:true,
+                                            image:true,
+                                        }
+                                    },
+                                    userId:true,
+                                    timestamp:true,
+                                }
+                            },
+
         }
 })
 }
@@ -96,6 +137,7 @@ if(user){
         ...post,
         likedByUser:hasLike
     }
+    console.log(postWithLike)
     return {post:postWithLike,success:true}
 }
 

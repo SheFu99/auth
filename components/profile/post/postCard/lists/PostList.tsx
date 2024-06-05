@@ -8,7 +8,7 @@ import RepostHeader from "../../Repost-author-header";
 import { BiRepost } from "react-icons/bi";
 import { post } from "@/components/types/globalTs";
 import { ExtendedUser } from "@/next-auth";
-import {  useRef, useState, useTransition } from "react";
+import {  useCallback, useRef, useState, useTransition } from "react";
 
 import { toast } from "sonner";
 import { awsBaseUrl } from "../../private/UserPostList";
@@ -35,6 +35,8 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
     const [addComent,setComentState]=useState([])
     const commentFormRef = useRef<HTMLTextAreaElement>(null)
     const router = useRouter()
+    const observer = useRef<IntersectionObserver|null>()
+   
 
     
     const postLikeAction = (postId:string)=>{
@@ -87,15 +89,11 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
         // }
     };
         const deletePost=(post:post)=>{
-      
-        
             const keys = post.image.map(item => {
                 const result = item.url.replace(awsBaseUrl,'');
                 return result
               });
-              
-           
-            
+
             startTransition(()=>{
                 DeleteUserPosts({
                     postId:post.PostId,
@@ -118,11 +116,8 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
                 })
                 
             });
-            // update()
         return 
-        
         };
-
         const openComentForm = (postIndex:number,postId)=>{
            
             const isTwice = addComent.filter(item=>item ===postIndex)
@@ -141,16 +136,13 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
                 return false
             }
         };
-
         const handleCommentOpen = ()=>{
             console.log(commentFormRef.current)
             if(commentFormRef.current){
                 commentFormRef.current.focus()
                 console.log('focus')
             }
-        }
-
-            
+        };   
         const commentStateWrapper = (postId,newComment)=>{
             console.log(postState)
             console.log(newComment.length)
@@ -165,23 +157,23 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
                 }
             })
             setPost(newPostState)
-        }
-
+        };
         const handleWhiteSpaceClick = (e, postId)=>{
             if(e.currentTarget === e.target){
                 console.log("Parent Clicked")
                 router.push(`/post/${postId}`)
             }
-        }
-
+        };
         const handleCommentClick = (e,postId)=>{
             if(e.currentTarget === e.target){
                 console.log("Parent Clicked")
                 router.push(`/post/${postId}`)
             }
-        }
+        };
     return ( 
 <div className="borde px-2">
+
+    
     {postState.map((post,index)=>(
         <div key={index} className="border border-neutral-500 rounded-md mb-4 mt-3">
             <div 
@@ -190,15 +182,15 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
                 >
                 <RepostHeader 
                     userId={post.userId}
-                    userName={post.authorName}
-                    userImage={post?.authorAvatar}
+                    userName={post.user.name}
+                    userImage={post?.user.image}
                     timestamp={post.timestamp}
                     className="max-w-[250px]"
                 />
                 {post?.superText&&(
                     <p className="px-10 mt-2">{post.superText}</p>
                 )}
-                {post?.originPost?.authorName &&post?.originPost?.authorAvatar&&(
+                {post?.originPost?.user.name &&post?.originPost?.user.image&&(
                 <>
                     <div className="py-2 px-5">
                         <BiRepost color="white" className="scale-150"/>
@@ -206,9 +198,9 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
               
                     <div className=" px-5 ">
                         <RepostHeader  
-                            userId={post.originPost.userId}
-                            userName={post.originPost.authorName}
-                            userImage={post.originPost?.authorAvatar}
+                            userId={post.originPost.user.userId}
+                            userName={post.originPost.user.name}
+                            userImage={post.originPost?.user.image}
                             timestamp={post.originPost.timestamp}
                             className="max-w-[250px]"
                             />
@@ -261,7 +253,7 @@ const PostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
               
                 {post?.comments?.map((comment,index)=>(
                  <div 
-                    className="border-t border-neutral-500 px-10 hover:bg-neutral-900 mb-1 cursor-pointer"
+                    className="border-t px-10  cursor-pointer"
                     onClick={(e)=>handleCommentClick(e,comment.postId)}
                     key={index}
                     >

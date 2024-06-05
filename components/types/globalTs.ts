@@ -43,8 +43,10 @@ export type gender = "Male" | "Female" | "Undefined"|null;
 
 export type post ={
     PostId: string,
-    authorAvatar?:string,
-    authorName:string,
+    user:{
+      name:string,
+      image?:string
+    },
     image?: image[],
     superText?:string,
     text: string,
@@ -60,10 +62,12 @@ export type post ={
 };
 
 type originPost ={
-  authorAvatar?:string,
-  authorName:string,
+ user:{
+  name:string,
+  image?:string,
   userId:string,
-  timestamp:Date
+ },
+  timestamp:Date,
 }
 export type deletePostParams ={
   postId:string,

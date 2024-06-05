@@ -64,8 +64,6 @@ if(!isReposted&&!isSelfRepost){
                 userId:user.id,
                 superText:superText,
                 text:post.text,
-                authorAvatar:user.image,
-                authorName:user.name,
                 image:{
                     create:post.image
                 },

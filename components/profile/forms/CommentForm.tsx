@@ -268,7 +268,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                 </div>
             )}
             {createdComment.map((com,index)=>(
-                    <div key={index} className="border-t px-10 hover:bg-neutral-900">
+                    <div key={index} className="border-t px-5 hover:bg-neutral-900">
                         <OneComment comment={com} commentState={createdComment} setComment={setCreatedComment} user={user} className="mt-1"/> 
                     </div>
 

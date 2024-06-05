@@ -159,6 +159,13 @@ if(!userId){
     take: pageSize,  // Limit the number of posts
 
     include: {
+        user:{
+            select:{
+                name:true,
+                image:true
+            }
+        }
+        ,
         _count: {
             select: {
                 likes: true, 
@@ -192,11 +199,17 @@ if(!userId){
             }
         },
         originPost:{
-            select:{
-                authorAvatar:true,
-                authorName:true,
-                userId:true,
-                timestamp:true
+            include:{
+                user:{
+                    select:{
+                        name:true,
+                        image:true,
+                        // userId:true,
+                    },
+                },
+                // timestamp:true,
+                // PostId:true
+               
             }
            
         }
@@ -260,6 +273,7 @@ if(!userId){
     //     success: true,
     //     totalPostCount:totalPostCount
     // }
+    console.log(postsWithLikeCounts)
     return { posts: postsWithLikeCounts, success: true,totalPostCount:totalPostCount };
 };
 

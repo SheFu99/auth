@@ -151,14 +151,14 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
                 
                 <RepostHeader 
                     userId={post.userId}
-                    userName={post.authorName}
-                    userImage={post.authorAvatar}
+                    userName={post.user.name}
+                    userImage={post.user.image}
                     timestamp={post.timestamp}
                 />
                 {post?.superText&&(
                     <p className="px-10 mt-2">{post.superText}</p>
                 )}
-                {post?.originPost?.authorName &&post?.originPost?.authorAvatar&&(
+                {post?.originPost?.user.name &&post?.originPost?.user.image&&(
                 <>
                     <div className="py-2 px-5">
                         <BiRepost color="white" className="scale-150"/>
@@ -166,9 +166,9 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
               
                     <div className=" px-5 ">
                         <RepostHeader  
-                            userId={post.originPost.userId}
-                            userName={post.originPost.authorName}
-                            userImage={post.originPost.authorAvatar}
+                            userId={post.originPost.user.userId}
+                            userName={post.originPost.user.name}
+                            userImage={post.originPost.user.image}
                             timestamp={post.originPost.timestamp}
                             
                             />
