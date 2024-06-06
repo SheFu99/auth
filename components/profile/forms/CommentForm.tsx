@@ -25,6 +25,8 @@ import PostAvatar from "@/components/ui/PostAvatar"
 import Comments from "../post/postCard/lists/Comments";
 import { Comment } from "@/components/types/globalTs";
 import OneComment from "../post/postCard/Commnet";
+import { PostPromise, usePosts } from "../post/lib/usePost";
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 
 
 
@@ -63,17 +65,77 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     const [focus, setFocus] = useState<boolean>(false) 
     const [createdComment,setCreatedComment]=useState<Comment[]>([])
     // const forwardedRef = useRef(null)
-   
-   
+    const queryClient= useQueryClient()
+    const {data,isError,isLoading}=usePosts(user.id)
+    const postQuery = ['posts',user.id]
+
+    const Submit = (post:CommentPrev)=>{
+        startTransition(()=>{
+
+            CreateComment({comment:post,postId:postId})
+            .then((data:any)=>{
+                if(data.error){
+                    setError(error);
+                    toast.error(data.error)
+                }
+                if(data.CommentId){
+                    // update() ///update session
+                    setCreatedComment(prev=>[...prev,data])
+                    toast.success("Your post has been send")
+                }
+            })
+            
+        })
+    
+              
+    };
+    const createCommentMutation = useMutation({
+        mutationFn:CreateComment,
+        onSuccess: (newComment)=>{
+            // const {comment,postId}=variables
+            console.log(newComment)
+        
+            const existingData = queryClient.getQueryData<InfiniteData<PostPromise>>(postQuery,
+            )
+            console.log(existingData)
+
+
+            if(existingData){
+                const updatedData = {
+                    ...existingData,
+                    pages:existingData.pages.map(page=>({
+                        ...page,
+                        data:page.data.map(post=>{
+                            if(post.PostId === newComment.createdComment.postId){
+                                return {
+                                    ...post,
+                                    comments:[newComment.createdComment,...post.comments]
+                                }
+                            } 
+                            return post
+                            
+                        })
+                    }))
+                }
+                console.log(updatedData)
+                queryClient.setQueryData(postQuery,updatedData)
+            }
+            return newComment
+        },
+        onError:(error,variables,context)=>{
+            toast.error("ERROR")
+        },
+        onSettled:()=>{
+            queryClient.invalidateQueries({queryKey:postQuery})
+        }
+
+
+    })
     // const user=useCurrentUser()
     const userId = user?.id
     const type = 'comment'
 
  
-// useEffect(()=>{
-//     console.log(createdComment)
-// },[createdComment])
-
     const submitPost= async(event)=>{
         setEmoji(false)
         event.preventDefault()
@@ -112,7 +174,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
             })
             .finally(()=>{
                 setIsUploading(false)
-                Submit(post)
+                createCommentMutation.mutateAsync({comment:post,postId:postId })
                 setImageFiles([])
                 setImagesBlobUrl(null)
                 setTextState(undefined)
@@ -125,26 +187,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     
     };
 
-    const Submit = (post:CommentPrev)=>{
-        startTransition(()=>{
-
-            CreateComment(post,postId)
-            .then((data:any)=>{
-                if(data.error){
-                    setError(error);
-                    toast.error(data.error)
-                }
-                if(data.CommentId){
-                    // update() ///update session
-                    setCreatedComment(prev=>[...prev,data])
-                    toast.success("Your post has been send")
-                }
-            })
-            
-        })
-    
-              
-    };
+ 
     const handleReactionClick = (reaction)=>{
         setTextState(prevValue=>prevValue + reaction.emoji)
         forwardedRef.current.value += reaction.emoji
@@ -267,12 +310,12 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                     </div>
                 </div>
             )}
-            {createdComment.map((com,index)=>(
+            {/* {createdComment.map((com,index)=>(
                     <div key={index} className="border-t px-5 hover:bg-neutral-900">
                         <OneComment comment={com} commentState={createdComment} setComment={setCreatedComment} user={user} className="mt-1"/> 
                     </div>
 
-                    ))}
+                    ))} */}
         </div>
            
 

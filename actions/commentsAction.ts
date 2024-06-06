@@ -2,9 +2,23 @@
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { deleteImagefromS3 } from "./UserPosts"
+import { CommentPrev } from "@/components/profile/forms/CommentForm"
+import { Comment } from "@/components/types/globalTs"
 
-export const CreateComment = async(commentCard,postId)=>{
+type CreateCommentParams = {
+    postId:String,
+    comment:CommentPrev
+};
+type CreateCommentPromise =  {
+    createdComment?:Comment,
+    error?:string,
+    success?:boolean
+}
 
+export const CreateComment = async({comment,postId}:CreateCommentParams):Promise<CreateCommentPromise>=>{
+    if(!postId){
+        throw new Error ('postID is required')
+    }
     const user= await currentUser()
     //    console.log("USER created post",user)
           if(!user){
@@ -21,8 +35,10 @@ export const CreateComment = async(commentCard,postId)=>{
          
             const existingPost = await db.comment.findFirst({
                 where: {
-                    text: commentCard.text,
-                    userId: user.id,
+                    AND:[
+                        {text: comment.text},
+                        {userId: user.id},
+                    ]
                 },
             });
             
@@ -34,20 +50,16 @@ export const CreateComment = async(commentCard,postId)=>{
         try{
             
         const postData = {
-            text:commentCard.text,
+            text:comment.text,
             userId:user.id,
             postId:postId
         } as any
-    
-        if(commentCard.image){
-            const imagesCopy = [...commentCard.image];
+        if(comment.image){
+            const imagesCopy = [...(comment.image as string[])];
             if(imagesCopy.length>0){
                 postData.image = {create:imagesCopy.map(url=>({url}))}
             }
         }
-          
-    
-            
             const createPost = await db.comment.create({
                 data: postData,
                 include:{
@@ -69,8 +81,7 @@ export const CreateComment = async(commentCard,postId)=>{
                 }
               });
             //   console.log("after insert:", [...postCard.image])
-            console.log("Post created", createPost)
-            return createPost
+            return {createdComment:createPost , success:true}
            
         }catch(error){
             if (error.code === 'P2002') { // Prisma's error code for unique constraint violation
@@ -82,7 +93,12 @@ export const CreateComment = async(commentCard,postId)=>{
         }
 }
 
-export const DeleteComment = async(commentId:string,keys:string)=>{
+type DeleteCommentParams = {
+    commentId:string,
+    keys?:string
+}
+export const DeleteComment = async({commentId,keys}:DeleteCommentParams)=>{
+     console.log('COMMENTDELETE',commentId)
     const user= await currentUser()
 
     const isCommentOwner = await db.user.findFirst({
@@ -114,6 +130,7 @@ try {
 };
 
 export const LikeComment = async (CommentId: string) => {
+    ///TODO: Add rate limit to each like action 
     console.log(CommentId)
     const user = await currentUser();
     if (!user) {
@@ -122,24 +139,19 @@ export const LikeComment = async (CommentId: string) => {
 
     const existingComment = await db.comment.findUnique({
         where: { CommentId: CommentId },
-        include: { likes: true }  // Assuming 'likes' is the relation field name in your Prisma schema
+        include: { likes: true } 
     });
-
     if (!existingComment) {
         return { error: "Post does not exist" };
     }
-
-    // Check if the current user has already liked the post
     const existingLike = existingComment.likes.find(like => like.userId === user.id);
 
     if (existingLike) {
-        // User has liked this post before, remove the like
         await db.like.delete({
-            where: { likeId: existingLike.likeId }  // Assuming 'id' is the identifier for likes
+            where: { likeId: existingLike.likeId }
         });
         return { success: true, message: "Like removed", likesCount: existingComment.likes.length - 1,hasLike:false };
     } else {
-        // User has not liked this post before, add a new like
         await db.like.create({
             data: {
                 userId: user.id,
@@ -147,6 +159,5 @@ export const LikeComment = async (CommentId: string) => {
             }
         });
         return { success: true, message: "Post liked", likesCount: existingComment.likes.length + 1,hasLike:true };
-        // return {error:"400"}
     }
 };

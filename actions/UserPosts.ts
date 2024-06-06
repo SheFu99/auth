@@ -1,7 +1,7 @@
 "use server"
 
 
-import { deletePostParams } from "@/components/types/globalTs"
+import { deletePostParams, post } from "@/components/types/globalTs"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { UserPost } from "@/schemas"
@@ -37,6 +37,7 @@ type PostCard = {
 }
 
 
+
 const s3Client = new S3Client({
     region: process.env.NEXT_PUBLIC_S3_REGION as string,
     credentials:{
@@ -44,7 +45,15 @@ const s3Client = new S3Client({
         secretAccessKey: process.env.NEXT_PUBLIC_S3_SECRET_KEY as string,
     }
 });
-export const CreatePost= async(postCard:PostCard)=>{
+
+type createPostPromise =  {
+    post?:post,
+    error?:string,
+    success?:boolean,
+    likedByUser?:boolean,
+}
+
+export const CreatePost= async(postCard:PostCard):Promise<createPostPromise>=>{
   
     const user= await currentUser()
 //    console.log("USER created post",user)
@@ -75,8 +84,6 @@ export const CreatePost= async(postCard:PostCard)=>{
     try{
         
     const postData = {
-        authorAvatar:user.image,
-        authorName:user.name,
         text:postCard.text,
         userId:user.id,
     } as any
@@ -87,15 +94,39 @@ export const CreatePost= async(postCard:PostCard)=>{
             postData.image = {create:imagesCopy.map(url=>({url}))}
         }
     }
-      
-
         
         const createPost = await db.post.create({
             data: postData,
-          });
+            
+            include:{
+                user:{
+                    select:{
+                        name:true,
+                        image:true,
+                        id:true,
+                    }
+                },
+                image:{
+                    select:{url:true}
+                },
+                likes:{
+                    where:{userId:user?.id}
+                },
+                _count:{
+                    select:{
+                        likes:true,
+                        comments:true
+                    }
+                },
+                
+            }
+          }) as post
         //   console.log("after insert:", [...postCard.image])
         // console.log("Post created", createPost)
-        return createPost
+
+
+        const likedByUser = user&& createPost.likes && createPost.likes.some(like=>like.userId === user.id)
+        return {post:createPost,success:true, likedByUser:likedByUser}
        
     }catch(error){
         if (error.code === 'P2002') { // Prisma's error code for unique constraint violation
@@ -119,7 +150,7 @@ let PostsCacheKey = {
     
 }
 export const GetUserPostsById = async (userId: string,page:number):Promise<postPromise> => {
-    console.log(page)
+    console.log('GET_USERPOST_REQUESTs',page)
     // const time = new Date()
     // let now = time.getTime()
     // console.log(now,PostsCacheKey.time)
@@ -150,10 +181,10 @@ if(!userId){
     const user = await currentUser()
 
 
-    const postsQuery={
+    let postsQuery={
         where: {userId: userId},
     orderBy: [
-        { timestamp: "desc" }  // Assuming 'createdAt' is the correct field for timestamping posts
+        { timestamp: "desc" } 
     ],
     skip: skip,  // Skip the previous pages
     take: pageSize,  // Limit the number of posts
@@ -177,6 +208,9 @@ if(!userId){
             take:5,
         },
         comments:{
+            orderBy:[
+                {timestamp: "desc"}
+            ],
             take:2,
             include:{
                 image:{
@@ -190,7 +224,7 @@ if(!userId){
                         id:true
                     }
                 },
-                likes:true,
+                // likes:true,
                 _count:{
                     select:{
                         likes:true
@@ -204,7 +238,7 @@ if(!userId){
                     select:{
                         name:true,
                         image:true,
-                        // userId:true,
+                        id:true,
                     },
                 },
                 // timestamp:true,
@@ -273,7 +307,6 @@ if(!userId){
     //     success: true,
     //     totalPostCount:totalPostCount
     // }
-    console.log(postsWithLikeCounts)
     return { posts: postsWithLikeCounts, success: true,totalPostCount:totalPostCount };
 };
 
@@ -384,7 +417,16 @@ if(originPostId){
             }
         };
 
-export const LikePost = async (postId: string) => {
+     export type LikePostPromise = {
+            success?:boolean,
+            message?:string,
+            likesCount?:number,
+            PostId?:string,
+            error?:string,
+            hasLike?:boolean,
+        }
+
+export const LikePost = async (postId: string):Promise<LikePostPromise> => {
     const user = await currentUser();
     if (!user) {
         return { error: "You need to be authorized!" };
@@ -398,10 +440,7 @@ export const LikePost = async (postId: string) => {
     if (!existingPost) {
         return { error: "Post does not exist" };
     }
-
-    // Check if the current user has already liked the post
     const existingLike = existingPost.likes.find(like => like.userId === user.id);
-
     if (existingLike) {
         // User has liked this post before, remove the like
         await db.like.delete({

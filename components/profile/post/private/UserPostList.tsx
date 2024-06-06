@@ -7,11 +7,12 @@ import React, {  Profiler, useCallback, useEffect, useState, useTransition } fro
 import { toast } from "sonner";
 const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
 import { useSession } from "next-auth/react";
-import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import {  Comment, post } from "../../../types/globalTs";
-import {  repostProps } from "@/actions/repost";
-import { changeLikeCount } from "../postCard/lib/changeLikeCount";
 import PostList from "../postCard/lists/PostList";
+import { QueryClient, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import PostSkeleton from "../skeleton";
+import PrivatePostList from "./PrivatePostList";
+import { usePosts } from "../lib/usePost";
 
 
 
@@ -22,15 +23,13 @@ type userListProps ={
     totalPostCount:number;
     setTotalCount?:(count:number)=>void;
     serverPosts?:post
-}
+};
+
+
 
 const UserPostList :React.FC<userListProps> = ({profile,totalPostCount,serverPosts,setTotalCount}) => {
-    console.log('rednder')
-const [posts, setPosts]=useState<post[]>()
-const [isOpen,setIsOpen]=useState(false)
-const [isPending,startTransition]=useTransition()
-const [addComent,setComentState]=useState([])
 
+const [posts, setPosts]=useState<post[]>()
 const {update}=useSession()
 
 const [hasMore,setHasMore]= useState(true)
@@ -50,49 +49,63 @@ const debouncedGetPost = useCallback(()=>{
         debouncedGetPost()
     },[profile])
 
-        const fetchMoreData = async ()=>{
-            if(isloading){
-                return
-            }
-            if(posts?.length>=totalPostCount ){
-                setHasMore(false)
-                return
-            }
-            console.log(page)
-            setIsLoading(true)
-            GetUserPostsById(profile,page)
-            .then(posts=>{
-                if(posts.posts){
-                    setPosts(prev=>[...prev,...posts?.posts])
-                    setPage(prev=>prev+1); 
+        // const fetchMoreData = async ()=>{
+        //     if(isloading){
+        //         return
+        //     }
+        //     if(posts?.length>=totalPostCount ){
+        //         setHasMore(false)
+        //         return
+        //     }
+        //     console.log(page)
+        //     setIsLoading(true)
+        //     GetUserPostsById(profile,page)
+        //     .then(posts=>{
+        //         if(posts.posts){
+        //             setPosts(prev=>[...prev,...posts?.posts])
+        //             setPage(prev=>prev+1); 
 
-                }
-            })
-            .catch(err=>{
-                toast.error(err)
-            })
-            .finally(()=>{
-                 setIsLoading(false)
-                })
-        };
+        //         }
+        //     })
+        //     .catch(err=>{
+        //         toast.error(err)
+        //     })
+        //     .finally(()=>{
+        //          setIsLoading(false)
+        //         })
+        // };
+  
+        const queryClient = useQueryClient()
 
-
+    const {data,fetchNextPage,hasNextPage,isLoading, isError,error,isPending,isSuccess}=usePosts(profile)
+    console.log(data?.pages)
+    console.log(data?.pages?.flatMap((page,pageParams)=>page.data))
+    console.log("Query Cache: ", queryClient.getQueryData(['posts',profile]));
+    
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1">
-              {!posts&&profile&&(
+              {/* {!posts&&profile&&(
                     <div className="w-full flex justify-center py-10 items-center align-middle">
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>
+                )} */}
+
+                {isLoading&&(
+                    <PostSkeleton/>
                 )}
-            <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded = {isloading}>
-            {posts&&(
-                 <PostList
+
+            <InfiniteScroll page={page} loadMore={fetchNextPage} hasMore={hasNextPage} isloaded = {isLoading}>
+            {data?.pages.map((page,index)=>(
+                <div key={index}>
+                     <PrivatePostList
                  // key={index}
                  setPost={setPosts}
-                 postState={posts} 
+                 postState={page.data} 
                  user={user}
                  />
-            )}
+                </div>
+                
+            ))}
            
            </InfiniteScroll>
 

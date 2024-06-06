@@ -21,6 +21,8 @@ import useOnError from "./functions/onError"
 import useBlobImage from "./functions/useBlobImage"
 import { postSchema } from "@/schemas"
 import BlobImageManager from "./classes/BlobImageManager"
+import { PostPromise, usePosts } from "../post/lib/usePost"
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query"
 
 
 
@@ -63,17 +65,66 @@ const UserPostForm = () => {
     const user=useCurrentUser()
     const userId = user?.id
     const type = 'post'
- 
+    
+    const queryClient = useQueryClient()
+    const {isLoading,isError}=usePosts(userId)
+    
+
+    const Submit = async (post)=>{
+        console.log("SUBMIT_START")
+        try {
+        const CreatedPost = await CreatePost(post)
+            return CreatedPost
+        } catch (error) {
+            return error
+        }
+    }
+    // console.log("Query Cache: ", queryClient.getQueryData<InfiniteData<PostPromise>>(['posts', userId ]));
+    const CreatePostMutation = useMutation({
+        mutationFn: Submit,
+        onSuccess: (newPost)=>{
+            console.log(userId)
+            queryClient.setQueryData<InfiniteData<PostPromise>>(['posts',userId],oldData=>{
+                
+                console.log(oldData,userId)
+
+                if(!oldData){
+                    console.log("RETURN_OLD_DATA")
+                    return oldData
+
+                }
+                const newData = {
+                    ...oldData,
+                    pages: oldData.pages.map((page,index)=>{
+                        if(index === 0) {
+                            return {
+                                ...page,
+                                data:[newPost.post, ...page.data]
+                            };
+
+                        }
+                        return page
+                        })
+                    }
+                    console.log(newData)
+                    return newData
+            }
+        )
+                
+            }
+        
+        })
+       
+
+    
     const submitPost= async(event)=>{
         console.log('SUBMIT!')
         setEmoji(false)
         event.preventDefault()
         setIsUploading(true)
-        // Validate form data against Zod schema
         try {
             postSchema.parse({ text: textState }); // Validate the text field
         } catch (error) {
-            // Handle validation errors (for example, display an error message)
             onError(error)
             setIsUploading(false);
             return null
@@ -101,7 +152,7 @@ const UserPostForm = () => {
             })
             .finally(()=>{
                 setIsUploading(false)
-                Submit(post)
+                CreatePostMutation.mutateAsync(post)
                 setImageFiles([])
                 setImagesBlobUrl([])
                 setTextState(undefined)
@@ -113,30 +164,7 @@ const UserPostForm = () => {
     return 
     
     };
-
-
-
- 
-    const Submit = (post)=>{
- 
-        startTransition(()=>{
-            console.log("CREATEPOST")
-            CreatePost(post)
-            .then((data:DataResponse)=>{
-                if(data.error){
-                    setError(error);
-                    toast.error(data.error)
-                }
     
-                if(!data.error){
-                    update() 
-                    toast.success("Your post has been send")
-                   
-                }
-            })
-            
-        })    
-    }
 
     const handleReactionClick = (reaction)=>{
         setTextState(prevValue=>prevValue + reaction.emoji)

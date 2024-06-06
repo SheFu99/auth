@@ -8,6 +8,10 @@ import { useState, useTransition } from "react";
 import { awsBaseUrl } from "../private/UserPostList";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import { toast } from "sonner";
+import { PostPromise, usePosts } from "../lib/usePost";
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
+import { MutationContext } from "../private/PrivatePostList";
+import { changeLikeCount } from "./lib/changeLikeCount";
 
 
 interface CommentProps {
@@ -21,54 +25,97 @@ interface CommentProps {
 
 const OneComment = ({user,comment,commentState,setComment,className,index}:CommentProps) => {
     const [isPending,startTransition]=useTransition()
-    const commentLikeAction = (CommentId:string)=>{
-        startTransition(()=>{
-            LikeComment(CommentId)
-            .then((data)=>{
-                if(data.error){
-                    toast.error('Comment Like Error')
-                }
-                if(data.success){
-                    return
-                }
-            })
-        })
-    };
+    const {data,isError,isLoading}=usePosts(user.id)
+    const queryClient = useQueryClient()
+    const postQuery = ['posts',user.id]
 
+    const comentLikeMutation = useMutation({
+        mutationFn:LikeComment,
+        onMutate: async (CommentId:string):Promise<MutationContext>=>{
+            await queryClient.cancelQueries({queryKey:postQuery});
+            const preveousPosts = queryClient.getQueryData<InfiniteData<PostPromise>>(postQuery);
+            
+            queryClient.setQueryData<InfiniteData<PostPromise>>(
+                postQuery,
+                (old)=>{
+                    if(!old) return old 
+
+                    return {
+                        ...old,
+                        pages:old.pages.map(page=>({
+                            ...page,
+                            data:page.data.map(post=>({
+                                ...post,
+                                comments:post.comments.map(comment=>{
+                                    if(comment.CommentId === CommentId){
+                                        const changedCount = changeLikeCount(comment)
+                                        return changedCount
+                                    }
+                                    return comment
+                                })
+                            }))
+                        }))
+                    }
+
+                }
+            )
+
+            return {preveousPosts}
+        },
+        onError:(err,commentId,context)=>{
+            if(context?.preveousPosts){
+                queryClient.setQueryData(postQuery,context.preveousPosts)
+            }
+        },
+        onSettled:()=>{
+            queryClient.invalidateQueries({queryKey:postQuery})
+        }
+    })
+    const commentDeleteMutation = useMutation({
+
+        mutationFn:DeleteComment,
+        onSuccess: (data,variables,context)=>{
+            console.log(variables)
+            const { commentId }=variables
+            console.log(commentId)
+            queryClient.setQueryData<InfiniteData<PostPromise>>(postQuery,
+                old=>{
+                    if(!old) return old
+
+                    const newPost = {
+                        ...old,
+                        pages:old.pages.map(page=>({
+                            ...page,
+                            data:page.data.map(post=>({
+                                ...post,
+                                comments:post.comments.filter(comment=>comment.CommentId !== commentId)
+                            }))
+                        }))
+                    }
+                    console.log(newPost)
+                    return newPost
+                }
+            )
+        },
+        onError:(err,variables,context)=>{
+            if(err){
+                toast.error("Error try again!")
+            }
+        },
+        onSettled:()=>{
+            queryClient.invalidateQueries({queryKey:postQuery})
+        }
+
+    })
      const CommentLike =  (comment:Comment) => {
         const commentId = comment.CommentId
         if (!user) {
             toast.error("You must be authorized");
             return;
         }
-       
-        
-        if(commentState){
-            const updatedPosts = commentState.map((com) => {
-                if (com.CommentId !== commentId) {
-                    return com; // No changes for other comments
-                }
-              
-             
-                // Update the comment here
-                return {
-                    ...com,
-                    likedByUser: !com.likedByUser,
-                    _count: {
-                        ...com._count,
-                        likes: com.likedByUser ? com._count?.likes - 1 : com._count?.likes + 1
-                    }
-                };
-         
-            // Return the updated post with the updated comments
-          
-        });
-            setComment(updatedPosts);
-
-        }
-        commentLikeAction(commentId);
-        
+        comentLikeMutation.mutateAsync(commentId);
     };
+
 
     const DeleteCommentFunction = (comment:Comment) =>{
         const keys:any = comment?.image?.map(item => {
@@ -76,29 +123,7 @@ const OneComment = ({user,comment,commentState,setComment,className,index}:Comme
             return result
           });
 
-
-        startTransition(()=>{
-            DeleteComment(comment.CommentId,keys)
-            .then((data)=>{
-                if(data.success){
-                    toast.success(data.success)
-
-                    if(commentState){
-                        const filteredState = commentState.filter(com=>{
-                           return com.CommentId !== comment.CommentId
-                        })
-                        setComment(filteredState)
-                    }
-                 
-
-
-                    // update()
-                }
-                if(data.error){
-                    toast.success(data.error)
-                }
-            })
-        })
+          commentDeleteMutation.mutateAsync({commentId:comment.CommentId,keys:keys})
 
     };
     return ( 

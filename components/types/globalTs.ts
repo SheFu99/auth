@@ -45,14 +45,15 @@ export type post ={
     PostId: string,
     user:{
       name:string,
-      image?:string
+      image?:string,
+      id:string,
     },
     image?: image[],
     superText?:string,
     text: string,
     timestamp: Date,
     userId: string,
-    likes?:any[]
+    likes?:any[],
     likedByUser?:boolean,
     _count:_count,
     comments?:Comment[],
@@ -65,7 +66,7 @@ type originPost ={
  user:{
   name:string,
   image?:string,
-  userId:string,
+  id:string,
  },
   timestamp:Date,
 }

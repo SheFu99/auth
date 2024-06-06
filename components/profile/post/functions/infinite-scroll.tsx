@@ -6,11 +6,12 @@ const InfiniteScroll = ({ loadMore, hasMore, children, isloaded, page }) => {
   const loaderRef = useRef(null);
 
   useEffect(() => {
+    
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore && !isFetching) {
           setIsFetching(true);
-          loadMore().then(() => setIsFetching(false));
+          loadMore()?.then(() => setIsFetching(false));
         }
       },
       {
@@ -44,7 +45,7 @@ const InfiniteScroll = ({ loadMore, hasMore, children, isloaded, page }) => {
               </div>
             ) : (
               <div className='flex w-full justify-center mb-2'>
-                <p className='text-gray-300 text-sm'>No more posts to upload!</p>
+                {/* <p className='text-gray-300 text-sm'>No more to upload!</p> */}
               </div>
             )}
           </div>
