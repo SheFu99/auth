@@ -2,31 +2,11 @@
 
 "use client"
 
-import { DeleteUserPosts, GetUserPostsById, LikePost } from "@/actions/UserPosts";
-import React, {  useCallback, useState, useTransition } from "react";
-import { toast } from "sonner";
-import { RiDeleteBin5Line } from "react-icons/ri";
-import ImageGrid from "../Image-grid";
-import { FaCommentDots } from "react-icons/fa";
-import { BiRepost } from "react-icons/bi";
-import LikeButton from "../Like-button";
-import PostHeader from "../Post-header";
-import CommentForm from "../../forms/CommentForm";
-import { DeleteComment, LikeComment } from "@/actions/commentsAction";
-import { Comment, post } from "../../../types/globalTs";
-import RepostHeader from "../Repost-author-header";
+import React from "react";
 import { ExtendedUser } from "@/next-auth";
-import Link from "next/link";
-import OneComment from "../postCard/Commnet";
-import PostCard from "../postCard/PostCard";
-import PostListArchive from "../postCard/archive/PostListArchive";
 import { usePosts } from "../lib/usePost";
 import PostList from "../postCard/lists/PrivatePostList";
 const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
-const RepostModalForm = React.lazy(()=>import ('../repostForm'))
-// import RepostForm from "./post/repostForm"
-
-///Add optimistic commentSettings
 
 export const awsBaseUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
 
@@ -37,11 +17,9 @@ type userListProps ={
 
 const PublicPostList :React.FC<userListProps> = ({userId,sessionUser}) => {
 
-const [posts, setPosts]=useState<post[]>([])
 const {data,fetchNextPage,hasNextPage,isError,isLoading,isFetched}=usePosts(userId)
-console.log(data?.pages[0].totalPostCount)
+// console.log(data?.pages[0].totalPostCount)
 const page = 2 
-
 const user = sessionUser
 
 
