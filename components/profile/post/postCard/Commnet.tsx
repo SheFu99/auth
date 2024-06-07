@@ -4,7 +4,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import PostHeader from "../Post-header";
 import ImageGrid from "../Image-grid";
 import LikeButton from "../Like-button";
-import { useState, useTransition } from "react";
+import {  useTransition } from "react";
 import { awsBaseUrl } from "../private/UserPostList";
 import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import { toast } from "sonner";
@@ -15,19 +15,20 @@ import { changeLikeCount } from "./lib/changeLikeCount";
 
 
 interface CommentProps {
-    user?:ExtendedUser,
+    currentSession?:ExtendedUser,
     comment?:Comment,
     commentState?:Comment[],
     setComment?: (comments:Comment[])=>void,
     className?:string,
     index?:number,
+    userId:string
 }
 
-const OneComment = ({user,comment,commentState,setComment,className,index}:CommentProps) => {
+const OneComment = ({currentSession,comment,userId,setComment,className,index}:CommentProps) => {
     const [isPending,startTransition]=useTransition()
-    const {data,isError,isLoading}=usePosts(user.id)
+    const {data,isError,isLoading}=usePosts(userId)
     const queryClient = useQueryClient()
-    const postQuery = ['posts',user.id]
+    const postQuery = ['posts',userId]
 
     const comentLikeMutation = useMutation({
         mutationFn:LikeComment,
@@ -106,7 +107,7 @@ const OneComment = ({user,comment,commentState,setComment,className,index}:Comme
     })
      const CommentLike =  (comment:Comment) => {
         const commentId = comment.CommentId
-        if (!user) {
+        if (!currentSession) {
             toast.error("You must be authorized");
             return;
         }
@@ -125,7 +126,7 @@ const OneComment = ({user,comment,commentState,setComment,className,index}:Comme
     };
     return ( 
         <div className={`${className} relative -mt-5 py-5 px-4`} key={index||1}>
-             {user?.id === comment.userId&&(
+             {currentSession?.id === comment.userId&&(
                                 <button title="delete commetn" 
                                 className="text-black absolute right-1"
                                 onClick={()=>DeleteCommentFunction(comment)}

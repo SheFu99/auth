@@ -5,7 +5,7 @@ import TabSwitch from "@/components/profile/Tabs";
 import PublicProfileFriends from "@/components/profile/friends/publicProfileFriends";
 import PublicPostList from "@/components/profile/post/public/PublicUserPost";
 import { ExtendedUser } from "@/next-auth";
-import { SessionProvider } from "next-auth/react";
+
 
 interface CompousePAgeProps {
     profile:any,
@@ -18,17 +18,15 @@ const CompousePage: React.FC<CompousePAgeProps> = ({profile,sessionUser,userPost
     return (
         <>
         <PublicProfile profile={profile} sessionUser={sessionUser}/> 
-        {/* <SessionProvider> */}
+
               {userPostList&&userfriendsList&&(
-                  // <Suspense fallback={<ListSkeleton/>}>
                   <TabSwitch
                   chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList} /> }
-                  chilldrenPosts={<PublicPostList userId={sessionUser.id}  sessionUser={sessionUser}/>}
+                  chilldrenPosts={<PublicPostList  userId={sessionUser.id}  sessionUser={sessionUser}/>}
                   postTotal={userPostList.totalPostCount}
                   />
-                  // </Suspense>
               )}
-              {/* </SessionProvider> */}
+
          </>
       );
 }

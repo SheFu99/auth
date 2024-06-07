@@ -25,7 +25,8 @@ import { PostPromise, usePosts } from "../../lib/usePost";
 
 type PostListProps={
     postState:post[],
-    user?:ExtendedUser,
+    currentSession?:ExtendedUser,
+    userId:string,
     
 }
 export interface MutationContext {
@@ -33,7 +34,7 @@ export interface MutationContext {
 }
 
 
-const PostList:React.FC<PostListProps> = ({postState,user}) => {
+const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => {
     // const [postState,setPost] = useState<post>(post)
     const [isPending,startTransition]=useTransition()
     const [addComent,setComentState]=useState([])
@@ -41,10 +42,10 @@ const PostList:React.FC<PostListProps> = ({postState,user}) => {
     const router = useRouter()
     // const observer = useRef<IntersectionObserver|null>()
 
-    const {data,isError,isLoading}=usePosts(user.id)
+    const {data,isError,isLoading}=usePosts(userId)
     const queryClient = useQueryClient()
   
-    const queryKey = ['posts', user.id]
+    const queryKey = ['posts', userId]
     const PostLikeMutation = useMutation({
         mutationFn: LikePost,
         onMutate: async (postId:string):Promise<MutationContext>=>{
@@ -110,7 +111,7 @@ const PostList:React.FC<PostListProps> = ({postState,user}) => {
     });
                     
         const Postlike =  (postId: string) => {
-            if (!user) {
+            if (!currentSession) {
                 toast.error("You must be authorized");
                 return;
             }
@@ -196,11 +197,11 @@ const PostList:React.FC<PostListProps> = ({postState,user}) => {
         
                 <div className="ml-[3rem] mr-[1rem]">
                     <p className="text-white text-xl col-span-10 col-start-2 mt-5">{post.text}</p>
-                        {user?.id === post.userId&&(
+                        {currentSession?.id === post.userId&&(
                             <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                         )}
                         <div className="">
-                            <ImageGrid images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3`} />
+                            <ImageGrid images={post.image} className={`${currentSession?.id===post.userId? '-mt-5':''}  mb-3`} />
                     
                         </div>
                    
@@ -229,7 +230,8 @@ const PostList:React.FC<PostListProps> = ({postState,user}) => {
         {isPostCommentOpen(post.PostId)&&(
             <div className={`border-t `} >
                 <CommentForm 
-                user={user} 
+                currentSession={currentSession} 
+                userId={userId}
                 postId={post?.PostId} 
                 forwardedRef={commentFormRef}
                 className=" mb-1 "
@@ -248,9 +250,10 @@ const PostList:React.FC<PostListProps> = ({postState,user}) => {
                     
                         <OneComment 
                             index={index}
-                            user={user} 
+                            currentSession={currentSession} 
                             comment={comment} 
                             commentState={post.comments}  
+                            userId={userId}
                         />
                         
                     </div>

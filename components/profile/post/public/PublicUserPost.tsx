@@ -60,7 +60,8 @@ const user = sessionUser
                     <div key={index}>
                         <PostList
                             postState={page?.data} 
-                            user={user}
+                            currentSession={user}
+                            userId={userId}
                     />
                     </div>
                     

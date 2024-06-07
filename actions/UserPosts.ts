@@ -140,31 +140,9 @@ export const CreatePost= async(postCard:PostCard):Promise<createPostPromise>=>{
         
 };
 ///add cache 
-let PostsCacheKey = {
-    userId:undefined,
-    page:null,
-    time:undefined,
-    posts:undefined,
-    success:undefined,
-    totalPostCount:undefined
-    
-};
 
 export const GetUserPostsById = async (userId: string,page:number):Promise<postPromise> => {
     console.log('GET_USERPOST_REQUESTs',page)
-    // const time = new Date()
-    // let now = time.getTime()
-    // console.log(now,PostsCacheKey.time)
-    // let cacheId = PostsCacheKey.userId === userId
-    // let cachePage = PostsCacheKey.page ===page
-    // let cacheTime = PostsCacheKey.time > now - 2000
-  
-    // if(cacheId===cachePage===cacheTime){
-    //     console.log('Retrive from cache')
-
-    //     return {success:true, posts: PostsCacheKey.posts ,totalPostCount:PostsCacheKey.totalPostCount}
-    // }
-   
 if(!userId){
     return {error:'ID required!'}
 }
@@ -225,7 +203,6 @@ if(!userId){
                         id:true
                     }
                 },
-                // likes:true,
                 _count:{
                     select:{
                         likes:true
@@ -242,8 +219,6 @@ if(!userId){
                         id:true,
                     },
                 },
-                // timestamp:true,
-                // PostId:true
                
             }
            

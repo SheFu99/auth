@@ -1,7 +1,7 @@
 
 "use client"
 
-import {  RefObject, useEffect, useRef, useState, useTransition } from "react"
+import {  useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "../../ui/button"
 import { IoCreate, IoSendSharp } from "react-icons/io5";
@@ -11,7 +11,6 @@ import { BsEmojiSmile } from "react-icons/bs"
 import { IoMdClose } from "react-icons/io"
 import { Theme } from "emoji-picker-react"
 import Picker from 'emoji-picker-react'
-import useBlobImage from "./functions/useBlobImage";
 import useUploadImages, { UploadImagesProps } from "./functions/uploadImages";
 import useOnError from "./functions/onError";
 import { postSchema } from "@/schemas";
@@ -22,9 +21,7 @@ import { SlLogin } from "react-icons/sl"
 import { RegisterButton } from "@/components/auth/RegisterButton"
 import { ExtendedUser } from "@/next-auth"
 import PostAvatar from "@/components/ui/PostAvatar"
-import Comments from "../post/postCard/lists/Comments";
 import { Comment } from "@/components/types/globalTs";
-import OneComment from "../post/postCard/Commnet";
 import { PostPromise, usePosts } from "../post/lib/usePost";
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -37,19 +34,20 @@ export interface DataResponse extends Comment{
 
 interface CommentFormProps {
     postId:string,
-    user?:ExtendedUser,
+    currentSession?:ExtendedUser,
     className?:string,
     forwardedRef?: React.RefObject<HTMLTextAreaElement>;
+    userId:string,
 }
 
 export type CommentPrev = {
     text:string,
     image?:string | string[],
-    userId:string
+    userId?:string
 }
 
-const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwardedRef}) => {
-
+const CommentForm:React.FC<CommentFormProps> = ({postId,currentSession,className,forwardedRef,userId}) => {
+ 
     const { isUploading,
             setIsUploading,
             uploadImages}=useUploadImages()
@@ -61,43 +59,20 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     const [isPending,startTransition]=useTransition()
     const [isEmoji,setEmoji]=useState<boolean>(false)
     const [textState,setTextState]=useState<string>('')
-    const [error,setError] =useState<string| undefined>()
     const [focus, setFocus] = useState<boolean>(false) 
-    const [createdComment,setCreatedComment]=useState<Comment[]>([])
-    // const forwardedRef = useRef(null)
+  
+
+
     const queryClient= useQueryClient()
-    const {data,isError,isLoading}=usePosts(user.id)
-    const postQuery = ['posts',user.id]
-
-    const Submit = (post:CommentPrev)=>{
-        startTransition(()=>{
-
-            CreateComment({comment:post,postId:postId})
-            .then((data:any)=>{
-                if(data.error){
-                    setError(error);
-                    toast.error(data.error)
-                }
-                if(data.CommentId){
-                    // update() ///update session
-                    setCreatedComment(prev=>[...prev,data])
-                    toast.success("Your post has been send")
-                }
-            })
-            
-        })
     
-              
-    };
+    const {data,isError,isLoading}=usePosts(userId)
+    const postQuery = ['posts',userId]
     const createCommentMutation = useMutation({
         mutationFn:CreateComment,
         onSuccess: (newComment)=>{
             // const {comment,postId}=variables
-            console.log(newComment)
-        
             const existingData = queryClient.getQueryData<InfiniteData<PostPromise>>(postQuery,
             )
-            console.log(existingData)
 
 
             if(existingData){
@@ -117,7 +92,6 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                         })
                     }))
                 }
-                console.log(updatedData)
                 queryClient.setQueryData(postQuery,updatedData)
             }
             return newComment
@@ -131,11 +105,10 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
 
 
     })
+  
     // const user=useCurrentUser()
-    const userId = user?.id
+    // const userId = user?.id
     const type = 'comment'
-
- 
     const submitPost= async(event)=>{
         setEmoji(false)
         event.preventDefault()
@@ -186,13 +159,10 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     return 
     
     };
-
- 
     const handleReactionClick = (reaction)=>{
         setTextState(prevValue=>prevValue + reaction.emoji)
         forwardedRef.current.value += reaction.emoji
     };
-
     const AddImages = (event:React.ChangeEvent<HTMLInputElement>) => {
         manager.addImage(event)
         setImageFiles(manager.getImages())
@@ -207,7 +177,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
     return (
         <div className={`${className} -mb-2 `}
         >
-            {userId?(
+            {currentSession?(
                 <>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
                 {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[80vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
@@ -220,8 +190,8 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                     >
 
                     <PostAvatar
-                        src={user.image}
-                        alt={user.name}
+                        src={currentSession.image}
+                        alt={currentSession.name}
                         className="col-span-1"
                     />
                         <Textarea 
@@ -291,7 +261,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                
                 </>
             ):(
-                <div className="flex justify-center border-2 p-5 rounded-sm w-full flex-wrap space-y-5">
+                <div className="flex justify-center p-5 rounded-sm w-full flex-wrap space-y-5">
                     <p>You can log/in or sign up to live comment here...</p>
                     <div className="justify-center w-full flex gap-2 align-middle items-center " role="button" >
                         <LoginButton mode="modal" asChild >
@@ -310,12 +280,6 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,user,className,forwarded
                     </div>
                 </div>
             )}
-            {/* {createdComment.map((com,index)=>(
-                    <div key={index} className="border-t px-5 hover:bg-neutral-900">
-                        <OneComment comment={com} commentState={createdComment} setComment={setCreatedComment} user={user} className="mt-1"/> 
-                    </div>
-
-                    ))} */}
         </div>
            
 

@@ -8,26 +8,24 @@ import RepostHeader from "../Repost-author-header";
 import { BiRepost } from "react-icons/bi";
 import { post } from "@/components/types/globalTs";
 import { ExtendedUser } from "@/next-auth";
-import {  useRef, useState, useTransition } from "react";
+import {  useRef, useTransition } from "react";
 
 import { toast } from "sonner";
 import { awsBaseUrl } from "../private/UserPostList";
-import { DeleteUserPosts, LikePost, postPromise } from "@/actions/UserPosts";
+import { DeleteUserPosts, LikePost } from "@/actions/UserPosts";
 import { changeLikeCount } from "./lib/changeLikeCount";
 import { FaCommentDots } from "react-icons/fa";
 import CommentForm from "../../forms/CommentForm";
-import Comments from "./lists/Comments";
-import OneComment from "./Commnet";
 
 type PostCardWithStateProps={
     postState:post[],
-    user?:ExtendedUser,
-    setPost?:(postState:post[])=>void
+    currentUser?:ExtendedUser,
+    userId?:string,
     
 }
 
 
-const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => {
+const PostCard:React.FC<PostCardWithStateProps> = ({postState,currentUser,userId}) => {
     // const [postState,setPost] = useState<post>(post)
     const [isPending,startTransition]=useTransition()
     const commentFormRef = useRef<HTMLTextAreaElement>(null)
@@ -52,8 +50,6 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
                     }
                     return post
                     })
-                    
-                    setPost(checkedState)
                 }
                 if(data.error){
                     toast.error(data.error)
@@ -64,7 +60,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
         })
     };
     const Postlike =  (postId: string) => {
-        if (!user) {
+        if (!currentUser) {
             toast.error("You must be authorized");
             return;
         }
@@ -76,7 +72,6 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
                 return post
             }
         })
-            setPost(newPosts);
             postLikeAction(postId);
         
         // }finally{
@@ -103,20 +98,11 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
                         toast.error(data.error)
                     }
                     if(data.success){
-                        console.log(data)
-                        // const optimisticPostState = postState.filter(prev=>{
-                        //         return prev.PostId !==post.PostId
-                        // })
-                        // setPost(optimisticPostState)
-                       
-
-
                         toast.success(data.message)
                     }
                 })
                 
             });
-            // update()
         return 
         
         };
@@ -128,25 +114,10 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
                 console.log('focus')
             }
         }
-
-        const commentStateWrapper = (postId,newComment)=>{
-            const newPostState = postState.map(post=>{
-                if(post.PostId === postId) {
-                    return {
-                        ...post,
-                        comments:newComment
-                    }
-                }else{
-                    return post
-                }
-            })
-            setPost(newPostState)
-        }
-
     return ( 
 <div>
     {postState.map((post,index)=>(
-        <div key={index}>
+        <article key={index}>
             <div className=" justify-between border border-neutral-400 p-3  relative hover:bg-neutral-900 ">
                 
                 <RepostHeader 
@@ -156,7 +127,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
                     timestamp={post.timestamp}
                 />
                 {post?.superText&&(
-                    <p className="px-10 mt-2">{post.superText}</p>
+                    <h1 className="px-10 mt-2">{post.superText}</h1>
                 )}
                 {post?.originPost?.user.name &&post?.originPost?.user.image&&(
                 <>
@@ -178,10 +149,10 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
         
                 <div className="ml-[3rem] mr-[1rem]">
                     <p className="text-white col-span-10 col-start-2 py-2 text-xl">{post.text}</p>
-                        {user?.id === post.userId&&(
+                        {currentUser?.id === post.userId&&(
                             <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                         )}
-                            <ImageGrid images={post.image} className={`${user?.id===post.userId? '-mt-5':''}  mb-3`} />
+                            <ImageGrid images={post.image} className={`${currentUser?.id===post.userId? '-mt-5':''}  mb-3`} />
                     <div className="flex gap-5 justify-between ">
               
                     </div>
@@ -208,26 +179,14 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
 
 
                 <CommentForm 
-                    user={user} 
+                    currentSession={currentUser} 
+                    userId={currentUser?.id}
                     postId={post?.PostId} 
                     forwardedRef={commentFormRef}
                     className=" mb-5  border-b border-t"
                     />
 
-       {/*  {post?.comments?.map((comment,index)=>(
-                        
-           <div className="px-10  hover:bg-neutral-900">
-            <OneComment 
-                index={index}
-                user={user} 
-                comment={comment} 
-                commentState={post.comments} 
-                setComment={(newComments)=>commentStateWrapper(post.PostId,newComments)} 
-              />
-           </div>
-        ))} */}
-
-        </div>
+        </article>
     ))}
                 
 </div>
