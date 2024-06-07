@@ -43,9 +43,8 @@ export default async function PublicProfileParams({ params }) {
                 <PublicProfile profile={profile}  sessionUser={sessionUser}/>
           
                     <TabSwitch
-                    userId={sessionUser?.id}
                     chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
-                    chilldrenPosts={<PublicPostList  totalCount={userPostList.totalPostCount} userId={params.id} sessionUser={sessionUser}/>}
+                    chilldrenPosts={<PublicPostList  userId={params.id} sessionUser={sessionUser}/>}
                     postTotal={userPostList.totalPostCount}
                     />
           
