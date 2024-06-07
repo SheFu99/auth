@@ -23,7 +23,7 @@ const CompousePage: React.FC<CompousePAgeProps> = ({profile,sessionUser,userPost
                   // <Suspense fallback={<ListSkeleton/>}>
                   <TabSwitch
                   chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList} /> }
-                  chilldrenPosts={<PublicPostList postList={userPostList.posts} totalCount={userPostList.totalPostCount} userId={sessionUser.id}  sessionUser={sessionUser}/>}
+                  chilldrenPosts={<PublicPostList userId={sessionUser.id}  sessionUser={sessionUser}/>}
                   postTotal={userPostList.totalPostCount}
                   />
                   // </Suspense>
