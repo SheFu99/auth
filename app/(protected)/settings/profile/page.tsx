@@ -10,6 +10,7 @@ import PostModal from "@/components/profile/cropper/Post-modal";
 import IncomeOfferList from "@/components/profile/friends/incomeOfferList";
 import UserFriends from "@/components/profile/friends/privateUserFriends";
 import UserPostList from "@/components/profile/post/private/UserPostList";
+import QueryProvider from "@/util/QueryProvider";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 
@@ -26,24 +27,15 @@ const ProfilePage =  () => {
     // const friends = await getUserFreinds()
     ////TODO: Compouse in one client component 
 
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: {
-                staleTime: 1000 * 60 * 5, // 5 minutes
-                refetchOnReconnect:false,
-                gcTime: 1000 * 60 * 10
-            },
-        },
-    });
-    
+
 
     return ( 
       
       
         <div className="">
-            <QueryClientProvider client={queryClient}>
+            <QueryProvider>
                 <EditProfile />
-            </QueryClientProvider>
+            </QueryProvider>
         </div>
 
       

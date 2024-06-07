@@ -148,7 +148,8 @@ let PostsCacheKey = {
     success:undefined,
     totalPostCount:undefined
     
-}
+};
+
 export const GetUserPostsById = async (userId: string,page:number):Promise<postPromise> => {
     console.log('GET_USERPOST_REQUESTs',page)
     // const time = new Date()

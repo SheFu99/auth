@@ -10,12 +10,20 @@ import { auth } from "@/auth";
 import { isProfileExist } from "./isProfileExist";
 import { getProfileFriends } from "@/actions/friends";
 import { GetUserPostsById } from "@/actions/UserPosts";
+import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
+import prefetchPost from "@/lib/prefetchQuery";
+import queryClientConfig from "@/lib/QueryClient";
+import QueryProvider from "@/util/QueryProvider";
 
 
 
 export default async function PublicProfileParams({ params }) {
 
-  console.log(params.id)
+  const prefetchedPost = await prefetchPost(params?.id)
+  console.log(prefetchedPost)
+  
+  const dehydratedState = dehydrate(queryClientConfig)
+  console.log(dehydratedState)
       const session = await auth()
       const sessionUser =session?.user
       const profile = await getPublicProfile(params.id)
@@ -26,31 +34,30 @@ export default async function PublicProfileParams({ params }) {
      
 
     return (
-      <div>
-        
-        {!profile.error?(
-          <div className="border rounded-lg">
-            <PublicProfile profile={profile}  sessionUser={sessionUser}/> 
+      <QueryProvider>
+        <HydrationBoundary state={dehydratedState}>
           
-                <TabSwitch 
-                chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
-                chilldrenPosts={<PublicPostList postList={userPostList.posts} totalCount={userPostList.totalPostCount} userId={params.id} sessionUser={sessionUser}/>}
-                postTotal={userPostList.totalPostCount}
-                />
-       
-          </div>
-        ):(
           <div>
-            <p>Profile is not found</p>
+            {!profile.error?(
+              <div className="border rounded-lg">
+                <PublicProfile profile={profile}  sessionUser={sessionUser}/>
+          
+                    <TabSwitch
+                    userId={sessionUser?.id}
+                    chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
+                    chilldrenPosts={<PublicPostList  totalCount={userPostList.totalPostCount} userId={params.id} sessionUser={sessionUser}/>}
+                    postTotal={userPostList.totalPostCount}
+                    />
+          
+              </div>
+            ):(
+              <div>
+                <p>Profile is not found</p>
+              </div>
+            )}
           </div>
-        )}
-       
-       
-              
-
-         
-
-      </div>
+        </HydrationBoundary>
+      </QueryProvider>
       
       );
 }

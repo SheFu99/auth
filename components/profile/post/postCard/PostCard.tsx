@@ -166,7 +166,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({setPost,postState,user}) => 
               
                     <div className=" px-5 ">
                         <RepostHeader  
-                            userId={post.originPost.user.userId}
+                            userId={post.originPost.user.id}
                             userName={post.originPost.user.name}
                             userImage={post.originPost.user.image}
                             timestamp={post.originPost.timestamp}

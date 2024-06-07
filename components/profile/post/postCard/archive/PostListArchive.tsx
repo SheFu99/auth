@@ -1,27 +1,25 @@
 "use client"
 
 import { RiDeleteBin5Line } from "react-icons/ri";
-import ImageGrid from "../Image-grid";
-import LikeButton from "../Like-button";
-import RepostModalForm from "../repostForm";
-import RepostHeader from "../Repost-author-header";
+import ImageGrid from "../../Image-grid";
+import LikeButton from "../../Like-button";
+import RepostModalForm from "../../repostForm";
+import RepostHeader from "../../Repost-author-header";
 import { BiRepost } from "react-icons/bi";
 import { post } from "@/components/types/globalTs";
 import { ExtendedUser } from "@/next-auth";
 import {  useCallback, useRef, useState, useTransition } from "react";
 
 import { toast } from "sonner";
-import { awsBaseUrl } from "./UserPostList";
-import { DeleteUserPosts, LikePost, LikePostPromise, postPromise } from "@/actions/UserPosts";
-import { changeLikeCount } from "../postCard/lib/changeLikeCount";
+import { awsBaseUrl } from "../../private/UserPostList";
+import { DeleteUserPosts, LikePost, postPromise } from "@/actions/UserPosts";
+import { changeLikeCount } from "../lib/changeLikeCount";
 import { FaCommentDots } from "react-icons/fa";
-import CommentForm from "../../forms/CommentForm";
-import Comments from "../postCard/lists/Comments";
-import OneComment from "../postCard/Commnet";
+import CommentForm from "../../../forms/CommentForm";
+import Comments from "../lists/Comments";
+import OneComment from "../Commnet";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
-import { PostPromise, usePosts } from "../lib/usePost";
 
 type PostListProps={
     postState:post[],
@@ -29,126 +27,109 @@ type PostListProps={
     setPost?:(postState:post[])=>void
     
 }
-export interface MutationContext {
-    preveousPosts: InfiniteData<PostPromise> | undefined;
-}
 
 
-const PrivatePostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
+const PostListArchive:React.FC<PostListProps> = ({setPost,postState,user}) => {
     // const [postState,setPost] = useState<post>(post)
     const [isPending,startTransition]=useTransition()
     const [addComent,setComentState]=useState([])
     const commentFormRef = useRef<HTMLTextAreaElement>(null)
     const router = useRouter()
     const observer = useRef<IntersectionObserver|null>()
+   
 
-
-    const {data,isError,isLoading}=usePosts(user.id)
-    const queryClient = useQueryClient()
-
-  
-    const queryKey = ['posts', user.id]
-    const PostLikeMutation = useMutation({
-        mutationFn: LikePost,
-        onMutate: async (postId:string):Promise<MutationContext>=>{
-            await queryClient.cancelQueries({queryKey});
-            const preveousPosts = queryClient.getQueryData<InfiniteData<PostPromise>>(queryKey);
-            queryClient.setQueryData<InfiniteData<PostPromise>>
-                (
-                    queryKey,
-                    (old)=>{
-                        if(!old) return old
-                            
-                            return {
-                                ...old,
-                                pages:old.pages.map(page=>({
-                                    ...page,
-                                    data: page.data.map(post=>{
-                                        if(post.PostId===postId){
-                                            const changedCount = changeLikeCount(post)
-                                            return changedCount
-                                            }
-                                            return post
-                                        })
-                                    }))
+    
+    const postLikeAction = (postId:string)=>{
+        startTransition(()=>{
+            LikePost(postId)
+            .then((data)=>{
+                if(data.success){
+                    const checkedState = postState.map(post=>{
+                        if(data.PostId === post.PostId){
+                            const likedPost = {
+                                ...post,
+                                likedByUser:data.hasLike,
+                                _count:{
+                                    likes:data.likesCount
                                 }
-                })
-                return {preveousPosts}
-            },
-        onError:(err,postId,context)=>{
-            if(context?.preveousPosts){
-                queryClient.setQueryData(queryKey,context.preveousPosts)
-            }
-        },
-        onSettled:()=>{
-            queryClient.invalidateQueries({queryKey})
-        }
-    })
-                    
-        const Postlike =  (postId: string) => {
-            if (!user) {
-                toast.error("You must be authorized");
-                return;
-            }
-                PostLikeMutation.mutateAsync(postId); 
-        };
-        
-      
-        const deletePostMutation = useMutation({
-            mutationFn:DeleteUserPosts,
-            onSuccess: (data,variables,context)=>{
-                const {postId} = variables;
-                queryClient.setQueryData<InfiniteData<PostPromise>>(
-                    queryKey,
-                    (old)=>{
-                        if(!old) return old
-                        return {
-                            ...old,
-                            pages:old.pages.map(page=>({
-                                ...page,
-                                data:page.data.filter(post=>post.PostId !==postId)
-                            }))
                         }
+                        return  likedPost 
+                    }
+                    return post
                     })
-            },
-            onError:(err,variables,context)=>{
-                if(err){
-                    toast.error('ERROR!')
+                    
+                    setPost(checkedState)
                 }
-            },
-
-
-            onSettled:()=>{
-                queryClient.invalidateQueries({queryKey})
-            }
-
-            
+                if(data.error){
+                    toast.error(data.error)
+                }
+            }).catch(err=>{
+                toast.error(err)
+            })
         })
-
-
+    };
+    const Postlike =  (postId: string) => {
+        if (!user) {
+            toast.error("You must be authorized");
+            return;
+        }
+        const newPosts = postState?.map(post => {
+            if(post.PostId===postId){
+                const changedCount = changeLikeCount(post)
+                return changedCount
+            }else{
+                return post
+            }
+        })
+            setPost(newPosts);
+            postLikeAction(postId);
+        
+        // }finally{
+        //     updatePost(!getPostTrigger)
+        // }
+    };
         const deletePost=(post:post)=>{
             const keys = post.image.map(item => {
                 const result = item.url.replace(awsBaseUrl,'');
                 return result
               });
 
-              deletePostMutation.mutateAsync({postId:post.PostId,keys:keys})
+            startTransition(()=>{
+                DeleteUserPosts({
+                    postId:post.PostId,
+                    keys:post?.originPostId ? undefined:keys,
+                })
+                .then((data)=>{
+                    if(data.error){
+                        toast.error(data.error)
+                    }
+                    if(data.success){
+                        console.log(data)
+                        const optimisticPostState = postState.filter(prev=>{
+                                return prev.PostId !==post.PostId
+                        })
+                        setComentState([])
+                        setPost(optimisticPostState)
+
+                        toast.success(data.message)
+                    }
+                })
+                
+            });
         return 
         };
-
-
-        const openComentForm = (postId:string)=>{
+        const openComentForm = (postIndex:number,postId)=>{
            
-            const isTwice = addComent.filter(item=>item ===postId)
+            const isTwice = addComent.filter(item=>item ===postIndex)
             if(isTwice.length>0){
                 const href = `/post/${postId}`
                 router.push(href)
             }else{
-                setComentState(prev=>[...prev,postId])
+                setComentState(prev=>[...prev,postIndex])
             }
         };
-        const isPostCommentOpen =(postId:string)=>{
-            const isExistInArray = addComent.filter(item=>item ===postId)
+        const isPostCommentOpen =(index:number)=>{
+            const isExistInArray = addComent.filter(item=>item ===index)
             if(isExistInArray.length>0){
                 return true
             }else{
@@ -241,7 +222,7 @@ const PrivatePostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
         
                 <div className="flex justify-between  px-2 py-3 mt-2">
                         <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
-                        <button title="comment" onClick={()=>openComentForm(post.PostId)} className="text-white bg-neutral-900 px-3 rounded-md   ">
+                        <button title="comment" onClick={()=>openComentForm(index,post.PostId)} className="text-white bg-neutral-900 px-3 rounded-md   ">
                         
                             <div className="flex gap-2 item-center justify-center align-middle">
                                 <FaCommentDots className="mt-1"/>
@@ -259,7 +240,7 @@ const PrivatePostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
  
             </div>
 
-        {isPostCommentOpen(post.PostId)&&(
+        {isPostCommentOpen(index)&&(
             <div className={`border-t `} >
                 <CommentForm 
                 user={user} 
@@ -290,7 +271,7 @@ const PrivatePostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
                     </div>
                 </div>
                 ))}
-                {post?._count?.comments>post?.comments?.length&&(
+                {post?._count?.comments>post?.comments.length&&(
                     <div className="w-full flex justify-center p-2 cursor-pointer border-t hover:bg-neutral-900 mb-1">
                         <p className="text-neutral-100 hover:text-white " onClick={(e)=>handleCommentClick(e,post.PostId)}>Read more...</p>
                     </div>
@@ -303,4 +284,4 @@ const PrivatePostList:React.FC<PostListProps> = ({setPost,postState,user}) => {
      );
 };
  
-export default PrivatePostList;
+export default PostListArchive;

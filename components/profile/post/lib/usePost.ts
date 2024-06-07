@@ -8,8 +8,8 @@ export type PostPromise = {
     totalPostCount?:number,
 }
 
-const fetchPosts = async ({ pageParam = 1,userId }): Promise<PostPromise> => {
-   
+export const fetchPosts = async ({ pageParam = 1,userId }): Promise<PostPromise> => {
+   console.log('FETCH_CALL')
     const data = await GetUserPostsById(userId, pageParam);
     if (data?.error) {
         throw new Error('Network error');

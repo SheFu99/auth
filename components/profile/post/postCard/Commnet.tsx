@@ -10,7 +10,7 @@ import { DeleteComment, LikeComment } from "@/actions/commentsAction";
 import { toast } from "sonner";
 import { PostPromise, usePosts } from "../lib/usePost";
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
-import { MutationContext } from "../private/PrivatePostList";
+import { MutationContext } from "./lists/PrivatePostList";
 import { changeLikeCount } from "./lib/changeLikeCount";
 
 
@@ -75,9 +75,7 @@ const OneComment = ({user,comment,commentState,setComment,className,index}:Comme
 
         mutationFn:DeleteComment,
         onSuccess: (data,variables,context)=>{
-            console.log(variables)
             const { commentId }=variables
-            console.log(commentId)
             queryClient.setQueryData<InfiniteData<PostPromise>>(postQuery,
                 old=>{
                     if(!old) return old
@@ -92,7 +90,6 @@ const OneComment = ({user,comment,commentState,setComment,className,index}:Comme
                             }))
                         }))
                     }
-                    console.log(newPost)
                     return newPost
                 }
             )
