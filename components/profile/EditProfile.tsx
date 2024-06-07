@@ -244,7 +244,7 @@ const  EditProfile =  () => {
                 
             <div className='col-span-12 space-y-5'>
                 <PostModal/>
-                <UserPostList profile={user?.id} setTotalCount={setTotalCount} totalPostCount={totalPostCount}/>  
+                <UserPostList profile={user?.id} />  
             </div>
                     
             </TabsContent>
