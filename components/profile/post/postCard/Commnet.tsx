@@ -18,13 +18,12 @@ interface CommentProps {
     currentSession?:ExtendedUser,
     comment?:Comment,
     commentState?:Comment[],
-    setComment?: (comments:Comment[])=>void,
     className?:string,
     index?:number,
-    userId:string
+    userId?:string
 }
 
-const OneComment = ({currentSession,comment,userId,setComment,className,index}:CommentProps) => {
+const OneComment = ({currentSession,comment,userId,className,index}:CommentProps) => {
     const [isPending,startTransition]=useTransition()
     const {data,isError,isLoading}=usePosts(userId)
     const queryClient = useQueryClient()

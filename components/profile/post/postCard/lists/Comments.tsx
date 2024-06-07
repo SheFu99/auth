@@ -44,7 +44,7 @@ const Comments: React.FC<commentsParams> = ({comments,user,commentsCount}) => {
         <InfiniteScroll page={page} loadMore={fetchMoreData} hasMore={hasMore} isloaded={!!commentState}>
         {commentState?.map((comment,index)=>(
                         <div key={index} className="px-5 border-b border-spacing-0 space-y-0  relative hover:bg-neutral-900">
-                           <OneComment comment={comment} commentState={commentState} user={user} setComment={setComment}/>
+                           <OneComment comment={comment} commentState={commentState} currentSession={user}/>
                         </div>
                     ))}
         </InfiniteScroll>
