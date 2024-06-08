@@ -20,6 +20,7 @@ import { awsBaseUrl } from "./lists/InfinitePostList";
 import { usePostCommentMutations } from "./lib/singlePostMutations";
 import { usePost } from "../lib/usePost";
 import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
+import Head from "next/head";
 
 type PostCardWithStateProps={
     postId:string,
@@ -59,7 +60,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
     const [isPending,startTransition]=useTransition()
     const commentFormRef = useRef<HTMLTextAreaElement>(null)
     const {createComment}=usePostCommentMutations(postId)
-    
+    const firstImage = post.image[0]
     
   
     const Postlike =  (postId: string) => {
@@ -110,6 +111,14 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
 <div>
   
         {post&&(
+            <>
+            <Head>
+            <title>{post.user.name} - Post</title>
+            <meta name="description" content={post.superText} />
+            <meta property="og:title" content={post.user.name} />
+            <meta property="og:description" content={post.text} />
+            <meta property="og:image" content={post?.image[0]?.url||''} />
+          </Head>
                 <article >
                 <div className=" justify-between border border-neutral-400 p-3  relative hover:bg-neutral-900 ">
                     
@@ -179,6 +188,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                         />
     
             </article>
+            </>
         )}
         
                 
