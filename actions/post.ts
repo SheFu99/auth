@@ -1,4 +1,5 @@
 "use server"
+import { Comment } from "@/components/types/globalTs"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { comment } from "postcss"
@@ -137,25 +138,28 @@ if(user){
         ...post,
         likedByUser:hasLike
     }
-    console.log(postWithLike)
     return {post:postWithLike,success:true}
 }
+type CommentByPost = {
+    comments?:Comment[],
+    success?:boolean,
+    error?:string,
+    totalCommentsCount?:number
+}
+export const getCommentByPost = async ({PostId, page}:getComentParams):Promise<CommentByPost>=>{
 
-export const getCommentByPost = async ({PostId, page}:getComentParams)=>{
     if(!PostId||!page){
-        return {error:'Unexpacted behavior'}
+        return {error:'Unexpected behavior'}
     }
     const user = await currentUser()
-    console.log(user)
     const pageSize = 5
     const skip = (page-1)*pageSize
-
+   
     const comments = await db.comment.findMany( 
-        {where:{
-        postId:PostId
-    },
+        {where:{postId:PostId},
 
     ///orederBy _count.likes
+
     orderBy:[
         {timestamp:'asc'}
     ],
@@ -201,6 +205,14 @@ export const getCommentByPost = async ({PostId, page}:getComentParams)=>{
         return {success:true}
     }
 
+    let totalCommentsCount:number
+    if(page===1){
+        totalCommentsCount = await db.comment.count({
+            where:{
+                postId:PostId
+            }
+        })
+    }
     
-    return {success:true , comments:commentsWithLikes}
+    return {success:true , comments:commentsWithLikes , totalCommentsCount}
 }

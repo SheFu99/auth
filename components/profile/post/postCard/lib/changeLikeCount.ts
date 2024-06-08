@@ -1,4 +1,4 @@
-export const changeLikeCount = (postState) =>{
+export const changeLikeCount = (postState:any) =>{
                 if (postState.likedByUser===true) {
                     const newPost = {
                         ...postState, 
@@ -7,7 +7,6 @@ export const changeLikeCount = (postState) =>{
                             ...postState._count,
                              likes : postState._count.likes - 1 
                         }}
-                        console.log(newPost)
                      return newPost
                      } else {
                         const newPost = {
@@ -17,7 +16,6 @@ export const changeLikeCount = (postState) =>{
                                 ...postState._count,
                                  likes : postState._count.likes + 1 
                             }}
-                            console.log(newPost)
                          return newPost
                          };
             };

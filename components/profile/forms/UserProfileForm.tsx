@@ -19,7 +19,7 @@ import { useSession } from 'next-auth/react';
 interface Profileform{
     profile:any,
     editProfileProps:boolean,
-    onChange:(event:React.ChangeEvent<HTMLInputElement>)=>void
+    onChange?:(event:React.ChangeEvent<HTMLInputElement>)=>void
 }
 
 
@@ -43,16 +43,15 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
     })
     const {handleSubmit,control,formState:{errors}} = Profileform
     useEffect(()=>{
-        console.log(errors)
-        console.log(shouldAnimate)
         if(Object.keys(errors).length>3){
             setShouldAnimate(false)
         }
-
     },[errors])
 
     useEffect(()=>{
-        console.log(editProfileProps)},[editProfileProps])
+
+    console.log(editProfileProps)},[editProfileProps])
+
     const onSubmit=(values:z.infer<typeof UserProfile>)=>{
         startTransition(()=>{
             updateUserProfile(values)
@@ -81,12 +80,6 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
         }
     }
 
-    // const onSubmit = (data)=>{
-    //     console.log(data)
-    // }
-    // const onError=(error)=>{
-    //     console.log(error)
-    // }
     const gender = profile?.gender
     const getGenderIcon = (gender:any)=>{
         switch(gender){
@@ -96,8 +89,7 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
                 return <BsGenderFemale color='black'/>
             default:
                 return <FaGenderless color='black'/>
-        }
-        
+        } 
     }
     
 
@@ -105,28 +97,27 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
         <div className="col-span-12">
         {!editProfile?(
             <div className='grid grid-cols-12 -mb-5'>
+                <div className='g-f:col-span-12 g-f:mt-2 col-start-1 sm:col-span-6 flex space-x-2 border border-black rounded-md p-3'>
+                    <FaPhone color='black'/>
+                    <p className='text-black col-span-12 md:text-md g-f:text-sm'>{`${profile?.phoneNumber}`}</p>
+                </div>
 
-            <div className='g-f:col-span-12 g-f:mt-2 col-start-1 sm:col-span-6 flex space-x-2 border border-black rounded-md p-3'>
-                <FaPhone color='black'/>
-                <p className='text-black col-span-12 md:text-md g-f:text-sm'>{`${profile?.phoneNumber}`}</p>
-            </div>
+                <div className='g-f:col-span-12 g-f:mt-2 sm:ml-1 sm:col-span-6 sm:col-start-7 flex items-center p-3 space-x-2 border border-black rounded-md'>
+                    <MdLocationCity color='black'/>
+                    <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`${profile?.adres}`}</p>
+                </div>
 
-            <div className='g-f:col-span-12 g-f:mt-2 sm:ml-1 sm:col-span-6 sm:col-start-7 flex items-center p-3 space-x-2 border border-black rounded-md'>
-                <MdLocationCity color='black'/>
-                <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`${profile?.adres}`}</p>
-            </div>
+                <div className='g-f:col-span-12  mt-2 sm:col-span-6  col-start-1 flex items-center p-3 space-x-2 col-span-6 border border-black rounded-md'>
+                    <MdElderly color='black'/>
+                    <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Age: ${profile?.age}`}</p>    
+                </div>
 
-            <div className='g-f:col-span-12  mt-2 sm:col-span-6  col-start-1 flex items-center p-3 space-x-2 col-span-6 border border-black rounded-md'>
-                <MdElderly color='black'/>
-                <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Age: ${profile?.age}`}</p>    
-            </div>
+                <div className='g-f:col-span-12 sm:ml-1 mt-2 sm:col-start-7 sm:col-span-6   flex items-center p-3 space-x-2 border border-black rounded-md'>
+                    <i className='text-black col-span-1 md:text-md'>{getGenderIcon(gender)}</i>
+                    <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Gender: ${profile?.gender}`}</p>
+                </div>
 
-            <div className='g-f:col-span-12 sm:ml-1 mt-2 sm:col-start-7 sm:col-span-6   flex items-center p-3 space-x-2 border border-black rounded-md'>
-                <i className='text-black col-span-1 md:text-md'>{getGenderIcon(gender)}</i>
-                <p className='text-black col-span-12 md:text-md  g-f:text-sm'>{`Gender: ${profile?.gender}`}</p>
-            </div>
-
-            <Button onClick={()=>swichEditProfile(true)} title='Edit profile information' className='w-full col-span-12 mt-5' >Edit information<FaEdit className='ml-2 scale-150'/></Button>
+                <Button onClick={()=>swichEditProfile(true)} title='Edit profile information' className='w-full col-span-12 mt-5' >Edit information<FaEdit className='ml-2 scale-150'/></Button>
         </div>
         ):(
         <Form {...Profileform}>
@@ -190,8 +181,8 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
                                     onChange={(e) => {
                                         const numberValue = e.target.value === "" ? null : Number(e.target.value);
                                         field.onChange(numberValue);
-                                      }}
-                                      Icon={MdElderly}
+                                    }}
+                                    Icon={MdElderly}
                                     className={shouldAnimate && errors.age ? 'animate-shake ' : ''}
                                     />
                             </FormControl>
@@ -209,7 +200,6 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
                             <FormControl>
                                 <Select 
                                     {...field}
-                                    
                                     disabled={isPending}
                                     onValueChange={(value) => {
                                         field.onChange(value);

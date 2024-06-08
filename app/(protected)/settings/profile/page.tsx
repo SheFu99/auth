@@ -1,4 +1,4 @@
-"use client"
+"use server"
 
 import { GetUserPostsById } from "@/actions/UserPosts";
 import { getUserFreinds } from "@/actions/friends";
@@ -9,7 +9,8 @@ import TabSwitch from "@/components/profile/Tabs";
 import PostModal from "@/components/profile/cropper/Post-modal";
 import IncomeOfferList from "@/components/profile/friends/incomeOfferList";
 import UserFriends from "@/components/profile/friends/privateUserFriends";
-import UserPostList from "@/components/profile/post/private/UserPostList";
+import ProfileTabs from "@/components/profile/navigation/Tabs";
+import PublicPostList from "@/components/profile/post/private/UserPostList";
 import QueryProvider from "@/util/QueryProvider";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -18,10 +19,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 
 
-const ProfilePage =  () => {
+const ProfilePage = async () => {
 
-    // const session = await auth()
-    // const user = session?.user
+    const session = await auth()
+    const user = session?.user
     // const post = await GetUserPostsById(user?.id,1)
     // const totalPostCount = post?.totalPostCount
     // const friends = await getUserFreinds()
@@ -35,6 +36,7 @@ const ProfilePage =  () => {
         <div className="">
             <QueryProvider>
                 <EditProfile />
+                <ProfileTabs userId={user.id}/>
             </QueryProvider>
         </div>
 

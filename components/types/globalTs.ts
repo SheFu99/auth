@@ -113,3 +113,9 @@ export type profileOfferDetail = {
 //   image?:string,
 //   role:UserRole,
 // }
+
+export type CommentPrev = {
+  text:string,
+  image?:string | string[],
+  userId?:string,
+};

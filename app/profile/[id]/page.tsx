@@ -5,7 +5,7 @@ import PublicProfile from "@/components/profile/PublicProfile";
 import { getPublicProfile } from "@/actions/UserProfile";
 import TabSwitch from "@/components/profile/Tabs";
 import PublicProfileFriends from "@/components/profile/friends/publicProfileFriends";
-import PublicPostList from "@/components/profile/post/public/PublicUserPost";
+import InfinitePostList from "@/components/profile/post/public/InfinitePostList";
 import { auth } from "@/auth";
 import { isProfileExist } from "./isProfileExist";
 import { getProfileFriends } from "@/actions/friends";
@@ -44,7 +44,7 @@ export default async function PublicProfileParams({ params }) {
           
                     <TabSwitch
                     chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
-                    chilldrenPosts={<PublicPostList  userId={params.id} sessionUser={sessionUser}/>}
+                    chilldrenPosts={<InfinitePostList  userId={params.id} sessionUser={sessionUser}/>}
                     postTotal={userPostList.totalPostCount}
                     />
           

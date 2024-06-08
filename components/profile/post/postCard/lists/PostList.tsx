@@ -7,112 +7,37 @@ import RepostModalForm from "../../repostForm";
 import RepostHeader from "../../Repost-author-header";
 import { BiRepost } from "react-icons/bi";
 import { post } from "@/components/types/globalTs";
-import { ExtendedUser } from "@/next-auth";
-import {  useCallback, useRef, useState, useTransition } from "react";
-
+import {   useRef, useState} from "react";
 import { toast } from "sonner";
-import { awsBaseUrl } from "../../private/UserPostList";
-import { DeleteUserPosts, LikePost, LikePostPromise, postPromise } from "@/actions/UserPosts";
-import { changeLikeCount } from "../lib/changeLikeCount";
 import { FaCommentDots } from "react-icons/fa";
 import CommentForm from "../../../forms/CommentForm";
-import Comments from "./Comments";
-import OneComment from "../Commnet";
-import Link from "next/link";
+import OneComment from "../OneComment";
 import { useRouter } from "next/navigation";
-import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
-import { PostPromise, usePosts } from "../../lib/usePost";
+import {  usePostList } from "../../lib/usePost";
+import { PostListProps, usePostListMutation } from "../lib/postListMutations";
+import { awsBaseUrl } from "./InfinitePostList";
 
-type PostListProps={
-    postState:post[],
-    currentSession?:ExtendedUser,
-    userId:string,
-    
-}
-export interface MutationContext {
-    preveousPosts: InfiniteData<PostPromise> | undefined;
-}
+
 
 
 const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => {
-    // const [postState,setPost] = useState<post>(post)
-    const [isPending,startTransition]=useTransition()
+   
     const [addComent,setComentState]=useState([])
     const commentFormRef = useRef<HTMLTextAreaElement>(null)
     const router = useRouter()
     // const observer = useRef<IntersectionObserver|null>()
-
-    const {data,isError,isLoading}=usePosts(userId)
-    const queryClient = useQueryClient()
-  
-    const queryKey = ['posts', userId]
-    const PostLikeMutation = useMutation({
-        mutationFn: LikePost,
-        onMutate: async (postId:string):Promise<MutationContext>=>{
-            await queryClient.cancelQueries({queryKey});
-            const preveousPosts = queryClient.getQueryData<InfiniteData<PostPromise>>(queryKey);
-            queryClient.setQueryData<InfiniteData<PostPromise>>
-                (
-                    queryKey,
-                    (old)=>{
-                        if(!old) return old
-                            
-                            return {
-                                ...old,
-                                pages:old.pages.map(page=>({
-                                    ...page,
-                                    data: page.data.map(post=>{
-                                        if(post.PostId===postId){
-                                            const changedCount = changeLikeCount(post)
-                                            return changedCount
-                                            }
-                                            return post
-                                        })
-                                    }))
-                                }
-                })
-                return {preveousPosts}
-            },
-        onError:(err,postId,context)=>{
-            if(context?.preveousPosts){
-                queryClient.setQueryData(queryKey,context.preveousPosts)
-            }
-        },
-        onSettled:()=>{
-            queryClient.invalidateQueries({queryKey})
-        }
-    });
-    const deletePostMutation = useMutation({
-        mutationFn:DeleteUserPosts,
-        onSuccess: (data,variables,context)=>{
-            const {postId} = variables;
-            queryClient.setQueryData<InfiniteData<PostPromise>>(
-                queryKey,
-                (old)=>{
-                    if(!old) return old
-                    return {
-                        ...old,
-                        pages:old.pages.map(page=>({
-                            ...page,
-                            data:page.data.filter(post=>post.PostId !==postId)
-                        }))
-                    }
-                })
-        },
-        onError:(err,variables,context)=>{
-            if(err){
-                toast.error('ERROR!')
-            }
-        },
-        onSettled:()=>{
-            queryClient.invalidateQueries({queryKey})
-        }
-
-    });
+    const {data,isError,isLoading}=usePostList(userId)
+    const {
+        PostLikeMutation,
+        deletePostMutation,
+        createCommentMutation,
+        comentLikeMutation,
+        commentDeleteMutation}=usePostListMutation(userId)
+ 
                     
         const Postlike =  (postId: string) => {
             if (!currentSession) {
-                toast.error("You must be authorized");
+                toast.error("You need to be authorized");
                 return;
             }
                 PostLikeMutation.mutateAsync(postId); 
@@ -158,6 +83,7 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
         };
 
     return ( 
+
 <div className="borde px-2">
 
     
@@ -208,7 +134,7 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                 </div>
         
                 <div className="flex justify-between  px-2 py-3 mt-2">
-                        <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isPending}/>
+                        <LikeButton className=" bg-neutral-900 px-3" post={post} onLike={()=>Postlike(post.PostId)} isPending={isLoading}/>
                         <button title="comment" onClick={()=>openComentForm(post.PostId)} className="text-white bg-neutral-900 px-3 rounded-md   ">
                         
                             <div className="flex gap-2 item-center justify-center align-middle">
@@ -235,6 +161,7 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                 postId={post?.PostId} 
                 forwardedRef={commentFormRef}
                 className=" mb-1 "
+                onCreate={createCommentMutation.mutateAsync}
                 />
             </div>
         )}
@@ -252,8 +179,9 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                             index={index}
                             currentSession={currentSession} 
                             comment={comment} 
-                            commentState={post.comments}  
                             userId={userId}
+                            onDelete={commentDeleteMutation.mutateAsync}
+                            onLike={comentLikeMutation.mutateAsync}
                         />
                         
                     </div>

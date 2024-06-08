@@ -2,7 +2,6 @@
 "use client"
 
 import {  useState, useTransition } from "react"
-import { toast } from "sonner"
 import { Button } from "../../ui/button"
 import { IoCreate, IoSendSharp } from "react-icons/io5";
 import { Textarea } from "../../ui/textarea"
@@ -14,17 +13,13 @@ import Picker from 'emoji-picker-react'
 import useUploadImages, { UploadImagesProps } from "./functions/uploadImages";
 import useOnError from "./functions/onError";
 import { postSchema } from "@/schemas";
-import {  CreateComment } from "@/actions/commentsAction"
 import BlobImageManager from "./classes/BlobImageManager"
 import { LoginButton } from "@/components/auth/loginButton"
 import { SlLogin } from "react-icons/sl"
 import { RegisterButton } from "@/components/auth/RegisterButton"
 import { ExtendedUser } from "@/next-auth"
 import PostAvatar from "@/components/ui/PostAvatar"
-import { Comment } from "@/components/types/globalTs";
-import { PostPromise, usePosts } from "../post/lib/usePost";
-import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
-
+import { Comment, CommentPrev, post } from "@/components/types/globalTs";
 
 
 export interface DataResponse extends Comment{
@@ -38,15 +33,15 @@ interface CommentFormProps {
     className?:string,
     forwardedRef?: React.RefObject<HTMLTextAreaElement>;
     userId:string,
+    onCreate:(params:createPostParams)=>void;
 }
 
-export type CommentPrev = {
-    text:string,
-    image?:string | string[],
-    userId?:string
+type createPostParams = {
+    comment:post,
+    postId:string
 }
 
-const CommentForm:React.FC<CommentFormProps> = ({postId,currentSession,className,forwardedRef,userId}) => {
+const CommentForm:React.FC<CommentFormProps> = ({postId,currentSession,className,forwardedRef,userId,onCreate}) => {
  
     const { isUploading,
             setIsUploading,
@@ -63,57 +58,12 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,currentSession,className
   
 
 
-    const queryClient= useQueryClient()
-    
-    const {data,isError,isLoading}=usePosts(userId)
-    const postQuery = ['posts',userId]
-    const createCommentMutation = useMutation({
-        mutationFn:CreateComment,
-        onSuccess: (newComment)=>{
-            // const {comment,postId}=variables
-            const existingData = queryClient.getQueryData<InfiniteData<PostPromise>>(postQuery,
-            )
-
-
-            if(existingData){
-                const updatedData = {
-                    ...existingData,
-                    pages:existingData.pages.map(page=>({
-                        ...page,
-                        data:page.data.map(post=>{
-                            if(post.PostId === newComment.createdComment.postId){
-                                return {
-                                    ...post,
-                                    comments:[newComment.createdComment,...post.comments]
-                                }
-                            } 
-                            return post
-                            
-                        })
-                    }))
-                }
-                queryClient.setQueryData(postQuery,updatedData)
-            }
-            return newComment
-        },
-        onError:(error,variables,context)=>{
-            toast.error("ERROR")
-        },
-        onSettled:()=>{
-            queryClient.invalidateQueries({queryKey:postQuery})
-        }
-
-
-    })
-  
-    // const user=useCurrentUser()
-    // const userId = user?.id
+   
     const type = 'comment'
     const submitPost= async(event)=>{
         setEmoji(false)
         event.preventDefault()
         setIsUploading(true)
-        // Validate form data against Zod schema
         try {
             postSchema.parse({ text: textState }); // Validate the text field
         } catch (error) {
@@ -147,7 +97,7 @@ const CommentForm:React.FC<CommentFormProps> = ({postId,currentSession,className
             })
             .finally(()=>{
                 setIsUploading(false)
-                createCommentMutation.mutateAsync({comment:post,postId:postId })
+                onCreate({comment:post,postId:postId })
                 setImageFiles([])
                 setImagesBlobUrl(null)
                 setTextState(undefined)

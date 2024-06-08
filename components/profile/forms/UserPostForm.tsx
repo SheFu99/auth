@@ -1,10 +1,10 @@
 "use client"
 
 import * as z from "zod"
+
+
 import {  CreatePost } from "@/actions/UserPosts"
-import { useSession } from "next-auth/react"
 import {   useRef, useState, useTransition } from "react"
-import { toast } from "sonner"
 import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
 import { Textarea } from "../../ui/textarea"
@@ -18,10 +18,9 @@ import Picker from 'emoji-picker-react'
 
 import useUploadImages, { UploadImagesProps } from "./functions/uploadImages"
 import useOnError from "./functions/onError"
-import useBlobImage from "./functions/useBlobImage"
 import { postSchema } from "@/schemas"
 import BlobImageManager from "./classes/BlobImageManager"
-import { PostPromise, usePosts } from "../post/lib/usePost"
+import { PostQueryPromise, usePostList } from "../post/lib/usePost"
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query"
 
 
@@ -48,6 +47,7 @@ const UserPostForm = () => {
     //     setImagesBlobUrl,
     //     AddImage,
     //     deleteImage}=useBlobImage()
+
     const [manager] = useState(new BlobImageManager)
     const [images, setImageFiles]=useState<File[]>([]);
     const [imagesBlobUrl,setImagesBlobUrl]=useState<string[]>([]);
@@ -57,21 +57,18 @@ const UserPostForm = () => {
 
     const [isEmoji,setEmoji]=useState<boolean>(false)
     const [textState,setTextState]=useState<string>('')
-    const [error,setError] =useState<string| undefined>()
 
     const TextInputRef = useRef(null)
-    const {update}=useSession()
-   
+
     const user=useCurrentUser()
     const userId = user?.id
     const type = 'post'
     
     const queryClient = useQueryClient()
-    const {isLoading,isError}=usePosts(userId)
+    const {isLoading,isError}=usePostList(userId)
     
 
     const Submit = async (post)=>{
-        console.log("SUBMIT_START")
         try {
         const CreatedPost = await CreatePost(post)
             return CreatedPost
@@ -79,20 +76,12 @@ const UserPostForm = () => {
             return error
         }
     }
-    // console.log("Query Cache: ", queryClient.getQueryData<InfiniteData<PostPromise>>(['posts', userId ]));
-    const CreatePostMutation = useMutation({
+    const queryKey = ['posts',userId]
+     const CreatePostMutation = useMutation({
         mutationFn: Submit,
         onSuccess: (newPost)=>{
-            console.log(userId)
-            queryClient.setQueryData<InfiniteData<PostPromise>>(['posts',userId],oldData=>{
-                
-                console.log(oldData,userId)
-
-                if(!oldData){
-                    console.log("RETURN_OLD_DATA")
-                    return oldData
-
-                }
+            queryClient.setQueryData<InfiniteData<PostQueryPromise>>(queryKey,oldData=>{
+                if(!oldData) return oldData
                 const newData = {
                     ...oldData,
                     pages: oldData.pages.map((page,index)=>{
@@ -101,22 +90,18 @@ const UserPostForm = () => {
                                 ...page,
                                 data:[newPost.post, ...page.data]
                             };
-
                         }
                         return page
                         })
                     }
-                    console.log(newData)
                     return newData
             }
-        )
-                
-            }
+        )},
+        onSettled:()=>{
+            queryClient.invalidateQueries({queryKey})
+        }
         
-        })
-       
-
-    
+    });
     const submitPost= async(event)=>{
         console.log('SUBMIT!')
         setEmoji(false)

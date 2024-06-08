@@ -4,9 +4,10 @@
 
 import React from "react";
 import { ExtendedUser } from "@/next-auth";
-import { usePosts } from "../lib/usePost";
-import PostList from "../postCard/lists/PrivatePostList";
-const InfiniteScroll = React.lazy(()=>import ('../functions/infinite-scroll'))
+import { usePostList } from "../../lib/usePost";
+import PostList from "./PostList";
+import ListSkeleton from "../../../friends/FriendSkeleton";
+const InfiniteScroll = React.lazy(()=>import ('../../functions/infinite-scroll'))
 
 export const awsBaseUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/`
 
@@ -15,9 +16,9 @@ type userListProps ={
     sessionUser?:ExtendedUser;
 }
 
-const PublicPostList :React.FC<userListProps> = ({userId,sessionUser}) => {
+const InfinitePostList :React.FC<userListProps> = ({userId,sessionUser}) => {
 
-const {data,fetchNextPage,hasNextPage,isError,isLoading,isFetched}=usePosts(userId)
+const {data,fetchNextPage,hasNextPage,isError,isLoading,isFetched}=usePostList(userId)
 // console.log(data?.pages[0].totalPostCount)
 const page = 2 
 const user = sessionUser
@@ -26,10 +27,13 @@ const user = sessionUser
            
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1 ">
-              {!data&&!isFetched&&(
+              {!data&&isFetched&&(
                     <div className="w-full flex justify-center py-10 items-center align-middle">
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>
+                )}
+                 {isLoading&&(
+                    <ListSkeleton/>
                 )}
             <InfiniteScroll page={page} loadMore={fetchNextPage} hasMore={hasNextPage} isloaded = {!isLoading}>
                 <>
@@ -53,5 +57,5 @@ const user = sessionUser
      );
 }
  
-export default PublicPostList;
+export default InfinitePostList;
 
