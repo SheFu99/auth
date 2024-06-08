@@ -116,6 +116,6 @@ export type profileOfferDetail = {
 
 export type CommentPrev = {
   text:string,
-  image?:string | string[],
+  image?:{ url?: string }[];
   userId?:string,
 };
