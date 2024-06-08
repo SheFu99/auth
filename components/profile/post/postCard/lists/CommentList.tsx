@@ -9,7 +9,7 @@ const CommentList = ({commentState,currentSession,postId}) => {
 
         <>
         {commentState?.map((comment, index)=>(
-                        <div className="px-5 border-b border-spacing-0 space-y-0  relative hover:bg-neutral-900">
+                        <div className="px-5 border-b border-spacing-0 space-y-0  relative hover:bg-neutral-900" key={index}>
                             <OneComment 
                                 index={index} 
                                 comment={comment}   
