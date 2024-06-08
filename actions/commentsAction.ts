@@ -2,8 +2,8 @@
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { deleteImagefromS3 } from "./UserPosts"
-import { CommentPrev } from "@/components/profile/forms/CommentForm"
-import { Comment } from "@/components/types/globalTs"
+
+import { Comment, CommentPrev } from "@/components/types/globalTs"
 
 type CreateCommentParams = {
     postId:String,
