@@ -5,21 +5,20 @@ import PublicProfile from "@/components/profile/PublicProfile";
 import { getPublicProfile } from "@/actions/UserProfile";
 import TabSwitch from "@/components/profile/Tabs";
 import PublicProfileFriends from "@/components/profile/friends/publicProfileFriends";
-import InfinitePostList from "@/components/profile/post/public/InfinitePostList";
 import { auth } from "@/auth";
-import { isProfileExist } from "./isProfileExist";
 import { getProfileFriends } from "@/actions/friends";
 import { GetUserPostsById } from "@/actions/UserPosts";
 import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
-import prefetchPost from "@/lib/prefetchQuery";
 import queryClientConfig from "@/lib/QueryClient";
 import QueryProvider from "@/util/QueryProvider";
+import InfinitePostList from "@/components/profile/post/postCard/lists/InfinitePostList";
+import { prefetchPostList } from "@/lib/prefetchQuery";
 
 
 
 export default async function PublicProfileParams({ params }) {
 
-  const prefetchedPost = await prefetchPost(params?.id)
+  const prefetchedPost = await prefetchPostList(params?.id)
   console.log(prefetchedPost)
   
   const dehydratedState = dehydrate(queryClientConfig)

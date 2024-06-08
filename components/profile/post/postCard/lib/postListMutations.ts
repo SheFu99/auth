@@ -110,12 +110,15 @@ export const usePostListMutation = (userId:string)=>{
                             })
                         }))
                     }
+                    console.log(updatedData)
                     queryClient.setQueryData(queryKey,updatedData)
                 }
                 return newComment
             },
             onError:(error,variables,context)=>{
                 toast.error("ERROR")
+                queryClient.invalidateQueries({queryKey:queryKey})
+
             },
             onSettled:()=>{
                 queryClient.invalidateQueries({queryKey:queryKey})

@@ -40,7 +40,6 @@ export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQuery
         if(data.error){
             throw new Error('Network Error!')
         }
-        console.log(data.post)
         return data.post
     };
 
