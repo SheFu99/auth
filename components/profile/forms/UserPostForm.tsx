@@ -168,7 +168,7 @@ const UserPostForm = () => {
 
     return (
         
-     <form  onSubmit={submitPost}  className="p-2  border border-white rounded-md" >
+     <form  onSubmit={submitPost}  className="p-2 mt-3 border border-white rounded-md" >
 
                 {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[90vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
                 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
