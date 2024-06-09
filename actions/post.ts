@@ -1,5 +1,5 @@
 "use server"
-import { Comment } from "@/components/types/globalTs"
+import { Comment, post } from "@/components/types/globalTs"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { comment } from "postcss"
@@ -10,7 +10,12 @@ type getComentParams = {
     PostId:string,
     page:number
 }
-export const getPostById = async (PostId:string) => {
+type GetPostPromise ={
+    post?:post,
+    success?:boolean,
+    error?:string
+}
+export const getPostById = async (PostId:string):Promise<GetPostPromise> => {
 
     if(!PostId){
         return {error:"PostId is required!"}
