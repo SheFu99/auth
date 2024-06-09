@@ -10,6 +10,9 @@ import { FiSettings } from "react-icons/fi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { RiAccountBoxFill } from "react-icons/ri";
 import LoginForm from "./auth/loginForm";
+import { LogoutButton } from "./auth/logout-button";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { ExitIcon } from "@radix-ui/react-icons";
 
 interface SideBarProps{
     className?:string;

@@ -46,6 +46,11 @@ const s3Client = new S3Client({
     }
 });
 
+// type CreatePostParams = {
+//     text?:string,
+//     userId:string,
+//     image?:
+// }
 type createPostPromise =  {
     post?:post,
     error?:string,
@@ -54,7 +59,7 @@ type createPostPromise =  {
 }
 
 export const CreatePost= async(postCard:PostCard):Promise<createPostPromise>=>{
-  
+  console.log(postCard)
     const user= await currentUser()
 //    console.log("USER created post",user)
       if(!user){
@@ -71,7 +76,7 @@ export const CreatePost= async(postCard:PostCard):Promise<createPostPromise>=>{
      
         const existingPost = await db.post.findFirst({
             where: {
-                text: postCard.text,
+                text: postCard?.text,
                 userId: user.id,
             },
         });
@@ -83,8 +88,10 @@ export const CreatePost= async(postCard:PostCard):Promise<createPostPromise>=>{
 
     try{
         
+
+      
     const postData = {
-        text:postCard.text,
+        text:postCard?.text,
         userId:user.id,
     } as any
 

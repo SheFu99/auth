@@ -87,17 +87,17 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
 <div className="borde px-2">
 
     
-    {postState.map((post,index)=>(
+    {postState?.map((post,index)=>(
         <div key={index} className="border border-neutral-500 rounded-md mb-4 mt-3">
             <div 
                 className=" justify-between  p-3 rounded-md  relative hover:bg-neutral-900 cursor-pointer"
                 onClick={(e)=>handleWhiteSpaceClick(e,post.PostId)}
                 >
                 <RepostHeader 
-                    userId={post.userId}
-                    userName={post.user.name}
+                    userId={post?.user.id}
+                    userName={post?.user.name}
                     userImage={post?.user.image}
-                    timestamp={post.timestamp}
+                    timestamp={post?.timestamp}
                     className="max-w-[250px]"
                 />
                 {post?.superText&&(
@@ -122,12 +122,12 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                 )}
         
                 <div className="ml-[3rem] mr-[1rem]">
-                    <p className="text-white text-xl col-span-10 col-start-2 mt-5">{post.text}</p>
-                        {currentSession?.id === post.userId&&(
+                    <p className="text-white text-xl col-span-10 col-start-2 mt-5">{post?.text}</p>
+                        {currentSession?.id === post?.userId&&(
                             <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                         )}
                         <div className="">
-                            <ImageGrid images={post.image} className={`${currentSession?.id===post.userId? '-mt-5':''}  mb-3`} />
+                            <ImageGrid images={post?.image} className={`${currentSession?.id===post?.userId? '-mt-5':''}  mb-3`} />
                     
                         </div>
                    
@@ -139,13 +139,13 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                         
                             <div className="flex gap-2 item-center justify-center align-middle">
                                 <FaCommentDots className="mt-1"/>
-                            {post._count.comments>0 &&(<p>{post?._count.comments}</p>)}
+                            {post?._count?.comments>0 &&(<p>{post?._count.comments}</p>)}
                             </div>
 
                         </button>
                         <RepostModalForm
                             ButtonTitle="Repost"
-                            postId={post.PostId}
+                            postId={post?.PostId}
                             repostCount={post?.repostCount}
                             />
                 </div>
@@ -153,7 +153,7 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
  
             </div>
 
-        {isPostCommentOpen(post.PostId)&&(
+        {isPostCommentOpen(post?.PostId)&&(
             <div className={`border-t `} >
                 <CommentForm 
                 currentSession={currentSession} 

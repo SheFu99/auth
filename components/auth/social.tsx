@@ -20,6 +20,7 @@ const onClick = (provider:"google"| "github") => {
     return(
         <div className="flex items-center gap-x-2 w-full">
             <Button 
+                title="Log/id with Google"
                 size="lg"
                 className="w-full"
                 variant="outline"
@@ -30,6 +31,7 @@ const onClick = (provider:"google"| "github") => {
             </Button>
 
             <Button 
+                title="Log/id with GitHub"
                 size="lg"
                 className="w-full"
                 variant="outline"

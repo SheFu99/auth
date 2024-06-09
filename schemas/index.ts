@@ -103,7 +103,7 @@ export const UserProfile = z.object({
 
 export const UserPost = z.object({
   image: z.string().min(10, 'Image is undefined').nullable().optional(),
-  text:  z.string().min(5, 'Text is Required').nullable(),
+  text:  z.string().min(5, 'Text is Required').nullable().optional(),
   timeStamp: z.string().min(5, 'TimeStamp is undefined').nullable().optional(),
   userId: z.string().min(5, 'User id is undefined').nullable().optional(),
   PostId:z.string().min(5, 'Post id is undefined').nullable().optional(),
@@ -115,5 +115,5 @@ export type LoginFormDataType = z.infer<typeof LoginSchema>;
 
 
 export const postSchema = z.object({
-  text:z.string().min(2,{message:'Error you need to type something to post this!'})
+  text:z.string().min(2,{message:'Error you need to type something to post this!'}).optional()
 })

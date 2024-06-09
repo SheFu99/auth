@@ -1,4 +1,4 @@
-import React, { useEffect, useState,lazy,Suspense } from 'react';
+import React, { useEffect, useState,lazy,Suspense, Profiler, Fragment } from 'react';
 import Image from 'next/image';
 const Lightbox =lazy(()=> import ('yet-another-react-lightbox'))
 // import Lightbox from "yet-another-react-lightbox";
@@ -6,6 +6,8 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 import "yet-another-react-lightbox/styles.css";
 import { PacmanLoader } from 'react-spinners';
+import { usePostList } from './lib/usePost';
+import { useCurrentUser } from '@/hooks/use-current-user';
 
 
 interface ImageGridProps {
@@ -17,6 +19,15 @@ interface ImageGridProps {
 export default  function ImageGrid( {images,className,type}:ImageGridProps ) {
     const [isOpen, setIsOpen] = useState(false);
     const [imageState , setImageState]= useState<number>()
+    const [loadingStatus, setLoadingStatus] = useState(images.map(() => true));
+
+    // Function to update the loading status for a specific image
+    const handleLoadingComplete = index => {
+        const newLoadingStatus = [...loadingStatus];
+        newLoadingStatus[index] = false;
+        setLoadingStatus(newLoadingStatus);
+    };
+    
 
     const modifyiedArray= images?.map((url)=>{
         return{src:url.url}
@@ -53,18 +64,24 @@ export default  function ImageGrid( {images,className,type}:ImageGridProps ) {
 
     return (
         <div className={`${className} grid grid-cols-6  gap-2  ${images?.length === 0 ? 'grid-cols-1' : ''}`}>
+
             {images?.map((img, index) => (
-                <div key={index} className={`${getGridForImage(index)} md:max-h-[350px] max-h-[250px] relative cursor-pointer col-span-1 `} onClick={() => openLightbox(index)}>
+                <div key={index} className={`
+                        ${getGridForImage(index)} 
+                        md:max-h-[350px] max-h-[250px] relative cursor-pointer col-span-1 
+                        
+                `} onClick={() => openLightbox(index)}>
                     <Image
+                        
                         key={index}
-                        src={img.url}
+                        src={`${img.url}`}
                         alt={`Gallery image ${index + 1}`}
                         width={400}
                         height={150}
-                        className="w-full h-full object-cover rounded-md"
+                        className={`w-full h-full object-cover rounded-md ${loadingStatus[index] ? 'blur' : ''}`}
                         priority
+                        onLoadingComplete={()=>handleLoadingComplete(index)}
                     />
-                  
                 </div>
                 
             ))}

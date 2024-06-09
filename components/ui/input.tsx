@@ -94,7 +94,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           />
           
           {type ==='password' && (
-            <button type='button' className='px-1' onClick={()=>showPassword(!visable)}>
+            <button type='button' title="ShowPassword" className='px-1' onClick={()=>showPassword(!visable)}>
               {visable ? <RxEyeOpen/>:<RxEyeClosed/>}
             </button>
           )}

@@ -107,11 +107,10 @@ const LoginForm = () => {
     return (  
        
         <CardWrapper
-            headerLable={showTwoFactor ?"undefined": "Welcome back" }
+            headerLable={showTwoFactor ?"undefined": "Homies" }
             backButtonLabel="Don't have an account?"
             backButtonHref="/auth/register"
             showSocial
-            
         >
             <Form {...form}>
                 <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6 p-2">
@@ -153,6 +152,7 @@ const LoginForm = () => {
                         {!showTwoFactor&&(
                         <>
                         <FormField
+
                             name="email"
                             control={control}
                             render={({ field }) => (
@@ -172,7 +172,6 @@ const LoginForm = () => {
                                 </FormItem>
                             )}
                         />
-                        
                         <FormField
                             control={control}
                             name="password"

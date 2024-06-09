@@ -16,7 +16,7 @@ const TabsTrigger: React.FC<React.PropsWithChildren<{ id: string; className?: st
   return (
       <button
           className={`${className} py-2 px-4 flex-1 mt-1 text-sm font-medium text-center
-          ${id === activeTab ? 'text-white border-white' : 'text-gray-500 border-transparent'}
+          ${id === activeTab ? 'text-white border-white scale-110' : 'text-gray-500 border-transparent'}
           border-b-2 transition duration-300 ease-in-out`}
           onClick={() => setActiveTab(id)}
       >
@@ -53,7 +53,7 @@ const TabsContent: React.FC<React.PropsWithChildren<{ id: string; className?: st
     return (
       <>
         {loading && (
-          <div className="w-full flex justify-center items-center min-h-[80vh]">
+          <div className="w-full flex justify-center items-center min-h-[65vh]">
             <HashLoader color="white" />
           </div>
         )}

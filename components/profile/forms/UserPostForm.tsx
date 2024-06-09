@@ -168,11 +168,10 @@ const UserPostForm = () => {
 
     return (
         
-     <form  onSubmit={submitPost}  className="p-2 mt-3 border border-white rounded-md" >
-
+        <form  onSubmit={submitPost}  className="p-2 mt-3 border border-white rounded-md" >
+         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
                 {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[90vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
- 
+
                                 <Textarea 
                                     ref={TextInputRef}
                                     onChange={(e)=>setTextState(e.target.value)}
@@ -205,6 +204,7 @@ const UserPostForm = () => {
                            
                     </div>
                     <div className="flex relative p-1 mt-2 flex-wrap gap-5">
+                        
                         {imagesBlobUrl?.map((image,index)=>(
                             <div key={index}>
                                 <div className="relative" title="remove image">
