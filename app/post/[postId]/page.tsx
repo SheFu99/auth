@@ -24,11 +24,9 @@ export const generateMetadata = async ({params:{postId}}):Promise<Metadata> =>{
    const post  = await getPost(postId)
     return {
         title:post.user.name,
-        description:post.text,
+        description:post?.superText || post.text,
         openGraph:{
-            images:[
-                {url:post.image[0].url}
-            ]
+            images: post?.image && post.image.length > 0 ? [{ url: post.image[0].url }] : []
         }
     }
 }
