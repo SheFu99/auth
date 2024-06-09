@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import { FiSettings } from "react-icons/fi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { RiAccountBoxFill } from "react-icons/ri";
+import LoginForm from "./auth/loginForm";
 
 interface SideBarProps{
     className?:string;
@@ -19,14 +20,16 @@ interface SideBarProps{
 
 const SideBar :React.FC<SideBarProps>=  ({className,role}) => {
 
-    console.log("ROLE_FETCH_SideBar_Render")
+    console.log(role)
     const pathname = usePathname();
 
     
 
     return ( 
         <div className={`${className} p-5 space-y-1`}>
-            {role === 'ADMIN'&&role &&(
+            {role?(
+                <>
+                     {role === 'ADMIN'&&role &&(
                   <>
                   <Button 
                       asChild
@@ -38,13 +41,8 @@ const SideBar :React.FC<SideBarProps>=  ({className,role}) => {
                           <p className="col-start-3">Admin</p>
                       </a>
                   </Button>
-      
-                 
-      
-                  
               </>
            )}
-
                 <>
                 <Button 
                       asChild
@@ -57,9 +55,6 @@ const SideBar :React.FC<SideBarProps>=  ({className,role}) => {
                       </Link>
                   </Button>
                 </>
-
-               
-
                 <>
                 <Button 
                       asChild
@@ -72,6 +67,11 @@ const SideBar :React.FC<SideBarProps>=  ({className,role}) => {
                       </a>
                   </Button>
                 </>
+                </>
+            ):(
+                <LoginForm/>
+            )}
+           
         </div>
      );
 }

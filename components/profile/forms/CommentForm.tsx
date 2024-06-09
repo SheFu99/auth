@@ -37,7 +37,7 @@ interface CommentFormProps {
 }
 
 type createPostParams = {
-    comment:post,
+    comment:Comment,
     postId:string
 }
 

@@ -7,7 +7,6 @@ import CommentList from "./CommentList";
 
 type commentsParams = {
     user?:ExtendedUser;
-    commentsCount:number,
     postId:string
 }
 

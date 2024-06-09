@@ -107,20 +107,15 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                 console.log('focus')
             }
         }
+        console.log(post.user.id)
     return ( 
 <div>
   
         {post&&(
             <>
-            <Head>
-            <title>{post.user.name} - Post</title>
-            <meta name="description" content={post.superText} />
-            <meta property="og:title" content={post.user.name} />
-            <meta property="og:description" content={post.text} />
-            <meta property="og:image" content={post?.image[0]?.url||''} />
-          </Head>
+           
                 <article >
-                <div className=" justify-between border border-neutral-400 p-3  relative hover:bg-neutral-900 ">
+                <div className=" justify-between border border-neutral-400 p-3 rounded-md  relative hover:bg-neutral-900 ">
                     
                     <RepostHeader 
                         userId={post.user.id}
@@ -150,7 +145,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                     )}
             
                     <div className="ml-[3rem] mr-[1rem]">
-                        <p className="text-white col-span-10 col-start-2 py-2 text-xl">{post.text}</p>
+                        <h2 className="text-white col-span-10 col-start-2 py-2 text-xl">{post.text}</h2>
                             {currentUser?.id === post.userId&&(
                                 <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                             )}

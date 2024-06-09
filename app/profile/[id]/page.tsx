@@ -38,15 +38,13 @@ export default async function PublicProfileParams({ params }) {
           
           <div>
             {!profile.error?(
-              <div className="border rounded-lg">
+              <div className="border rounded-xl">
                 <PublicProfile profile={profile}  sessionUser={sessionUser}/>
-          
                     <TabSwitch
                     chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
                     chilldrenPosts={<InfinitePostList  userId={params.id} sessionUser={sessionUser}/>}
                     postTotal={userPostList.totalPostCount}
                     />
-          
               </div>
             ):(
               <div>
