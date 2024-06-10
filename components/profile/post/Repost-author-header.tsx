@@ -13,7 +13,7 @@ type RepostHeaderParams ={
     userId:string,
     userName:string,
     userImage?:string,
-    timestamp:Date,
+    timestamp?:Date,
     className?:string
 }
 const RepostHeader :React.FC<RepostHeaderParams> = ({userId,userName,userImage,timestamp,className}) => {
@@ -40,9 +40,12 @@ const RepostHeader :React.FC<RepostHeaderParams> = ({userId,userName,userImage,t
                      
            <div className="grid-rows-5">
               <p className="text-white font-bold row-span-4 ">{userName}</p>
-               <div className="text-gray-300 text-xs wf row-start-4 row-span-1">
-                  <TimeAgo date={timestamp}  formatter={formatter}/>
-                </div>
+              {timestamp&&(
+                 <div className="text-gray-300 text-xs wf row-start-4 row-span-1">
+                 <TimeAgo date={timestamp}  formatter={formatter}/>
+               </div>
+              )}
+              
             </div>
                         
        </div>

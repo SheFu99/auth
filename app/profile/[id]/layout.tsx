@@ -5,6 +5,8 @@ import React from "react";
 import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
 import QueryProvider from "@/util/QueryProvider";
+import BottomNavBar from "@/components/navigation/BottomNavBar";
+import HomiesLoader from "@/components/HomiesLoader";
 
 type PublicProfileProps = {
     children?:React.ReactNode,
@@ -14,7 +16,6 @@ const PublicProfileLayout:React.FC<PublicProfileProps> = async ({children}) => {
     const session = await auth()
     const user = session?.user
     console.log('Render_SSSION_TRIGGERED')
-    
     return ( 
         //Do not use session provider with <Link/> component!
         // <SessionProvider session={session}>
@@ -28,6 +29,10 @@ const PublicProfileLayout:React.FC<PublicProfileProps> = async ({children}) => {
                                        <QueryProvider> {children} </QueryProvider>
                                 </div>
                             </div>
+                           
+                            {/* <BottomNavBar user={user}/> */}
+                            
+                    
                         </div>
                     </>
         // </SessionProvider>

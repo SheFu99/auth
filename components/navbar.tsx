@@ -9,6 +9,7 @@ import SideBar from './SideBar';
 import React from "react";
 import UserButton from "./auth/user-button";
 import { ExtendedUser } from "@/next-auth";
+import HomiesLoader from "./HomiesLoader";
 // const UserButton = React.lazy(()=> import ("./auth/user-button"));
   
 type navbarProps = {
@@ -17,10 +18,15 @@ type navbarProps = {
 }
  const Navbar:React.FC<navbarProps> = ({user})=>{
     const role = user?.role
+    
     return(
         <>
      
             <nav className=" bg-opacity-30 bg-neutral-900  col-start-1 col-span-12 row-span-1  rounded-xs md:w-full h-auto grid grid-cols-12">
+            
+            <div className="">
+          
+            </div>
                 <Sheet>
                     <SheetTrigger 
                         title="Humburger Menu" 

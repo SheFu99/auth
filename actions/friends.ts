@@ -269,20 +269,28 @@ export type getPrivateFriendsPromise = {
     success?:boolean,
     error?:string,
 };
-export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
+export const getUserFreinds = async (page:number):Promise<getPrivateFriendsPromise> =>{
     const user = await currentUser()
     if(!user){
-        return {error:'Error user not found!'}
+        return {error:'Error!You need to be authorized!'}
     }
+    const pageSize = 3;
+    let newPage = page | 1
+    const skip = (newPage - 1) * pageSize; 
+
     try {
         const userFriendsList:FriendsOffer[] = await db.friendShip.findMany({
+            
             where:{
                 AND:[
                     {requesterId:user.id},
                     {status:'ACCEPTED'}
                 ]
             },
+            skip:skip,
+            take:pageSize,
             include:{
+                
                 addressee:{
                     select:{
                          firstName:true,
@@ -291,6 +299,7 @@ export const getUserFreinds = async ():Promise<getPrivateFriendsPromise> =>{
                     }
                 }
             }
+
         })
         const userFriendsListRight = await db.friendShip.findMany({
             where:{

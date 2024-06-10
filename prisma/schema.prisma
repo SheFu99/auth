@@ -24,6 +24,7 @@ model User {
   profile               Profile?
   twoFactorConfirmation TwoFactorConformation?
 
+@@index([id])
 }
 
 model Profile {
@@ -44,22 +45,26 @@ model Profile {
     requested    FriendShip[] @relation("RequestedFriends")
     received     FriendShip[] @relation("ReceivedFriends")
 
-
+@@index([shortName])
+@@index([userId])
+@@index([firstName])
+@@unique([firstName])
 }
 
 model FriendShip {
   transactionId String @id @default(cuid())
-  requesterId String
-  adresseedId String 
+  requesterName String
+  adresseedName String 
   status FriendStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  requester     Profile @relation("RequestedFriends" ,fields: [requesterId],references: [userId],onDelete: Cascade)
-  addressee     Profile @relation("ReceivedFriends"  ,fields: [adresseedId],references: [userId],onDelete: Cascade)
+  requester     Profile @relation("RequestedFriends" ,fields: [requesterName],references: [firstName],onDelete: Cascade)
+  addressee     Profile @relation("ReceivedFriends"  ,fields: [adresseedName],references: [firstName],onDelete: Cascade)
 
-  @@index([requesterId])
-  @@index([adresseedId])
-  @@unique([requesterId,adresseedId])
+  @@index([requesterName])
+  @@index([adresseedName])
+
+
 }
 
 enum FriendStatus {
@@ -83,6 +88,8 @@ model Post {
   image       Images[]
   likes       Like[]
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([PostId])
 }
 
 model Images {
@@ -92,6 +99,8 @@ model Images {
   id        Int      @id @default(autoincrement())
   Comment   Comment? @relation(fields: [CommentId], references: [CommentId], onDelete: Cascade)
   Post      Post?    @relation(fields: [postId], references: [PostId], onDelete: Cascade)
+
+  @@index([postId])
 }
 
 model Comment {
@@ -109,6 +118,8 @@ model Comment {
   likes     Like[]
   originComment Comment? @relation("OriginOfComentAnswers",fields: [originCommentId],references: [CommentId],onDelete: Cascade)
   answers Comment[] @relation("OriginOfComentAnswers")
+
+  @@index([postId])
  }
 
 model Gallery {
@@ -136,6 +147,9 @@ model Like {
   @@unique([postId, userId])
   @@unique([commentId, userId])
   @@unique([galleryId, userId])
+
+  @@index([userId])
+  @@index([postId])
 }
 
 model Account {
@@ -154,6 +168,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model VerificationToken {

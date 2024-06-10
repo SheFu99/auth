@@ -18,7 +18,7 @@ import { ExtendedUser } from "@/next-auth"
 // import { useEffect } from "react"
 
 type userButtonProps = {
-    user:ExtendedUser,
+    user?:ExtendedUser,
 }
 
  const UserButton: React.FC<userButtonProps> =  ({user})=>{

@@ -4,22 +4,29 @@ import { FriendsOffer } from "@/components/types/globalTs";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { FaUser } from "react-icons/fa";
 import Link from "next/link";
+import SearchBar from "@/components/search/user/SearchBar";
+import { usePathname, useSearchParams } from "next/navigation";
+import { ExtendedUser } from "@/next-auth";
 
 
 interface props {
-    friendsList:FriendsOffer[],
+    friendsList:FriendsOffer[]&ExtendedUser[],
+    search?:string,
+    profileId?:string,
 }
-const PublicProfileFriends:React.FC<props> = ({friendsList}) => {
-    console.log("RENDER")
+const PublicProfileFriends:React.FC<props> = ({friendsList,search,profileId}) => {
+    console.log(friendsList)
     ///TEST: in production check how is work <Link with next auth session 
 //    const router = useRouter()
 //    const linkRef= useRef()
 //     const handleRoute = (userId)=>{
 //         router.push(`/profile/${userId}`)
 //     }
-
+const path = usePathname()
+const combined = `${path}?tab=tab1&`
     return ( 
         <div className=" w-full space-y-2">
+            <SearchBar search={search} context={combined} />
             {friendsList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full" key={index}> 
                 

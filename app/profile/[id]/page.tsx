@@ -13,22 +13,35 @@ import queryClientConfig from "@/lib/QueryClient";
 import QueryProvider from "@/util/QueryProvider";
 import InfinitePostList from "@/components/profile/post/postCard/lists/InfinitePostList";
 import { prefetchPostList } from "@/lib/prefetchQuery";
+import { getUserListByName } from "@/actions/search/users";
 
 
 
-export default async function PublicProfileParams({ params }) {
+export default async function PublicProfileParams({
+  params,
+  searchParams,
+}) {
+  // console.log(params)
 
-  const prefetchedPost = await prefetchPostList(params?.id)
-  console.log(prefetchedPost)
-  
+   await prefetchPostList(params?.id)
+  const search = searchParams?.search
+  console.log(search)
   const dehydratedState = dehydrate(queryClientConfig)
-  console.log(dehydratedState)
+
       const session = await auth()
       const sessionUser =session?.user
       const profile = await getPublicProfile(params.id)
       const userPostList = await GetUserPostsById(profile?.profile?.userId,1)
-      const userfriendsList = await getProfileFriends(profile?.profile?.userId)
-  
+      let userfriendsList
+      if(search){
+       const {postResult,error,success} = await getUserListByName({pageParams:1,name:search})
+       if(error) return null
+       userfriendsList = postResult
+      }else{
+         userfriendsList = await getProfileFriends(profile?.profile?.userId)
+        
+      }
+  console.log(userfriendsList)
     //  const {userPostList,userfriendsList} = await isProfileExist(profile)
      
 
@@ -41,7 +54,7 @@ export default async function PublicProfileParams({ params }) {
               <div className="border rounded-xl">
                 <PublicProfile profile={profile}  sessionUser={sessionUser}/>
                     <TabSwitch
-                    chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList}/> }
+                    chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList||userfriendsList} search={search}/> }
                     chilldrenPosts={<InfinitePostList  userId={params.id} sessionUser={sessionUser}/>}
                     postTotal={userPostList.totalPostCount}
                     />
