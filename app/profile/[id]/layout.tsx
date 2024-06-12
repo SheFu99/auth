@@ -12,7 +12,9 @@ type PublicProfileProps = {
     children?:React.ReactNode,
 }
 
-const PublicProfileLayout:React.FC<PublicProfileProps> = async ({children}) => {
+const PublicProfileLayout = async ({children,searchParams}) => {
+  const search = searchParams?.search
+console.log(search)
     const session = await auth()
     const user = session?.user
     console.log('Render_SSSION_TRIGGERED')

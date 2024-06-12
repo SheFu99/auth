@@ -32,15 +32,13 @@ export default async function PublicProfileParams({
       const sessionUser =session?.user
       const profile = await getPublicProfile(params.id)
       const userPostList = await GetUserPostsById(profile?.profile?.userId,1)
-      let userfriendsList
-      if(search){
+     
        const {postResult,error,success} = await getUserListByName({pageParams:1,name:search})
-       if(error) return null
-       userfriendsList = postResult
-      }else{
-         userfriendsList = await getProfileFriends(profile?.profile?.userId)
-        
-      }
+    
+     
+     const userfriendsList = await getProfileFriends(profile?.profile?.userId)
+      
+
   console.log(userfriendsList)
     //  const {userPostList,userfriendsList} = await isProfileExist(profile)
      
@@ -54,7 +52,7 @@ export default async function PublicProfileParams({
               <div className="border rounded-xl">
                 <PublicProfile profile={profile}  sessionUser={sessionUser}/>
                     <TabSwitch
-                    chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList||userfriendsList} search={search}/> }
+                    chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList} search={search}/> }
                     chilldrenPosts={<InfinitePostList  userId={params.id} sessionUser={sessionUser}/>}
                     postTotal={userPostList.totalPostCount}
                     />

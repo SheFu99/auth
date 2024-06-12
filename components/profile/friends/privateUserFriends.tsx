@@ -25,7 +25,7 @@ const UserFriends = () => {
 
     const getFriends = ()=>{
         startTransition(()=>{
-            getUserFreinds()
+            getUserFreinds(1)
             .then(response=>{
                 console.log(response)
                 if(response?.success){

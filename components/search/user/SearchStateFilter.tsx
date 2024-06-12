@@ -6,29 +6,14 @@ import { IoSearchSharp } from "react-icons/io5";
 import { useDebounce } from 'use-debounce';
 
 type SearchBarProps = {
-  search?:string,
-  context?:string
+  search:string,
+  setSearch:(value:string)=>void,
 }
 
-const SearchBar = ({ search , context }: SearchBarProps) => {
-  console.log(context)
-    const router = useRouter()
-    const initialRender = useRef(true)
+const SearchStateFilter = ({ search,setSearch  }: SearchBarProps) => {
+
     const [text, setText] = useState(search)
-    const [query] = useDebounce(text, 500)
-  
-    useEffect(() => {
-      if (initialRender.current) {
-        initialRender.current = false
-        return
-      }
-  
-      if (!query) {
-        router.push(context)
-      } else {
-        router.push(`${context}search=${query}`)
-      }
-    }, [query])
+
   
     return (
       <div className='relative rounded-md shadow-sm'>
@@ -36,13 +21,13 @@ const SearchBar = ({ search , context }: SearchBarProps) => {
           <IoSearchSharp color="white"/>
         </div>
         <input
-          value={text}
+          value={search}
           placeholder='Search users...'
-          onChange={e => setText(e.target.value)}
+          onChange={e => setSearch(e.target.value)}
           className='block w-full rounded-md border-0 py-1.5 pl-10 text-wgite ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6'
         />
       </div>
     )
   }
  
-export default SearchBar;
+export default SearchStateFilter;

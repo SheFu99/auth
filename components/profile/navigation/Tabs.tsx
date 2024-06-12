@@ -13,7 +13,18 @@ import { usePostList } from "../post/lib/usePost";
 import InfinitePostList from "../post/postCard/lists/InfinitePostList";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
-const ProfileTabs = ({userId}) => {
+import SearchUsers from "@/app/profile/[id]/searchFriends";
+import { ExtendedUser } from "@/next-auth";
+import SearchResultOrFriendList from "@/components/search/user/SearchResult";
+
+interface profileTabsProps {
+  userId:string,
+  searchParams?:string,
+  searchResult?:ExtendedUser[]
+}
+
+const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
+  console.log(searchResult)
   const user = useCurrentUser()
   const {data,isLoading,isError} = usePostList(userId)
 
@@ -39,8 +50,19 @@ const ProfileTabs = ({userId}) => {
         <TabsContent id="tab2" className="p-4">
 
           <Suspense fallback={<ListSkeleton/>}>
-            <IncomeOfferList/>
-            <UserFriends/>
+            <div className="mb-2 -mt-2">
+              <SearchUsers search={searchParams}/>
+            </div>
+            {searchResult?(
+              <SearchResultOrFriendList searchResult={searchResult}/>
+
+            ):(
+              <>
+                <IncomeOfferList/>
+                <UserFriends/>
+              </>
+            )}
+           
           </Suspense>
         </TabsContent>
         <TabsContent id="tab3" className="p-4">

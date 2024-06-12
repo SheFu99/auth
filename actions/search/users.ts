@@ -1,4 +1,5 @@
 'use server'
+import { FriendsOffer } from "@/components/types/globalTs"
 import { db } from "@/lib/db"
 import { ExtendedUser } from "@/next-auth"
 
@@ -34,7 +35,14 @@ try {
             }
         },
         take:pageSize,
-        skip:skip
+        skip:skip,
+        select:{
+            id:true,
+            name:true,
+            email:true,
+            image:true,
+            role:true
+        }
     });
 
 
@@ -46,3 +54,4 @@ try {
 
 
 }
+

@@ -65,7 +65,7 @@ const TabsContent = ({ children, id, className }) => {
   return (
     <>
       {loading && (
-        <div className="w-full flex justify-center items-center min-h-[65vh]">
+        <div className="w-full flex justify-center items-center min-h-[40vh]">
           <HashLoader color="white" />
         </div>
       )}

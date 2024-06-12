@@ -37,7 +37,8 @@ export default function CoverPublic({url, className}:CoverProps) {
           
       )}
       
-        {isUploading||!url&&(
+      
+        {!isUploading||!url&&(
             <CoverPlaceHolder/>
         )}
       

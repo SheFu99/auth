@@ -2,7 +2,8 @@
 
 import { getUserListByName } from "@/actions/search/users";
 import RepostHeader from "@/components/profile/post/Repost-author-header";
-import SearchBar from "@/components/search/user/SearchBar";
+import SearchBar from "@/components/search/user/SearchBarWithUrlQuery";
+
 import { Fragment } from "react";
 
 const SearchPage = async ({searchParams}) => {
@@ -15,7 +16,7 @@ const SearchPage = async ({searchParams}) => {
 
         <div>
             <h1>SearchParams:{search}</h1>   
-            <SearchBar search={search} />
+            <SearchBar search={search} context="/users"/>
             <h2>Result:</h2>
              {getUser?.postResult?.map(user=>(
             <Fragment key={user.id}>

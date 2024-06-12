@@ -25,12 +25,12 @@ const TabSwitch = ({chilldrenPosts,chilldrenFriends,friendsTotal,postTotal,class
                 {/* <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center"><RiGalleryFill/>Gallery</TabsTrigger> */}
             </TabsList>
 
-            <TabsContent id="tab2" className="grid grid-cols-12 ">
-                <div className='col-span-12 space-y-5'>
+            <TabsContent id="tab2" className="p-4">
+                
                     {/* <Suspense fallback={<ListSkeleton/>}>  */}
                     {chilldrenPosts}
                     {/* </Suspense> */}
-                </div>
+            
             </TabsContent>
 
             <TabsContent id="tab1" className="p-4">
