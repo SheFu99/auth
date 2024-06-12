@@ -1,5 +1,6 @@
 'use server'
 import { FriendsOffer } from "@/components/types/globalTs"
+import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { ExtendedUser } from "@/next-auth"
 
@@ -16,8 +17,11 @@ type getUserListParams = {
 
 export const getUserListByName = async ({name,pageParams}:getUserListParams):Promise<UserListPromise>=>{
     if(!name){ 
-        return {error:'Has no params!'}
+        return {error:'Params require!'}
     }
+    const user = await currentUser()
+
+
     let page:number = pageParams
     if(!page){
          page = 1
@@ -31,8 +35,12 @@ try {
         where:{
             name:{
                 contains:name,
-                mode:'insensitive'
-            }
+                mode:'insensitive',
+                not: {
+                    contains: user.name,
+                }
+            },
+            
         },
         take:pageSize,
         skip:skip,
@@ -45,6 +53,7 @@ try {
         }
     });
 
+    const filteredUserList = userList.filter(userObj=> userObj.id !==user.id)
 
     return {postResult:userList,success:true}
 } catch (error) {

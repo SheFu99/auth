@@ -30,12 +30,12 @@ const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
 
     return (  
         <Tabs defaultId="tab1" >
-        <TabsList className=" p-1 rounded-lg flex justify-around flex-wrap mt-1">
-            <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center">
+        <TabsList className=" p-1 rounded-lg flex  flex-wrap mt-1">
+            <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">
               <RiProfileLine/>{data?.pages[0]?.totalPostCount} Posts</TabsTrigger>
-            <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center">
+            <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">
               <FaUser/>Friends</TabsTrigger>
-            <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center">
+            <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">
               <RiGalleryFill/>Gallery</TabsTrigger>
         </TabsList>
 
@@ -57,10 +57,10 @@ const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
               <SearchResultOrFriendList searchResult={searchResult}/>
 
             ):(
-              <>
+              <div className="space-y-1">
                 <IncomeOfferList/>
                 <UserFriends/>
-              </>
+              </div>
             )}
            
           </Suspense>
