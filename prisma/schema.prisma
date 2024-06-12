@@ -53,18 +53,17 @@ model Profile {
 
 model FriendShip {
   transactionId String @id @default(cuid())
-  requesterName String
-  adresseedName String 
+  requesterId String
+  adresseedId String 
   status FriendStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  requester     Profile @relation("RequestedFriends" ,fields: [requesterName],references: [firstName],onDelete: Cascade)
-  addressee     Profile @relation("ReceivedFriends"  ,fields: [adresseedName],references: [firstName],onDelete: Cascade)
+  requester     Profile @relation("RequestedFriends" ,fields: [requesterId],references: [userId],onDelete: Cascade)
+  addressee     Profile @relation("ReceivedFriends"  ,fields: [adresseedId],references: [userId],onDelete: Cascade)
 
-  @@index([requesterName])
-  @@index([adresseedName])
-
-
+  @@index([requesterId])
+  @@index([adresseedId])
+  @@unique([requesterId,adresseedId])
 }
 
 enum FriendStatus {
