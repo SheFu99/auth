@@ -5,14 +5,13 @@ import React from "react";
 import Navbar from "@/components/navbar";
 import SideBar from "@/components/SideBar";
 import QueryProvider from "@/util/QueryProvider";
-import BottomNavBar from "@/components/navigation/BottomNavBar";
-import HomiesLoader from "@/components/HomiesLoader";
 
 type PublicProfileProps = {
     children?:React.ReactNode,
+    searchParams?:{search:string},
 }
 
-const PublicProfileLayout = async ({children,searchParams}) => {
+const PublicProfileLayout = async ({children,searchParams}:PublicProfileProps) => {
   const search = searchParams?.search
 console.log(search)
     const session = await auth()

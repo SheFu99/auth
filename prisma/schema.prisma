@@ -48,7 +48,6 @@ model Profile {
 @@index([shortName])
 @@index([userId])
 @@index([firstName])
-@@unique([firstName])
 }
 
 model FriendShip {
