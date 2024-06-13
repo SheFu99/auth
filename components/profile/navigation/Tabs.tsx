@@ -17,6 +17,7 @@ import SearchUsers from "@/app/profile/[id]/searchFriends";
 import { ExtendedUser } from "@/next-auth";
 import SearchResultOrFriendList from "@/components/search/user/SearchResult";
 
+
 interface profileTabsProps {
   userId:string,
   searchParams?:string,
@@ -24,15 +25,20 @@ interface profileTabsProps {
 }
 
 const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
+  console.log(userId)
   console.log(searchResult)
   const user = useCurrentUser()
-  const {data,isLoading,isError} = usePostList(userId)
+  const {data} = usePostList(userId)
+  // const {data:profileData,isError,isLoading} =useProfile(user?.id)
+
+  console.log(data)
+
 
     return (  
         <Tabs defaultId="tab1" >
         <TabsList className=" p-1 rounded-lg flex  flex-wrap mt-1">
             <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">
-              <RiProfileLine/>{data?.pages[0]?.totalPostCount} Posts</TabsTrigger>
+              <RiProfileLine/>{data?.pages[0]?.totalPostCount || 0} Posts</TabsTrigger>
             <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">
               <FaUser/>Friends</TabsTrigger>
             <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">

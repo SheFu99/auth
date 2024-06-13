@@ -3,8 +3,6 @@
 import { FriendsOffer } from "@/components/types/globalTs";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { FaUser } from "react-icons/fa";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
 import { ExtendedUser } from "@/next-auth";
 import { useState } from "react";
 import SearchStateFilter from "@/components/search/user/SearchStateFilter";

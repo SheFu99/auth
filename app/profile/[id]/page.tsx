@@ -59,7 +59,8 @@ export default async function PublicProfileParams({
               </div>
             ):(
               <div>
-                <p>Profile is not found</p>
+                <h1 className="text-[12rem]">404</h1>
+                <p className="text-[3rem]">Profile is not exist</p>
               </div>
             )}
           </div>

@@ -1,8 +1,7 @@
 'use client'
 
-import React, { Suspense } from "react";
+import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import ListSkeleton from "./friends/FriendSkeleton";
 import { RiProfileLine } from "react-icons/ri";
 import { FaUser } from "react-icons/fa";
 

@@ -30,7 +30,7 @@ type navbarProps = {
                 <Sheet>
                     <SheetTrigger 
                         title="Humburger Menu" 
-                        className="md:block p-2 ml-4 xl:hidden">
+                        className="md:block p-2 ml-4 xl:hidden hidden">
                             <GiHamburgerMenu/>
                         </SheetTrigger>
                     <SheetContent className="g-f:w-[200px] sm:w-[225px] md:w-[225px] flex">

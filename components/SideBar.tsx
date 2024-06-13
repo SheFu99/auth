@@ -1,18 +1,13 @@
 'use client'
 
-import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { useCurrentRole } from "@/hooks/use-current-role";
-import { currentRole } from "@/lib/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiSettings } from "react-icons/fi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { RiAccountBoxFill } from "react-icons/ri";
 import LoginForm from "./auth/loginForm";
-import { LogoutButton } from "./auth/logout-button";
-import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
-import { ExitIcon } from "@radix-ui/react-icons";
+
 
 interface SideBarProps{
     className?:string;
@@ -22,11 +17,8 @@ interface SideBarProps{
 
 
 const SideBar :React.FC<SideBarProps>=  ({className,role}) => {
-
-    console.log(role)
-    const pathname = usePathname();
-
     
+    const pathname = usePathname();
 
     return ( 
         <div className={`${className} p-5 space-y-1`}>
@@ -72,7 +64,12 @@ const SideBar :React.FC<SideBarProps>=  ({className,role}) => {
                 </>
                 </>
             ):(
-                <LoginForm/>
+                <div>
+                    <div className="hidden md:block">
+                        <LoginForm />
+                    </div>
+
+                </div>
             )}
            
         </div>

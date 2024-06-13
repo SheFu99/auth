@@ -1,5 +1,6 @@
 
 import { GetUserPostsById } from "@/actions/UserPosts";
+import { getCurrentProfile } from "@/actions/UserProfile";
 import { getPostById } from "@/actions/post";
 import { post } from "@/components/types/globalTs";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
@@ -11,18 +12,24 @@ export type PostQueryPromise = {
 }
 
 export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQueryPromise> => {
-   console.log('POSTS_GET')
-    const data = await GetUserPostsById(userId, pageParam);
-    if (data?.error) {
+    console.log("fetchPostList")
+    const {error,success,posts,totalPostCount} = await GetUserPostsById(userId, pageParam);
+    console.log(posts)
+
+    if (error) {
+        console.log("ERROR")
         throw new Error('Network error');
     }
+   console.log(posts)
+
     return {
-        data: data.posts, 
+        data: posts, 
         nextPage: pageParam + 1 ,
-        totalPostCount: data.totalPostCount
+        totalPostCount: totalPostCount
     };
 };
   export const usePostList = (userId:string) =>{
+    console.log(userId)
         return useInfiniteQuery({
             queryKey:['posts',userId],
             queryFn: ({pageParam=1})=>fetchPostList({pageParam,userId}),
@@ -44,10 +51,26 @@ export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQuery
     };
 
     export const usePost = (postId:string)=>{
-   
         return useQuery({
             queryKey:['post',postId],
             queryFn:()=>fetchPost(postId),
-
         })
     }
+    export const fetchProfile = async (userId:string)=>{
+        console.log(userId)
+        const {profile,error}= await getCurrentProfile(userId)
+        if(error) {
+            throw new Error(error)
+        }
+    
+        return profile
+    };
+    
+
+    export const useProfile = (userId:string)=>{
+        return useQuery({
+            queryKey:['profile' ,userId],
+            queryFn:()=>fetchProfile(userId)
+        })
+    
+    };

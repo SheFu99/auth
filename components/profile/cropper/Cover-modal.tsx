@@ -12,17 +12,17 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { BounceLoader } from "react-spinners";
 import { microserviceEndpoint } from "@/lib/utils";
 interface ModalProps {
-    updateCover: (newAvatarUrl: Blob) => void;
+  update: () => void;
     closeCoverModal: () => void;
   }
 
 
-const CoverModal: React.FC<ModalProps>  = ({ closeCoverModal }) => {
+const CoverModal: React.FC<ModalProps>  = ({ closeCoverModal ,update}) => {
   const user = useCurrentUser()
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [coverSrc,setCoverSrc] = useState('')
   const [visable,setVisable]=useState<boolean>(false)
-  const {update}=useSession()
+ 
   const [uploadError,setUploadError]=useState<boolean>(false)
   const [isUploading,setIsUploading]=useState<boolean>(false)
 

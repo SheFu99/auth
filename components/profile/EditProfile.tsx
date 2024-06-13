@@ -5,21 +5,23 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import Cover from "./Cover";
-import { getProfileById } from "@/actions/UserProfile";
+import { getCurrentProfile } from "@/actions/UserProfile";
 import ImageCropper from "./cropper/Image-Cropper";
 import { BounceLoader } from "react-spinners";
 import { ProfileData } from "../types/globalTs";
 import {debounce} from 'lodash'
 import HeaderAvatar from "../ui/AvatarCoustom";
 import ProfileAbout from "./post/ProfileAccordion";
+import { useQueryClient } from "@tanstack/react-query";
+import { useProfile } from "./post/lib/usePost";
+import queryClientConfig from "@/lib/QueryClient";
 
 
 
 const  EditProfile =  () => {
   
   const user = useCurrentUser();
-  const [profile, setProfile] = useState<ProfileData>()
-
+  const {data:profileData,isError,isLoading} =useProfile(user?.id)
   const {update} = useSession() ///replace to updateProfile redux hook 
   const [avatarUploading, setAvatarUloading] = useState(false);
   const [sessionImage, setSessionImage] = useState( user?.image); 
@@ -27,8 +29,7 @@ const  EditProfile =  () => {
   const [avatarCropper,setModalAvatarCropper]=useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
-  
+  const queryKey = ['profile', user?.id]
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     
       if (event.target.files && event.target.files[0]) {
@@ -42,40 +43,16 @@ const  EditProfile =  () => {
           reader.readAsDataURL(event.target.files[0]);
       }
   };
-
   const handleAvatarCropped = (croppedImage: string) => {
       setAvatarUloading(true)
       updateAvatar(croppedImage)
   };
 
-  const fetchProfile = async () => {
-      try {
-        const profileData = await getProfileById(user?.id!);
-        console.log('profilefetched',profileData )
-        setProfile(profileData as ProfileData);
-        
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
-      }
-  };
-
-  const debounceFetchProfile = useCallback(
-    debounce(()=>{
-      fetchProfile();
-  },1000),[])
-
-  
-  useEffect(()=>{
-    debounceFetchProfile();
-  },[update]) 
 
   const updateAvatar = async(croppedImageBlob) =>{
- 
       const response = await fetch(croppedImageBlob);
       const blob = await response.blob(); // Convert the image URL to a blob for uploading
-     
-    
-  
+      
     const formData = new FormData();
      const now = new Date();
     const dateTime = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
@@ -125,11 +102,25 @@ const  EditProfile =  () => {
 
   };
 
+  const handleCoverChange = () => {
+    console.log('HandleCOverChange')
+    queryClientConfig.invalidateQueries({queryKey}); 
+};
+
   return (
     
     <div className="col-span-12 grid-row-6 ">
         <div className=''>
-          <Cover url={profile?.coverImage!} onChange={fetchProfile} editable={true} className=" z-1 rounded-md shadow-xs col-span-12"></Cover>
+          <Cover 
+            url={profileData?.coverImage} 
+            isUploading={isLoading} 
+            onChange={handleCoverChange} 
+            editable={true} 
+            className=" z-1 rounded-md shadow-xs col-span-12"
+            queryKey={queryKey}
+            />
+
+           
           <div>
 
             {avatarCropper && (
@@ -151,7 +142,7 @@ const  EditProfile =  () => {
                             src={sessionImage}
                             width={100}
                             height={100}
-                            alt={profile?.firstName}
+                            alt={profileData?.firstName}
                         />
                         )}
                       <button
@@ -172,7 +163,7 @@ const  EditProfile =  () => {
           </div>
         </div>
           
-            <ProfileAbout profile={profile} user={user} />
+            <ProfileAbout profile={profileData} user={user} />
             
     </div>
 

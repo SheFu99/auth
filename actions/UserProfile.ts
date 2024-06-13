@@ -23,18 +23,25 @@ export type FRtransaction={
   status:friendshipStatus
 }
 export type Profile = z.infer<typeof UserProfile>
+ interface getProfileByIDPromise {
+  error?:string,
+  success?:boolean;
+  profile?:ProfileData
 
-export const getProfileById = async (userId:string)=>{
+ }
+export const getCurrentProfile = async (userId:string):Promise<getProfileByIDPromise>=>{
   
-  if(!userId){
-    return {error: 'userId is required'}
-  }
-  const existingProfile = await CurrentProfile()
+  // const existingProfile = await CurrentProfile()
+  const existingProfile = await db.profile.findFirst({
+    where:{userId:userId}
+  })
     if(!existingProfile){
       return {error: 'Profile not found'}
     }
-    return  existingProfile
+    return  {profile:existingProfile}
 }
+
+
 
 export const createUserProfile = async (values: Profile) => {
 

@@ -275,7 +275,7 @@ export const getUserFreinds = async (page:number):Promise<getPrivateFriendsPromi
         return {error:'Error!You need to be authorized!'}
     }
     const pageSize = 3;
-    let newPage = page | 1
+    let newPage = page || 1
     const skip = (newPage - 1) * pageSize; 
 
     try {

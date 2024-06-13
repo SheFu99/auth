@@ -22,7 +22,7 @@ const SearchStateFilter = ({ search,setSearch  }: SearchBarProps) => {
         </div>
         <input
           value={search}
-          placeholder='Search users...'
+          placeholder='Find some...'
           onChange={e => setSearch(e.target.value)}
           className='block w-full rounded-md border-0 py-1.5 pl-10 text-wgite ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6'
         />

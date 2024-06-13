@@ -15,22 +15,24 @@ import { FaEdit, FaGenderless, FaPhone } from 'react-icons/fa';
 import { MdElderly, MdLocationCity } from 'react-icons/md';
 import { BsGenderFemale, BsGenderMale } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
+import queryClientConfig from '@/lib/QueryClient';
+import { ProfileData } from '@/components/types/globalTs';
 
 interface Profileform{
-    profile:any,
+    profile:ProfileData,
     editProfileProps:boolean,
     onChange?:(event:React.ChangeEvent<HTMLInputElement>)=>void
 }
 
 
 const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
- 
     const [shouldAnimate,setShouldAnimate]=useState<boolean>(false)
     const [isPending,startTransition]=useTransition()
     const [error,setError] =useState<string| undefined>()
     const [success, setSuccess] = useState<string|undefined>()
     const [editProfile, swichEditProfile]=useState<boolean>(editProfileProps)
-    const {update} = useSession()
+    const queryKey = ['profile',profile.userId]
+    
     const Profileform = useForm<z.infer<typeof UserProfile>>({
         resolver:zodResolver(UserProfile),
         defaultValues:{
@@ -63,7 +65,8 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
     
                 if(data.success){
                     swichEditProfile(false)
-                    update()
+                    // update()
+                    queryClientConfig.invalidateQueries({queryKey})
                     toast.success(data.success)
                 }
             })

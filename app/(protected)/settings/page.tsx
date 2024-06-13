@@ -26,25 +26,14 @@ import {
 from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
 import { useCurrentUser } from '@/hooks/use-current-user';
-import { 
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { FormSucces } from '@/components/form-succes';
-import { FormError } from '@/components/form-error';
-import { UserRole } from '@prisma/client';
 import { Switch } from '@/components/ui/switch';
-import { MdAccountBox, MdElderly, MdFiberNew } from 'react-icons/md';
+import {  MdElderly, MdFiberNew } from 'react-icons/md';
 import { toast } from 'sonner';
 import ContactInformation from '@/components/profile/Contact-information';
-import StoreProvider from '@/app/StoreProvider';
 const SettingPage =  () => {
     const user = useCurrentUser()
-    const [error,setError] =useState<string| undefined>()
-    const [success, setSuccess] = useState<string|undefined>()
+
+
     const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
     const {update} = useSession()
     const [isPending , startTransition] = useTransition()
@@ -56,17 +45,15 @@ const SettingPage =  () => {
         settings(values)
         .then((data)=>{
             if(data.error){
-                setError(data.error);
                 toast.error(data.error)
             }
 
             if(data.success){
                 update()
-                setSuccess(data.success);
                 toast.success(data.success)
             }
         })
-        .catch (()=>setError('Something went wrong!'))
+        .catch (()=>toast.error('Something went wrong!'))
     })
     return 
     }

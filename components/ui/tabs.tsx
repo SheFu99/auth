@@ -1,14 +1,14 @@
 // components/Tabs.js
-import { useSearchParams, useRouter } from 'next/navigation';
+// import {  useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { TabsProvider, useTabs } from "./context/TabsContext";
 import { HashLoader } from 'react-spinners';
 
 const Tabs = ({ children, defaultId }) => {
-  const searchParams = useSearchParams();
-  const tabIdFromUrl = searchParams.get('tab') || defaultId;
+  // const searchParams = useSearchParams();
+  // const tabIdFromUrl = searchParams.get('tab') || defaultId;
 
-  return <TabsProvider defaultId={tabIdFromUrl}>{children}</TabsProvider>;
+  return <TabsProvider defaultId={defaultId}>{children}</TabsProvider>;
 };
 
 const TabsList = ({ children, className }) => {
@@ -17,13 +17,13 @@ const TabsList = ({ children, className }) => {
 
 const TabsTrigger = ({ children, id, className }) => {
   const { activeTab, setActiveTab } = useTabs();
-  const router = useRouter();
+  // const router = useRouter();
 
   const handleClick = () => {
     setActiveTab(id);
-    const params = new URLSearchParams(window.location.search);
-    params.set('tab', id);
-    router.push(`${window.location.pathname}?${params.toString()}`);
+    // const params = new URLSearchParams(window.location.search);
+    // params.set('tab', id);
+    // router.push(`${window.location.pathname}?${params.toString()}`);
   };
 
   return (
@@ -70,7 +70,7 @@ const TabsContent = ({ children, id, className }) => {
         </div>
       )}
       <div className={`${!contentVisible ? 'hidden' : ''} ${loading ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}`}>
-        <div className={`${className} transition-all duration-300 ease-out ${isActive ? '' : 'hidden'} ${motionClass}`}>
+        <div className={`${className} transition-all duration-300 ease-out ${isActive ? '' : 'hidden'} `}>
           {children}
         </div>
       </div>

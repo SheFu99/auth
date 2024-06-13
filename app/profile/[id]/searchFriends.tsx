@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 const SearchUsers = ({search}:{search:string}) => {
     const path = usePathname()
-    const combined = `${path}?tab=tab2&`
+    const combined = `${path}?`
 
     return ( 
 

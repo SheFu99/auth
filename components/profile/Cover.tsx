@@ -1,72 +1,24 @@
 "use client"
-import React, {useEffect, useState} from "react";
-import { useSession } from "next-auth/react";
-import { toast } from "sonner";
+import React, {useState} from "react";
 import { BounceLoader } from "react-spinners";
 import { HiPhotograph } from "react-icons/hi";
 import CoverModal from "./cropper/Cover-modal";
 import Image from "next/image";
-import { S3Response } from "@/app/api/s3-upload/route";
-import { AspectRatio } from "../ui/aspect-ratio";
 import CoverPlaceHolder from "./post/lib/coverPlaceHolder";
+import { useQueryClient } from "@tanstack/react-query";
 
 type CoverProps = {
     url?:string | null ,
     editable:boolean,
     onChange?:()=>void,
     className?: string,
+    isUploading:boolean,
+    queryKey:string[]
 }
 
 
-export default function Cover({url,editable,onChange, className}:CoverProps) {
-  const {update} = useSession()
-
-  const [isUploading,setIsUploading] = useState(false);
+export default function Cover({url,editable,onChange, className,isUploading}:CoverProps) {
   const [modal ,setModal] = useState<boolean>(false)
-
-  async function updateCover(croppedImageBlob: Blob) {
-    console.log(croppedImageBlob)
-    const formData = new FormData();
-          formData.append("cover", croppedImageBlob);
-
-    try {
-      setIsUploading(true)
-      const response = await fetch('/api/s3-upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-            const data:S3Response = await response.json();
-            
-            if (!data.success === true ) {
-              // switchUpload(false)
-              return {error: "Something wrong!Is no imageURL from server"}
-            }else{
-
-              const imageUrl = data.imageUrl 
-              if (imageUrl) {
-                // Assuming the response includes the new URL
-                //  switchUpload(true)
-                update()
-                toast.success('Cover updated successfully.');
-              } else {
-                throw new Error('New Cover URL not provided');
-              }
-            }
-    
-    } catch (error) {
-      console.error('Error updating Cover:', error);
-      toast.error('Failed to update Cover.');
-    }finally{
-      setIsUploading(false)
-    }
-    
-  }
-  useEffect(()=>{
-    setIsUploading(!isUploading)
-  },[url]) 
-
- 
   return (
     
     <div className={`${className} overflow-hidden relative rounded-xl w-full `}>
@@ -82,7 +34,6 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
           
         </div>
           )}
-
       {url&&(
        
           <Image src={url} alt="cover"
@@ -91,8 +42,6 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
             objectFit="cover"
             layout="responsive" 
             className={`${className} xl:-mt-[2rem] w-full h-full bg-blend-overlay g-f:w-auto aspect-6/1  md:aspect-4/1 ${!isUploading?'block':'hidden'}`}
-            onLoadStart={()=>setIsUploading(true)}
-            onLoadingComplete={()=>setIsUploading(false)}
           /> 
           
       )}
@@ -111,7 +60,7 @@ export default function Cover({url,editable,onChange, className}:CoverProps) {
             <p className="text-black font-semibold xl:text-base md:text-md text-xs">Change cover image</p>
           </label>
           {modal &&(
-              <CoverModal updateCover={updateCover} closeCoverModal={()=>setModal(!modal)} />
+              <CoverModal update={onChange} closeCoverModal={()=>setModal(!modal)} />
             )}
         </div>
     )}
