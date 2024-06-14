@@ -19,42 +19,35 @@ import { getUserListByName } from "@/actions/search/users";
 
 export default async function PublicProfileParams({
   params,
-  searchParams,
+  searchParams
 }) {
-  // console.log(params)
 
-   await prefetchPostList(params?.id)
+  await prefetchPostList(params?.id)
   const search = searchParams?.search
-  console.log(search)
+
   const dehydratedState = dehydrate(queryClientConfig)
 
       const session = await auth()
       const sessionUser =session?.user
-      const profile = await getPublicProfile(params.id)
-      const userPostList = await GetUserPostsById(profile?.profile?.userId,1)
-     
-       const {postResult,error,success} = await getUserListByName({pageParams:1,name:search})
-    
-     
-     const userfriendsList = await getProfileFriends(profile?.profile?.userId)
+      const {profile,error,friendStatus} = await getPublicProfile(params.id)
+     const userfriendsList = await getProfileFriends(profile?.userId)
       
-
-  console.log(userfriendsList)
-    //  const {userPostList,userfriendsList} = await isProfileExist(profile)
-     
-
     return (
       <QueryProvider>
         <HydrationBoundary state={dehydratedState}>
           
           <div>
-            {!profile.error?(
+            {!error?(
               <div className="border rounded-xl">
-                <PublicProfile profile={profile}  sessionUser={sessionUser}/>
+                <PublicProfile 
+                  profile={profile} 
+                  friendStatus={friendStatus}  
+                  sessionUser={sessionUser}
+                  />
                     <TabSwitch
                     chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList} search={search}/> }
                     chilldrenPosts={<InfinitePostList  userId={params.id} sessionUser={sessionUser}/>}
-                    postTotal={userPostList.totalPostCount}
+                    userId={params.id}
                     />
               </div>
             ):(

@@ -48,3 +48,6 @@ export const prefetchCommentList = async (postId:string)=>{
   return queryClientConfig
 }
 
+export const prefetchFriendList = async (userId:string)=>{
+  ///TODO: Make prefetchFriendsList
+}

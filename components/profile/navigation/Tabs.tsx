@@ -25,14 +25,8 @@ interface profileTabsProps {
 }
 
 const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
-  console.log(userId)
-  console.log(searchResult)
   const user = useCurrentUser()
   const {data} = usePostList(userId)
-  // const {data:profileData,isError,isLoading} =useProfile(user?.id)
-
-  console.log(data)
-
 
     return (  
         <Tabs defaultId="tab1" >
