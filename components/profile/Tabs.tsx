@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { RiProfileLine } from "react-icons/ri";
 import { FaUser } from "react-icons/fa";
 import { usePostList } from "./post/lib/usePost";
+import { useFriendList } from "./friends/lib/useFriends";
 
 type TabSwitchProps ={
     chilldrenPosts?:React.ReactNode|React.ReactNode[],
@@ -14,9 +15,12 @@ type TabSwitchProps ={
     userId?:string
 }
 
-const TabSwitch = ({chilldrenPosts,chilldrenFriends,friendsTotal,className,userId}:TabSwitchProps) => {
-  const {data,isError}=usePostList(userId)
+const TabSwitch = ({chilldrenPosts,chilldrenFriends,className,userId}:TabSwitchProps) => {
 
+  const {data,isError}=usePostList(userId)
+  const {data:friends,isError:isFriendsErreor}=useFriendList(userId)
+  const friendsTotal = friends.pages[0].totalFriendsCount
+  console.log('friendsTotal',friendsTotal)
     return ( 
         <div className={`${className}`}>
          <Tabs defaultId="tab2" >

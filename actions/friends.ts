@@ -209,60 +209,124 @@ export type deleteFriendParams = {
 
 
 
-
 export type getPublicFriendsPromise ={
     profileFirendsList?:FriendsOffer[];
+    totalFriendsCount?:number,
     message?:string,
     success?:boolean;
     error?:string
 }
-export const getProfileFriends = async (userId:string):Promise<getPublicFriendsPromise>=>{
+export const getProfileFriends = async ({userId,pageParam}:{userId:string,pageParam:number}):Promise<getPublicFriendsPromise>=>{
     if(!userId){
         return {error:'Profile is not found'}
     }
+    console.log('getProfileFriendsParams',userId)
+    const isFirstPage:boolean = pageParam===1 
+
+    let totalFriendsCount :number
+    if(isFirstPage){
+        const {error , count} = await getCountFriends(userId)
+        console.log('CountFriends:',count   )
+        if(!error){
+            totalFriendsCount = count
+        }
+    }
+
+    const pageSize = 15
+    const skip = (pageParam-1)+ pageSize
+    ////TODO: Need wrapper for relation search skip logic 
+
     try {
             const userFriendsList:FriendsOffer[] = await db.friendShip.findMany({
+                
                 where:{
-                    AND:[
-                        {requesterId:userId},
-                        {status:'ACCEPTED'}
+                    OR:[
+                        {AND:[
+                            {adresseedId:userId},
+                            {status:'ACCEPTED'}
+                        ]},
+                        {AND:[
+                            {requesterId:userId},
+                            {status:'ACCEPTED'}
+                        ]}
                     ]
+                   
                 },
+                take:pageSize,
                 include:{
-                    addressee:{
-                        select:{
-                            firstName:true,
-                            image:true,
-                            userId:true,
-                        }
-                    }
-                }
-            })
-            const userFriendsListRight = await db.friendShip.findMany({
-                where:{
-                    AND:[
-                        {adresseedId:userId},
-                        {status:'ACCEPTED'}
-                    ]
+                    addressee:true,
+                    requester:true
                 },
-                include:{
-                    requester:{
-                        select:{
-                            firstName:true,
-                            image:true,
-                            userId:true,
-                        }
-                    }
-                }
+                
             })
+
+            // const pageSizeAdopted = userFriendsList?.length>0 ? pageSize - userFriendsList?.length : pageSize
+            // console.log("COUNT to get next side ",pageSizeAdopted)
+            // const userFriendsListRight = await db.friendShip.findMany({
+            //     where:{
+            //         AND:[
+            //             {adresseedId:userId},
+            //             {status:'ACCEPTED'}
+            //         ]
+            //     },
+            //     take:pageSizeAdopted,
+            //     include:{
+ 
+            //     }
+            // })
     
-            userFriendsList.push(...userFriendsListRight)
-        return {success:true,profileFirendsList:userFriendsList}
+            // userFriendsList.push(...userFriendsListRight)
+            
+            console.log('totalFriendsCount',totalFriendsCount)
+
+        return {success:true,profileFirendsList:userFriendsList,totalFriendsCount}
     } catch (error) {
         return {error:error}
     }
 };
- 
+ type getCountPromise = {
+    error?:string,
+    count?:number,
+ }
+    const getCountFriends= async (userId:string):Promise<getCountPromise> =>{
+        if(!userId){
+            throw new Error ('User Id is required')
+        }
+
+
+        try{
+            const totalFriendsCount = await db.friendShip.count({
+                where:{
+                    OR:[
+                        {AND:[
+                            {adresseedId:userId},
+                            {status:'ACCEPTED'}
+                        ]},
+                        {AND:[
+                            {requesterId:userId},
+                            {status:'ACCEPTED'}
+                        ]}
+                    ]
+                   
+                   
+                },
+            
+
+            })
+        console.log('CountFriendsInside:',totalFriendsCount)
+
+            if(!totalFriendsCount){
+                return {count:0}
+            }
+    
+            return {count:totalFriendsCount}
+    
+        }catch(err){
+            return {error:err}
+        }
+       
+    };
+
 export type getPrivateFriendsPromise = {
     userFriendsList?:FriendsOffer[],
     message?:string,
@@ -280,35 +344,29 @@ export const getUserFreinds = async (page:number):Promise<getPrivateFriendsPromi
 
     try {
         const userFriendsList:FriendsOffer[] = await db.friendShip.findMany({
-            
             where:{
-                AND:[
-                    {requesterId:user.id},
-                    {status:'ACCEPTED'}
+                OR:[
+                    {AND:[
+                        {requesterId:user.id},
+                        {status:'ACCEPTED'}
+                    ]},
+                    {AND:[
+                        {adresseedId:user.id},
+                        {status:'ACCEPTED'}
+                    ]}
                 ]
+               
             },
             skip:skip,
             take:pageSize,
             include:{
-                
                 addressee:{
                     select:{
                          firstName:true,
                             image:true,
                             userId:true,
                     }
-                }
-            }
-
-        })
-        const userFriendsListRight = await db.friendShip.findMany({
-            where:{
-                AND:[
-                    {adresseedId:user.id},
-                    {status:'ACCEPTED'}
-                ]
-            },
-            include:{
+                },
                 requester:{
                     select:{
                         firstName:true,
@@ -317,15 +375,150 @@ export const getUserFreinds = async (page:number):Promise<getPrivateFriendsPromi
                     }
                 }
             }
-        })
 
-         userFriendsList.push(...userFriendsListRight)
+        })
+        // const userFriendsListRight = await db.friendShip.findMany({
+        //     where:{
+        //         AND:[
+        //             {adresseedId:user.id},
+        //             {status:'ACCEPTED'}
+        //         ]
+        //     },
+        //     include:{
+        //         requester:{
+        //             select:{
+        //                 firstName:true,
+        //                     image:true,
+        //                     userId:true,
+        //             }
+        //         }
+        //     }
+        // })
+
+        //  userFriendsList.push(...userFriendsListRight)
         return {success:true ,userFriendsList:userFriendsList }
     } catch (error) {
         return {error:error}
     }
 };
+type searchProfileFriendist = {
+    cursor?:string,
+    name:string,
+    profileId:string
+}
+type fiterfriendsPromise = {
+    friendships:FriendsOffer[],
+    count?:number
+}
+export const filterFirendsWithCursor = async ({cursor,name,profileId}:searchProfileFriendist):Promise<fiterfriendsPromise>=>{
+    ///TODO: test case: create 20 users , connect with admin and check how its works with cursor pointer 
+    
+    const take = 10
+    if(!profileId||!name){
+        throw new Error ('Params is required')
+    }
+    let count:number
+    if(!cursor){
+        count = await totalSearchResult({profileId, name})
+    }
+    console.log('FilterFriends:',count)
+    try {
+        const friendships = await prisma.friendShip.findMany({
+            where:{
+                    OR: [
+                        {AND:[
+                        { requester: { firstName: { contains: name, mode: 'insensitive' } } },
+                        {adresseedId:profileId},
+                        {status:'ACCEPTED'}
+                        ]},
+                        {AND:[
+                        { addressee: { firstName: { contains: name, mode: 'insensitive' } } },
+                        {requesterId:profileId},
+                        {status:'ACCEPTED'}
+                        ]}
+                      ]
+            },
+          include: {
+            addressee:{
+                select:{
+                     firstName:true,
+                        image:true,
+                        userId:true,
+                }
+            },
+            requester:{
+                select:{
+                    firstName:true,
+                        image:true,
+                        userId:true,
+                }
+            }
+          },
+          take,
+          ...(cursor && { skip: 1, cursor: { transactionId: cursor } }),
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+        console.log(friendships)
+        if(!count){
+     
+            return {friendships,count:0}
 
+        }
+     console.log('FilterFriends:',friendships)
 
+        return {friendships,count};
+      } catch (error) {
+        if (error.code === 'P2025') {
+          // Record not found (cursor deleted)
+          // Handle the scenario, e.g., by fetching without a cursor
+          const friendships = await prisma.friendShip.findMany({
+            include: {
+              requester: true,
+              addressee: true,
+            },
+            take,
+            orderBy: {
+              createdAt: 'asc',
+            },
+          });
+    
+          return {friendships};
+        } else {
+          throw error
+        }
+      }
+};
+const totalSearchResult = async ({profileId,name}:searchProfileFriendist)=>{
+    if(!profileId||!name){
+        return 
+    }
+    const count = await db.friendShip.count({
+        where:{
+            AND:[
+                {OR: [
+                    { requester: { firstName: { contains: name, mode: 'insensitive' } } },
+                    { addressee: { firstName: { contains: name, mode: 'insensitive' } } }
+                  ]},{
+                OR:[
+                        {AND:[
+                            {adresseedId:profileId},
+                            {status:'ACCEPTED'}
+                        ]},
+                        {AND:[
+                            {requesterId:profileId},
+                            {status:'ACCEPTED'}
+                        ]}
+                    ]
+                  }
+                ]
+        }
+    })
+    console.log(count)
+
+    return count 
+
+}
 
 ///filter friends list and infinite loading 

@@ -26,6 +26,7 @@ export type friendRelation = {
 };
 
 export type FriendsOffer ={
+  _count?:{addressee?:number,requerter?:number}
   addressee?:profileOfferDetail;
   requester?: profileOfferDetail;
   transactionId: string;

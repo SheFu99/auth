@@ -12,7 +12,7 @@ import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query
 import queryClientConfig from "@/lib/QueryClient";
 import QueryProvider from "@/util/QueryProvider";
 import InfinitePostList from "@/components/profile/post/postCard/lists/InfinitePostList";
-import { prefetchPostList } from "@/lib/prefetchQuery";
+import { prefetchFriendList, prefetchPostList } from "@/lib/prefetchQuery";
 import { getUserListByName } from "@/actions/search/users";
 
 
@@ -23,14 +23,17 @@ export default async function PublicProfileParams({
 }) {
 
   await prefetchPostList(params?.id)
+  await prefetchFriendList(params?.id)
   const search = searchParams?.search
 
-  const dehydratedState = dehydrate(queryClientConfig)
+  const dehydratedState = dehydrate(queryClientConfig);
 
       const session = await auth()
       const sessionUser =session?.user
       const {profile,error,friendStatus} = await getPublicProfile(params.id)
-     const userfriendsList = await getProfileFriends(profile?.userId)
+     const userfriendsList = await getProfileFriends({userId:profile?.userId,pageParam:1})
+
+
       
     return (
       <QueryProvider>
@@ -45,7 +48,7 @@ export default async function PublicProfileParams({
                   sessionUser={sessionUser}
                   />
                     <TabSwitch
-                    chilldrenFriends={<PublicProfileFriends friendsList={userfriendsList.profileFirendsList} search={search}/> }
+                    chilldrenFriends={<PublicProfileFriends profileId={params.id}  search={search}/> }
                     chilldrenPosts={<InfinitePostList  userId={params.id} sessionUser={sessionUser}/>}
                     userId={params.id}
                     />
