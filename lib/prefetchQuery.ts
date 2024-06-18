@@ -3,6 +3,7 @@ import { fetchComments } from "@/components/profile/post/lib/useComment";
 import { fetchPost, fetchPostList } from "@/components/profile/post/lib/usePost";
 import { fetchFriendList, FriendsQueryPromise } from '@/components/profile/friends/lib/useFriends';
 import { PrefetchOptions } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { QueryFunctionContext } from '@tanstack/react-query';
 
 export const prefetchPostList = async (userId:string)=>{
     const queryKey: [string, string] = ['posts',userId] 
@@ -57,13 +58,14 @@ export const prefetchFriendList = async (userId:string)=>{
   const queryKey = ['friendList',userId]
   const options  = {
     queryKey,
-    queryFn:({pageParam=1})=> fetchFriendList({pageParam,userId}),
-    initialPageParam:1,
-    getNextPageParam:(lastPage,allPages)=>{
-      const totalFetchedFriends = allPages.flatMap(page=>page.data).length;
-      const hasMore = totalFetchedFriends < lastPage.totalPostCount ? lastPage.nextPage : undefined
-
-      return hasMore
+    queryFn:({pageParam= ''}:QueryFunctionContext)=> fetchFriendList({cursor:pageParam as Date ,userId}),
+    initialPageParam:null,
+    getNextPageParam:(lastPage)=>{ 
+      console.log('LastPage:',lastPage?.data)
+      const sorted = lastPage?.data?.sort((a, b) => new Date(a.createdAt).getDate() - new Date(b.createdAt).getDate());
+      const index = lastPage?.data?.length-1 
+      const cursor = index ? sorted[index]?.createdAt : null
+      return cursor;
     },
   
   }

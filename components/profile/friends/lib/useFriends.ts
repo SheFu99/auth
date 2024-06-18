@@ -5,56 +5,60 @@ import { useInfiniteQuery ,QueryFunctionContext} from "@tanstack/react-query";
 
 interface fetchFrinendListParams {
     userId:string,
-    pageParam:number,
+    cursor?:Date,
 }
 
 export type FriendsQueryPromise = {
     data?:FriendsOffer[],
     totalFriendsCount?:number,
-    nextPage?:number,
+    cursor?:Date,
+};
+type fetchSearchParams = {
+    cursor?:Date|null,
+    profileId:string,
+    name:string
+}
+type fetchSearchPromise ={
+    data:FriendsOffer[],
+    cursor?:Date,
+    totalFound?:number
 }
 
-export const fetchFriendList = async ({pageParam = 1, userId}:fetchFrinendListParams):Promise<FriendsQueryPromise>=>{
+export const fetchFriendList = async ({cursor, userId}:fetchFrinendListParams):Promise<FriendsQueryPromise>=>{
     console.log("fetchFrinendListParams",userId)
-    const {success,profileFirendsList,totalFriendsCount,error}= await getProfileFriends({userId , pageParam})
+    const {success,profileFirendsList,totalFriendsCount,error}= await getProfileFriends({userId , cursor})
     console.log("totalFriendsCount:",totalFriendsCount),
     console.log("profileFirendsList",profileFirendsList)
-    
+    console.log('profileFirendsListError',error)
+
     if(error) {
         throw new Error(error)
     }
     return {
         data:profileFirendsList, 
-        nextPage: pageParam + 1,
+        cursor: cursor,
         totalFriendsCount:totalFriendsCount,
     }
 };
-type fetchSearchParams = {
-    cursor?:string|null,
-    profileId:string,
-    name:string
-}
-
 export const useFriendList = (userId:string)=>{
     console.log('useFriendListParams',userId)
     return useInfiniteQuery({
         queryKey:['friendList' ,userId],
-        queryFn:({pageParam=1})=>fetchFriendList({pageParam,userId}),
-        initialPageParam:1,
-        getNextPageParam:(lastPage,allPages)=>{
-            const totalFetchedFriends = allPages.flatMap(page=>page.totalFriendsCount).length
-            const hasMore = totalFetchedFriends < lastPage.totalFriendsCount ? lastPage.nextPage : undefined
-            return hasMore
-        }
-
+        queryFn:({pageParam=''}:QueryFunctionContext)=>fetchFriendList({cursor:pageParam as Date,userId}),
+        initialPageParam:null,
+        getNextPageParam:(lastPage)=>{ 
+          console.log('LastPage:',lastPage?.data)
+          const sorted = lastPage?.data?.sort((a, b) => new Date(a.createdAt).getDate() - new Date(b.createdAt).getDate());
+          const index = lastPage?.data?.length-1 
+          const cursor = index ? sorted[index]?.createdAt : null
+          return cursor;
+        },
+        refetchOnMount:true,
+        refetchOnWindowFocus:true,
+        staleTime:1000 * 60 
     })
 
 };
-type fetchSearchPromise ={
-    data:FriendsOffer[],
-    cursor?:string,
-    totalFound?:number
-}
 export const fetchSearchWithCursor= async ({cursor,profileId,name}:fetchSearchParams)=>{
     if(!name) {
         return {data:null,cursor:null,totalFound:0}
@@ -72,9 +76,6 @@ export const fetchSearchWithCursor= async ({cursor,profileId,name}:fetchSearchPa
      }
 
 };
-
-
-
 export const useFriendsSearch =  ({ cursor, profileId, name }:fetchSearchParams) => {
     console.log('friendSearch:', cursor, profileId, name);
     
@@ -85,7 +86,7 @@ export const useFriendsSearch =  ({ cursor, profileId, name }:fetchSearchParams)
   return useInfiniteQuery({
     queryKey: ['friendSearch', name, profileId],
     queryFn: async ({ pageParam = '' }: QueryFunctionContext) => {
-        const response = await fetchSearchWithCursor({ cursor: pageParam as string | null, profileId, name });
+        const response = await fetchSearchWithCursor({ cursor: pageParam as Date | null, profileId, name });
         console.log('HOOKRESPONSE',response)
         return response;
       },
@@ -95,8 +96,9 @@ export const useFriendsSearch =  ({ cursor, profileId, name }:fetchSearchParams)
         return undefined; 
       }
       console.log('LastPage:',lastPage?.data)
+      const sorted = lastPage?.data?.sort((a, b) => new Date(a.createdAt).getDate() - new Date(b.createdAt).getDate());
       const index = lastPage?.data?.length-1 
-      const cursor = index ? lastPage?.data[index]?.transactionId : null
+      const cursor = index ? sorted[index]?.createdAt : null
       return cursor;
     },
   })

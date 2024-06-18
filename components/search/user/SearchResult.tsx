@@ -1,15 +1,10 @@
 "use client"
 
-import {  changeFriendOfferStatus, changeStatusParams, deleteFriend, deleteFriendParams, getUserFreinds } from "@/actions/friends"
-import { FriendsOffer } from "@/components/types/globalTs"
+import {  changeFriendOfferStatus, changeStatusParams, deleteFriend } from "@/actions/friends"
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { Profiler, startTransition, useEffect, useState } from "react"
-import { FaBan, FaUser } from "react-icons/fa"
-import { IoMdMore } from "react-icons/io"
-import { IoPersonRemoveSharp } from "react-icons/io5"
+import { FaUser } from "react-icons/fa"
 import { toast } from "sonner"
 import { ExtendedUser } from "@/next-auth"
 

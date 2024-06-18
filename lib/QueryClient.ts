@@ -6,7 +6,9 @@ const queryClientConfig = new QueryClient(
             queries: {
                 staleTime: 1000 * 60 * 5, // 5 minutes
                 // refetchOnReconnect:false,
-                gcTime: 1000 * 60 * 10
+                gcTime: 1000 * 60 * 10,
+                refetchOnWindowFocus:true,
+                refetchOnMount:true,
             },
         },
     }

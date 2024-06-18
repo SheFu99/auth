@@ -6,7 +6,7 @@ import EditProfile from "@/components/profile/EditProfile";
 
 import ProfileTabs from "@/components/profile/navigation/Tabs";
 import queryClientConfig from "@/lib/QueryClient";
-import { prefetchPostList } from "@/lib/prefetchQuery";
+import { prefetchFriendList, prefetchPostList } from "@/lib/prefetchQuery";
 import QueryProvider from "@/util/QueryProvider";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 
@@ -19,6 +19,8 @@ const ProfilePage = async ({searchParams}) => {
     const session = await auth()
     const user = session?.user
     await prefetchPostList(user.id)
+    await prefetchFriendList(user?.id)
+
     const dehydratedState = dehydrate(queryClientConfig)
     // console.log('DATA:',profile)
     const search = searchParams?.search

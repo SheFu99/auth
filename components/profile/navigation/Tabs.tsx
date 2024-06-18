@@ -7,8 +7,7 @@ import PostModal from "../cropper/Post-modal";
 
 import { Suspense } from "react";
 import ListSkeleton from "../friends/FriendSkeleton";
-import IncomeOfferList from "../friends/incomeOfferList";
-import UserFriends from "../friends/privateUserFriends";
+import PrivateUserFriends from "../friends/private/privateUserFriends";
 import { usePostList } from "../post/lib/usePost";
 import InfinitePostList from "../post/postCard/lists/InfinitePostList";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -16,6 +15,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import SearchUsers from "@/app/profile/[id]/searchFriends";
 import { ExtendedUser } from "@/next-auth";
 import SearchResultOrFriendList from "@/components/search/user/SearchResult";
+import { useFriendList } from "../friends/lib/useFriends";
 
 
 interface profileTabsProps {
@@ -27,14 +27,15 @@ interface profileTabsProps {
 const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
   const user = useCurrentUser()
   const {data} = usePostList(userId)
-
+  const {data:friendsList,hasNextPage}=useFriendList(userId)
+  console.log('friendsList',hasNextPage)
     return (  
         <Tabs defaultId="tab1" >
         <TabsList className=" p-1 rounded-lg flex  flex-wrap mt-1">
             <TabsTrigger id="tab1" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">
               <RiProfileLine/>{data?.pages[0]?.totalPostCount || 0} Posts</TabsTrigger>
             <TabsTrigger id="tab2" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">
-              <FaUser/>Friends</TabsTrigger>
+              <FaUser/>{friendsList?.pages[0]?.totalFriendsCount} Friends</TabsTrigger>
             <TabsTrigger id="tab3" className="text-sm font-medium text-center flex gap-2 align-middle items-center justify-center">
               <RiGalleryFill/>Gallery</TabsTrigger>
         </TabsList>
@@ -55,14 +56,11 @@ const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
             </div>
             {searchResult?(
               <SearchResultOrFriendList searchResult={searchResult}/>
-
             ):(
               <div className="space-y-1">
-                <IncomeOfferList/>
-                <UserFriends/>
+                <PrivateUserFriends/>
               </div>
             )}
-           
           </Suspense>
         </TabsContent>
         <TabsContent id="tab3" className="p-4">

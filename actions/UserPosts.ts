@@ -179,7 +179,8 @@ if(!userId){
         user:{
             select:{
                 name:true,
-                image:true
+                image:true,
+                id:true
             }
         }
         ,

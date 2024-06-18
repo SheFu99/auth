@@ -1,5 +1,6 @@
 import { FriendsOffer } from "@/components/types/globalTs"
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
+import Link from "next/link"
 import { FaUser } from "react-icons/fa"
 
 type friendistProp = {
@@ -12,7 +13,7 @@ return(
     <>
         {friendList?.map((page)=>(
         <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full" key={page.transactionId}> 
-        <a 
+        <Link 
             href={`/profile/${page?.addressee?.userId||page?.requester?.userId}`} 
             className="col-span-10 flex items-center gap-1 cursor-pointer"
         >
@@ -28,7 +29,7 @@ return(
            
            
             <p className="text-white ml-2">{page?.addressee?.firstName||page?.requester?.firstName}</p>
-        </a>
+        </Link>
         </div>)
     )}
     </>

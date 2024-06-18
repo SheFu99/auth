@@ -31,7 +31,7 @@ export default async function PublicProfileParams({
       const session = await auth()
       const sessionUser =session?.user
       const {profile,error,friendStatus} = await getPublicProfile(params.id)
-     const userfriendsList = await getProfileFriends({userId:profile?.userId,pageParam:1})
+     const userfriendsList = await getProfileFriends({userId:profile?.userId})
 
 
       

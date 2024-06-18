@@ -19,8 +19,7 @@ const TabSwitch = ({chilldrenPosts,chilldrenFriends,className,userId}:TabSwitchP
 
   const {data,isError}=usePostList(userId)
   const {data:friends,isError:isFriendsErreor}=useFriendList(userId)
-  const friendsTotal = friends.pages[0].totalFriendsCount
-  console.log('friendsTotal',friendsTotal)
+  const friendsTotal = friends?.pages[0]?.totalFriendsCount
     return ( 
         <div className={`${className}`}>
          <Tabs defaultId="tab2" >
@@ -31,19 +30,11 @@ const TabSwitch = ({chilldrenPosts,chilldrenFriends,className,userId}:TabSwitchP
             </TabsList>
 
             <TabsContent id="tab2" className="p-4">
-                
-                    {/* <Suspense fallback={<ListSkeleton/>}>  */}
                     {chilldrenPosts}
-                    {/* </Suspense> */}
-            
             </TabsContent>
 
             <TabsContent id="tab1" className="p-4">
-
-            {/* <Suspense fallback={<ListSkeleton/>}> */}
                 {chilldrenFriends}
-            {/* </Suspense> */}
-
             </TabsContent>
             <TabsContent id="tab3" className="p-4">
                 <h1>Content for Tab Three</h1>

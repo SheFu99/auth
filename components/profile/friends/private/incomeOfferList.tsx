@@ -2,24 +2,25 @@
 
 import {  changeStatusParams, getCurrentUserOffer } from "@/actions/friends";
 import {changeFriendOfferStatus} from '@/actions/friends'
-import { FriendsOffer, friendshipStatus } from "@/components/types/globalTs";
-import Image from "next/image";
+import { FriendsOffer } from "@/components/types/globalTs";
 import Link from "next/link";
-import { Profiler, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { MdDoneOutline } from "react-icons/md";
 import { toast } from "sonner";
 import { TiCancel } from "react-icons/ti";
-import HeaderAvatar from "@/components/ui/AvatarCoustom";
-import { Avatar } from "@radix-ui/react-avatar";
-import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { FaUser } from "react-icons/fa";
-import { useSession } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import queryClientConfig from "@/lib/QueryClient";
 
 
 const IncomeOfferList = () => {
     const [userList,setUserList]=useState<FriendsOffer[]>([])
     const [click,setClick]=useState<boolean>(false)
-    const {update}=useSession()
+    const user = useCurrentUser()
+    const queryKey = ['friendList',user?.id]
+
+    ///TODO: make react query for income list , or websocket to push notification
     
     const getIncomeOfferList = ()=>{
         getCurrentUserOffer()
@@ -40,7 +41,8 @@ const IncomeOfferList = () => {
         .then(response=>{
             if(response.success){
                 toast.success(response.message)
-                update()
+                queryClientConfig.invalidateQueries({queryKey})
+                setClick(true)
             }
             if(response.error){
                 toast.error(response.error)
@@ -49,12 +51,11 @@ const IncomeOfferList = () => {
     }
     useEffect(()=>{
         getIncomeOfferList() 
-        console.log(userList)
-    },[update])
+        console.log('getIncomeOfferList')
+    },[click])
 
     return ( 
         <div className="flex space-y-2 flex-wrap">
-            {/* <button title="button" onClick={()=>{setClick(!click)}}>Refresh</button> */}
             {userList?.map((user,index)=>(
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full "key={index}> 
                         <Link  href={`/profile/${user.requester.userId}`} className="md:col-span-10 col-span-9 flex items-center gap-1 cursor-pointer">
@@ -63,10 +64,9 @@ const IncomeOfferList = () => {
                                     src={user.requester.image}
                                     alt={user.requester.firstName}
                                     className="rounded-sm w-[50px] h-[50px]"
-
                                     />
                                      <AvatarFallback>
-                                        <FaUser className="text-white"/>
+                                         <FaUser color="white" className="w-[50px] h-[50px] bg-neutral-400 rounded-sm p-1"/>
                                     </AvatarFallback>
                             </Avatar>
                                
@@ -89,7 +89,6 @@ const IncomeOfferList = () => {
                                 status:'DECLINED',
                                 transactionId:user.transactionId,
                             })}
-
                             >
                             <TiCancel color="white" className="scale-150" />
                         </button>
