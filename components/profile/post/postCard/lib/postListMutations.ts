@@ -21,7 +21,6 @@ export const usePostListMutation = (userId:string)=>{
     const queryClient = useQueryClient()
     const queryKey = ['posts', userId]
         ///createPostMutation?
-
         const PostLikeMutation = useMutation({
             mutationFn: LikePost,
             onMutate: async (postId:string):Promise<PostMutationContext>=>{
@@ -31,8 +30,7 @@ export const usePostListMutation = (userId:string)=>{
                     (
                         queryKey,
                         (old)=>{
-                            if(!old) return old
-                                
+                            if(!old) return old 
                                 return {
                                     ...old,
                                     pages:old.pages.map(page=>({

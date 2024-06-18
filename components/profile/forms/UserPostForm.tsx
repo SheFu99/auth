@@ -22,6 +22,7 @@ import { postSchema } from "@/schemas"
 import BlobImageManager from "./classes/BlobImageManager"
 import { PostQueryPromise, usePostList } from "../post/lib/usePost"
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query"
+import Popper from "@/components/ui/popper"
 
 
 
@@ -191,12 +192,11 @@ const UserPostForm = () => {
                                 disabled={isUploading}
                                 />
                         </label>
-                        
-                            <BsEmojiSmile 
-                            className={`scale-110 cursor-pointer  ${isEmoji ? 'text-yellow-500':'text-white'}`}
-                            title="Emoji!" onClick={()=>setEmoji(!isEmoji)}/>
+                        <Popper button={<BsEmojiSmile 
+                            />}
+                            chilldren={<Picker open={isEmoji}  width={300} className="mt-4 " theme={Theme.DARK} onEmojiClick={(e)=>handleReactionClick(e)}/>}/>
+                            
                         <div className="flex flex-wrap justify-center mt-2 z-50 absolute top-[6rem]" >
-                                <Picker open={isEmoji}  width={300} className="mt-4 " theme={Theme.DARK} onEmojiClick={(e)=>handleReactionClick(e)}/>
                            
                         </div>
                        

@@ -50,7 +50,6 @@ const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
 
         <TabsContent id="tab2" className="p-4">
 
-          <Suspense fallback={<ListSkeleton/>}>
             <div className="mb-2 -mt-2">
               <SearchUsers search={searchParams}/>
             </div>
@@ -61,7 +60,6 @@ const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
                 <PrivateUserFriends/>
               </div>
             )}
-          </Suspense>
         </TabsContent>
         <TabsContent id="tab3" className="p-4">
             <h1>Content for Tab Three</h1>

@@ -221,7 +221,7 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
     if(!userId){
         return {error:'Profile is not found'}
     }
-    console.log('getProfileFriendsParams',userId)
+    console.log('CURSOR',cursor)
     const isFirstPage:boolean = !cursor
 
     let totalFriendsCount :number
@@ -233,19 +233,20 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
         }
     }
 
-    const pageSize = 10
-
+    const pageSize = 2
+    let pageSizeAdopted:number
     ////TODO: Need wrapper for relation search skip logic 
     try {
             const userFriendsList:FriendsOffer[] = await db.friendShip.findMany({ 
                 where:{
                     AND:[
                         {requesterId:userId},
-                        {status:'ACCEPTED'}
+                        {status:'ACCEPTED'},
+                        cursor ? { createdAt: { gt: cursor } } : {}
                         
                     ]
                 },
-                take: pageSize,
+                take:pageSize + 1 ,
                 orderBy: { createdAt: 'asc' },
                 include:{
                     addressee:true,
@@ -253,15 +254,19 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
                 },
             })
 
-            // const pageSizeAdopted = userFriendsList?.length>0 ? pageSize - userFriendsList?.length : pageSize
+            //  pageSizeAdopted = userFriendsList?.length>0 ? pageSize - userFriendsList?.length : pageSize
             // console.log("COUNT to get next side ",pageSizeAdopted)
             const userFriendsListRight = await db.friendShip.findMany({
                 where:{
                     AND:[
                         {adresseedId:userId},
-                        {status:'ACCEPTED'}
+                        {status:'ACCEPTED'},
+                        cursor ? { createdAt: { gt: cursor } } : {}
+
                     ]
                 },
+                take:pageSize + 1 ,
+
                 orderBy: { createdAt: 'asc' },
                 include:{
                     requester:true
@@ -342,17 +347,15 @@ export const getUserFreinds = async (cursor:Date):Promise<getPrivateFriendsPromi
             totalFriendsCount = count
         }
     }
-
     const pageSize = 3;
-  
- 
     try {
         const userFriendsList:FriendsOffer[] = await db.friendShip.findMany({
             where:{
                     AND:[
                         {requesterId:user.id},
-                        {status:'ACCEPTED'}
-                    ]
+                        {status:'ACCEPTED'},
+                        cursor ? { createdAt: { gt: cursor } } : {}
+                    ],
             },
 
             take:pageSize,
@@ -367,13 +370,16 @@ export const getUserFreinds = async (cursor:Date):Promise<getPrivateFriendsPromi
             }
 
         });
+
         const userFriendsListRight = await db.friendShip.findMany({
             where:{
                 AND:[
                     {adresseedId:user.id},
-                    {status:'ACCEPTED'}
+                    {status:'ACCEPTED'},
+                    cursor ? { createdAt: { gt: cursor } } : {}
                 ]
             },
+            take:pageSize,
             include:{
                 requester:{
                     select:{

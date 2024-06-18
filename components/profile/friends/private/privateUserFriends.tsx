@@ -7,11 +7,12 @@ import { useFriendList } from "../lib/useFriends"
 import PrivateFriendList from "./privateFriendList"
 import queryClientConfig from "@/lib/QueryClient"
 import IncomeOfferList from "./incomeOfferList"
+import InfiniteScroll from "../../post/functions/infinite-scroll"
 
 const PrivateUserFriends = () => {
     const user = useCurrentUser()
     const queryKey = ['friendList',user?.id]
-    const {data,isError,isLoading,hasNextPage,fetchNextPage}=useFriendList(user?.id)
+    const {data,isError,isLoading,hasNextPage,fetchNextPage,isFetched}=useFriendList(user?.id)
     const flatData = data?.pages?.flatMap(pages=>pages.data)
     console.log('flatUserFriens',data?.pages)
     const changeFriendStatus = ({status,transactionId}:changeStatusParams)=>{
@@ -47,7 +48,10 @@ const PrivateUserFriends = () => {
         <div className=" w-full space-y-2">
         {/* INCOME */}
         <IncomeOfferList/>
+        <InfiniteScroll hasMore={hasNextPage} isloaded={isFetched} loadMore={fetchNextPage} page={1}>
         <PrivateFriendList onBan={changeFriendStatus} onDelete={deleteFriendButton} friendList={flatData}/>
+
+        </InfiniteScroll>
 
         </div>
      )

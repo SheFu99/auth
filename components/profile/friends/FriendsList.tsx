@@ -26,8 +26,6 @@ return(
                         <FaUser color="white" className="w-[50px] h-[50px] bg-neutral-400 rounded-sm p-1"/>
                 </AvatarFallback>
            </Avatar>
-           
-           
             <p className="text-white ml-2">{page?.addressee?.firstName||page?.requester?.firstName}</p>
         </Link>
         </div>)

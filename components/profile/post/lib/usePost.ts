@@ -15,7 +15,7 @@ export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQuery
     console.log("fetchPostList")
     const {error,success,posts,totalPostCount} = await GetUserPostsById(userId, pageParam);
     console.log(posts)
-
+    
     if (error) {
         console.log("ERROR")
         throw new Error('Network error');
@@ -39,6 +39,8 @@ export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQuery
                 const hasMore = totalFetchedPosts < lastPage.totalPostCount ? lastPage.nextPage : undefined
                 return hasMore
             },
+
+
         });
     }
 

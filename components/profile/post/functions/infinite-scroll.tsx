@@ -6,7 +6,7 @@ const InfiniteScroll = ({ loadMore, hasMore, children, isloaded, page }) => {
   const loaderRef = useRef(null);
 
   useEffect(() => {
-    
+    console.log('hasMore',hasMore)
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore && !isFetching) {
