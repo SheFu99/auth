@@ -5,7 +5,7 @@ import {  CreatePost } from "@/actions/UserPosts"
 import {    Suspense, useCallback, useEffect, useRef, useState, useTransition } from "react"
 import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
-import { Textarea } from "../../ui/textarea"
+import DOMPurify from 'dompurify';
 import { MdAddPhotoAlternate } from "react-icons/md"
 import { BsEmojiSmile } from "react-icons/bs"
 import { useCurrentUser } from "@/hooks/use-current-user"
@@ -36,6 +36,7 @@ import debounce from 'lodash/debounce';
 import { getUserListByName } from "@/actions/search/users";
 import { ExtendedUser } from "@/next-auth";
 import Link from "next/link";
+import ContentEditableInput, { ContentEditableInputHandle } from "./ui/ContentEditableInput";
 
 
 
@@ -78,7 +79,7 @@ const UserPostForm = () => {
     const [cursorPosition, setCursorPosition] = useState<number>(0);
 
     const [popoverState, setPopoverState]=useState(false)
-    const TextInputRef = useRef(null)
+    const TextInputRef = useRef<ContentEditableInputHandle>(null)
 
     const user=useCurrentUser()
     const userId = user?.id
@@ -123,6 +124,7 @@ const UserPostForm = () => {
         }
         
     });
+    
     const submitPost= async(event)=>{
         console.log('SUBMIT!')
         setEmoji(false)
@@ -162,31 +164,18 @@ const UserPostForm = () => {
                 setImageFiles([])
                 setImagesBlobUrl([])
                 setTextState(undefined)
-                TextInputRef.current.value = null
+                TextInputRef.current.innerText = null
             }) 
         }) 
     return 
     
     };
-    const handleReactionClick = (reaction)=>{
-            if (TextInputRef.current) {
-                const { selectionStart, selectionEnd } = TextInputRef.current;
-                //  console.log('reaction.emoji',selectionStart,selectionEnd)
 
-                const newText = textState.slice(0, selectionStart!) + reaction.emoji + textState.slice(selectionEnd!);
-                console.log('reaction.emoji',newText)
-                TextInputRef.current.value = newText
-                setTextState(newText);
-          
-                // Update the cursor position after setting the state
-                setTimeout(() => {
-                  if (TextInputRef.current) {
-                    TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + reaction.emoji.length;
-                    TextInputRef.current.focus();
-                  }
-                }, 0);
-        };
-    };
+    const handleReactionClick = (reaction: { emoji: string }) => {
+        if (TextInputRef.current) {
+            TextInputRef.current.insertEmoji(reaction.emoji);
+        }
+      };
     const AddImages = (event:React.ChangeEvent<HTMLInputElement>)=>{
         manager.addImage(event);
         setImageFiles(manager.getImages());        
@@ -202,56 +191,99 @@ const UserPostForm = () => {
         setTextState(prev=>prev + "@")
         TextInputRef.current.value += "@"
     };
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const target = e.target;
-        const cursorPos = target.selectionStart;
-        console.log('cursorPos',cursorPos)
-        setCursorPosition(cursorPos);
-        setTextState(target.value);
-    };
+   
+    useEffect(()=>{
+        console.log(textState)
+    },[textState])
+
+
     const debouncedTogglePopover = useCallback(
         debounce(() => {
             console.log('handlePoppoverTrigger',popoverState)
             setPopoverState(prev => !prev);
-        }, 2000),
+        }, 5000),
         []
     );
 
-    useEffect(() => {
-        const detectMention = async () => {
-            console.log('DetectMentionEffect',isUserChoose)
-          const mentionIndex = textState.lastIndexOf('@');
-          if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
-            const query = textState.substring(mentionIndex + 1, cursorPosition);
-            if (query) {
-              const {searchResult,error} = await getUserListByName({name:query,pageParams:1});
-              if(error) {throw new Error (error)}
-              setUsers(searchResult);
-              setShowSuggestions(true);
-            }   
-          } else {
-            setShowSuggestions(false);
-          }
-        };
-        if(isUserChoose){
-            setUserChoose(false)
-            return ()=>null
-        }
-        detectMention()
-      }, [textState, cursorPosition]);
+    // useEffect(() => {
+    //     const detectMention = async () => {
+    //         // console.log('DetectMentionEffect',isUserChoose)
+    //       const mentionIndex = textState.lastIndexOf('@');
+    //       if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
+    //         const query = textState.substring(mentionIndex + 1, cursorPosition);
+    //         if (query) {
+    //           const {searchResult,error} = await getUserListByName({name:query,pageParams:1});
+    //           if(error) {throw new Error (error)}
+    //           setUsers(searchResult);
+    //           setShowSuggestions(true);
+    //         }   
+    //       } else {
+    //         setShowSuggestions(false);
+    //       }
+    //     };
+    //     if(isUserChoose){
+    //         setUserChoose(false)
+    //         return ()=>null
+    //     }
+
+    //     const handleFocus = () => {
+    //         if (TextInputRef.current.innerText === 'Type here...') {
+    //           TextInputRef.current.innerText = '';
+    //           TextInputRef.current.classList.remove('placeholder');
+    //         }
+    //       };
+      
+    //       const handleBlur = () => {
+    //         if (TextInputRef.current.innerText === '') {
+    //           TextInputRef.current.innerText = 'Type here...';
+    //           TextInputRef.current.classList.add('placeholder');
+    //         }
+    //       };
+      
+    //       const editor = TextInputRef.current;
+    //       editor.addEventListener('input', detectMention);
+    //       editor.addEventListener('focus', handleFocus);
+    //       editor.addEventListener('blur', handleBlur);
+      
+    //       // Initialize the placeholder
+    //       handleBlur();
+      
+    //       return () => {
+    //         editor.removeEventListener('input', detectMention);
+    //         editor.removeEventListener('focus', handleFocus);
+    //         editor.removeEventListener('blur', handleBlur);
+    //       };
+    //     // detectMention()
+    //   }, [textState, cursorPosition]);
+
+    //   const placeCaretAtEnd = (el) => {
+    //     el.focus();
+    //     if (typeof window.getSelection != 'undefined' && typeof document.createRange != 'undefined') {
+    //       const range = document.createRange();
+    //       range.selectNodeContents(el);
+    //       range.collapse(false);
+    //       const sel = window.getSelection();
+    //       sel.removeAllRanges();
+    //       sel.addRange(range);
+    //     } else if (typeof document.body.createTextRange != 'undefined') {
+    //       const textRange = document.body.createTextRange();
+    //       textRange.moveToElementText(el);
+    //       textRange.collapse(false);
+    //       textRange.select();
+    //     }
+    //   };
+    useEffect(()=>{console.log('textState',textState)},[textState])
     const handlePoppoverTrigger = ()=>{
         debouncedTogglePopover()
     };
     const handleUserClick = (user: ExtendedUser) => {
         setUserChoose(true)
         const mentionIndex = textState?.lastIndexOf('@');
-        // const newStateValue = `${textState?.substring(0, mentionIndex)}<a href="/profile/${user.id}">${user.name}</a> `;
-        const newValue = `${textState?.substring(0,mentionIndex)}@${user.name}`
+        const newRefValue =  `${textState?.substring(0,mentionIndex)}@${user.name}`
+        setTextState(newRefValue);
         TextInputRef.current?.focus();
-        TextInputRef.current.value = newValue
-
-
-        setTextState(newValue);
+        console.log('textState',newRefValue)
+        TextInputRef.current.innerText = newRefValue
         setShowSuggestions(false);
       };
 
@@ -261,14 +293,12 @@ const UserPostForm = () => {
          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
 
 
-                                <Textarea 
-                                    ref={TextInputRef}
-                                    onChange={(e)=>handleInputChange(e)}
-                                    disabled={isUploading}
-                                    className={`${shouldAnimate ? 'animate-shake' : ''} `}
-                                    placeholder="Type your message here." 
-
-                                 />
+         <ContentEditableInput 
+            ref={TextInputRef} 
+            isEditable={!isPending} 
+            textState={textState} 
+            onContentChange={setTextState}
+            />
                                  {showSuggestions&&(
                                     <div className="absolute insent-0 left-0 right-0 bg-black border-white rounded-sm max-width-[150px]">
                                          {users?.map(user=>(

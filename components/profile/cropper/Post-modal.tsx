@@ -1,8 +1,12 @@
+'use clientx'
+import { InputProvider } from "../forms/Context";
 import UserPostForm from "../forms/UserPostForm";
 
 const PostModal = () => {
     return ( 
-        <UserPostForm/>
+        <InputProvider>
+         <UserPostForm/>
+        </InputProvider>
      );
 }
  
