@@ -18,7 +18,7 @@ const SearchPage = async ({searchParams}) => {
             <h1>SearchParams:{search}</h1>   
             <SearchBar search={search} context="/users"/>
             <h2>Result:</h2>
-             {getUser?.postResult?.map(user=>(
+             {getUser?.searchResult?.map(user=>(
             <Fragment key={user.id}>
                 <p>Name: {user.name}</p>
                 <RepostHeader 

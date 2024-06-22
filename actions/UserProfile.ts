@@ -3,7 +3,7 @@
 import * as z from "zod"
 import { db } from "@/lib/db"
 import { UserProfile } from "@/schemas"
-import { CurrentProfile, currentUser } from "@/lib/auth"
+import { currentUser } from "@/lib/auth"
 import { ProfileData, friendshipStatus } from "@/components/types/globalTs"
 
 
@@ -29,6 +29,8 @@ export type Profile = z.infer<typeof UserProfile>
   profile?:ProfileData
 
  }
+
+ ////TODO: change method of serch 
 export const getCurrentProfile = async (userId:string):Promise<getProfileByIDPromise>=>{
   
   // const existingProfile = await CurrentProfile()
@@ -117,7 +119,15 @@ export type getProfilePromise ={
 export const getPublicProfile = async (userId:string):Promise<getProfilePromise>=>{
   console.log("Get_Public_Profile")
     const user = await currentUser()
-  
+    const existingProfile = await db.profile.findFirst({
+      where:{
+        userId:userId,
+      }, 
+    });
+    
+      if(!existingProfile){
+        return {error: 'Profile not found'}
+      }
     if(!userId){
       return {error: 'userId is required'}
     }
@@ -159,16 +169,6 @@ export const getPublicProfile = async (userId:string):Promise<getProfilePromise>
       return {error:'Error with profile FR.relation'}
     }
  }
-   
-    const existingProfile = await db.profile.findFirst({
-      where:{
-        userId:userId,
-      }, 
-    });
-    
-      if(!existingProfile){
-        return {error: 'Profile not found'}
-      }
        return {
         profile: existingProfile,
         friendStatus: relation

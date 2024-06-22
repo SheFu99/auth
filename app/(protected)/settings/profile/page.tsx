@@ -26,7 +26,7 @@ const ProfilePage = async ({searchParams}) => {
     const search = searchParams?.search
     let searchResult
     if(search) {
-        const {postResult,error}= await getUserListByName({name:search,pageParams:1})
+        const {searchResult: postResult,error}= await getUserListByName({name:search,pageParams:1})
         searchResult = postResult
         console.log(searchResult)
     }

@@ -20,7 +20,9 @@ import { awsBaseUrl } from "./lists/InfinitePostList";
 import { usePostCommentMutations } from "./lib/singlePostMutations";
 import { usePost } from "../lib/usePost";
 import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
-import Head from "next/head";
+import htmlParser from 'html-react-parser';
+import convertMentionsToLinks from "./helpers/convertMentionsToLink";
+
 
 type PostCardWithStateProps={
     postId:string,
@@ -63,6 +65,8 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
     const firstImage = post.image[0]
     
   
+
+
     const Postlike =  (postId: string) => {
         if (!currentUser) {
             toast.error("You need to be authorized!");
@@ -107,7 +111,9 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                 console.log('focus')
             }
         }
-        console.log(post.user.id)
+
+       
+
     return ( 
 <div>
   
@@ -124,7 +130,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                         timestamp={post.timestamp}
                     />
                     {post?.superText&&(
-                        <h1 className="px-10 mt-2">{post.superText}</h1>
+                        <h1 className="px-10 mt-2">{htmlParser(convertMentionsToLinks(post.superText))}</h1>
                     )}
                     {post?.originPost?.user.name &&post?.originPost?.user.image&&(
                     <>
@@ -145,7 +151,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                     )}
             
                     <div className="ml-[3rem] mr-[1rem]">
-                        <h2 className="text-white col-span-10 col-start-2 py-2 text-xl">{post.text}</h2>
+                        <h2 className="text-white col-span-10 col-start-2 py-2 text-xl">{htmlParser(convertMentionsToLinks(post.text))}</h2>
                             {currentUser?.id === post.userId&&(
                                 <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                             )}

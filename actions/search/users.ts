@@ -1,5 +1,4 @@
 'use server'
-import { FriendsOffer } from "@/components/types/globalTs"
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { ExtendedUser } from "@/next-auth"
@@ -7,7 +6,7 @@ import { ExtendedUser } from "@/next-auth"
 type UserListPromise = {
     success?:boolean,
     error?:string,
-    postResult?:ExtendedUser[]
+    searchResult?:ExtendedUser[]
 }
 
 type getUserListParams = {
@@ -55,7 +54,7 @@ try {
 
     const filteredUserList = userList.filter(userObj=> userObj.id !==user.id)
 
-    return {postResult:userList,success:true}
+    return {searchResult:userList,success:true}
 } catch (error) {
     return {error:error}
 }

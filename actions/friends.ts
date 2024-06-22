@@ -243,14 +243,12 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
                         {requesterId:userId},
                         {status:'ACCEPTED'},
                         cursor ? { createdAt: { gt: cursor } } : {}
-                        
                     ]
                 },
                 take:pageSize + 1 ,
                 orderBy: { createdAt: 'asc' },
                 include:{
                     addressee:true,
-                
                 },
             })
 
@@ -262,7 +260,6 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
                         {adresseedId:userId},
                         {status:'ACCEPTED'},
                         cursor ? { createdAt: { gt: cursor } } : {}
-
                     ]
                 },
                 take:pageSize + 1 ,

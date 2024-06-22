@@ -1,27 +1,41 @@
 "use client"
 
-import * as z from "zod"
-
 
 import {  CreatePost } from "@/actions/UserPosts"
-import {   useRef, useState, useTransition } from "react"
+import {    Suspense, useCallback, useEffect, useRef, useState, useTransition } from "react"
 import { Button } from "../../ui/button"
 import { IoSendSharp } from "react-icons/io5";
 import { Textarea } from "../../ui/textarea"
 import { MdAddPhotoAlternate } from "react-icons/md"
 import { BsEmojiSmile } from "react-icons/bs"
-import { IoMdClose } from "react-icons/io"
 import { useCurrentUser } from "@/hooks/use-current-user"
 
 import { Theme } from "emoji-picker-react"
-import Picker from 'emoji-picker-react'
+const Picker = dynamic(
+    () => {
+      return import('emoji-picker-react');
+    },
+    {
+        loading:()=><BeatLoader color="white"/>,
+        ssr: false,
+     },
+  );
+// import Picker from 'emoji-picker-react'
 
 import useUploadImages, { UploadImagesProps } from "./functions/uploadImages"
 import useOnError from "./functions/onError"
 import { postSchema } from "@/schemas"
 import BlobImageManager from "./classes/BlobImageManager"
-import { PostQueryPromise, usePostList } from "../post/lib/usePost"
+import { PostQueryPromise } from "../post/lib/usePost"
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { BeatLoader, PulseLoader } from "react-spinners"
+import dynamic from "next/dynamic"
+import ImageBlobList from "./ui/ImageBlobList"
+import debounce from 'lodash/debounce';
+import { getUserListByName } from "@/actions/search/users";
+import { ExtendedUser } from "@/next-auth";
+import Link from "next/link";
 
 
 
@@ -55,9 +69,15 @@ const UserPostForm = () => {
     const {shouldAnimate,onError}=useOnError()
     const [isPending,startTransition]=useTransition()
 
+
+    const [isUserChoose,setUserChoose]=useState(false)
     const [isEmoji,setEmoji]=useState<boolean>(false)
     const [textState,setTextState]=useState<string>('')
+    const [users,setUsers]=useState<ExtendedUser[]>()
+    const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+    const [cursorPosition, setCursorPosition] = useState<number>(0);
 
+    const [popoverState, setPopoverState]=useState(false)
     const TextInputRef = useRef(null)
 
     const user=useCurrentUser()
@@ -65,7 +85,8 @@ const UserPostForm = () => {
     const type = 'post'
     
     const queryClient = useQueryClient()
-    const {isLoading,isError}=usePostList(userId)
+    // TODO: make pending animation for submit button
+    // const {isLoading,isError}=usePostList(userId)
     
 
     const Submit = async (post)=>{
@@ -142,18 +163,29 @@ const UserPostForm = () => {
                 setImagesBlobUrl([])
                 setTextState(undefined)
                 TextInputRef.current.value = null
-                  
             }) 
         }) 
-    
     return 
     
     };
-    
-
     const handleReactionClick = (reaction)=>{
-        setTextState(prevValue=>prevValue + reaction.emoji)
-        TextInputRef.current.value += reaction.emoji
+            if (TextInputRef.current) {
+                const { selectionStart, selectionEnd } = TextInputRef.current;
+                //  console.log('reaction.emoji',selectionStart,selectionEnd)
+
+                const newText = textState.slice(0, selectionStart!) + reaction.emoji + textState.slice(selectionEnd!);
+                console.log('reaction.emoji',newText)
+                TextInputRef.current.value = newText
+                setTextState(newText);
+          
+                // Update the cursor position after setting the state
+                setTimeout(() => {
+                  if (TextInputRef.current) {
+                    TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + reaction.emoji.length;
+                    TextInputRef.current.focus();
+                  }
+                }, 0);
+        };
     };
     const AddImages = (event:React.ChangeEvent<HTMLInputElement>)=>{
         manager.addImage(event);
@@ -164,21 +196,88 @@ const UserPostForm = () => {
         manager.deleteImage(image,inedx);
         setImageFiles(manager.getImages());
         setImagesBlobUrl(manager.getImagesBlobUrl());
-    }
+    };
+    const handleMention = () =>{
+        console.log('HandleMentions')
+        setTextState(prev=>prev + "@")
+        TextInputRef.current.value += "@"
+    };
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const target = e.target;
+        const cursorPos = target.selectionStart;
+        console.log('cursorPos',cursorPos)
+        setCursorPosition(cursorPos);
+        setTextState(target.value);
+    };
+    const debouncedTogglePopover = useCallback(
+        debounce(() => {
+            console.log('handlePoppoverTrigger',popoverState)
+            setPopoverState(prev => !prev);
+        }, 2000),
+        []
+    );
+
+    useEffect(() => {
+        const detectMention = async () => {
+            console.log('DetectMentionEffect',isUserChoose)
+          const mentionIndex = textState.lastIndexOf('@');
+          if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
+            const query = textState.substring(mentionIndex + 1, cursorPosition);
+            if (query) {
+              const {searchResult,error} = await getUserListByName({name:query,pageParams:1});
+              if(error) {throw new Error (error)}
+              setUsers(searchResult);
+              setShowSuggestions(true);
+            }   
+          } else {
+            setShowSuggestions(false);
+          }
+        };
+        if(isUserChoose){
+            setUserChoose(false)
+            return ()=>null
+        }
+        detectMention()
+      }, [textState, cursorPosition]);
+    const handlePoppoverTrigger = ()=>{
+        debouncedTogglePopover()
+    };
+    const handleUserClick = (user: ExtendedUser) => {
+        setUserChoose(true)
+        const mentionIndex = textState?.lastIndexOf('@');
+        // const newStateValue = `${textState?.substring(0, mentionIndex)}<a href="/profile/${user.id}">${user.name}</a> `;
+        const newValue = `${textState?.substring(0,mentionIndex)}@${user.name}`
+        TextInputRef.current?.focus();
+        TextInputRef.current.value = newValue
+
+
+        setTextState(newValue);
+        setShowSuggestions(false);
+      };
 
     return (
         
-        <form  onSubmit={submitPost}  className="p-2 mt-3 border border-white rounded-md" >
+        <form  onSubmit={submitPost}  className="p-2 mt-3 border border-white rounded-md relative" >
          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
-                {isEmoji&&(<div className="absolute inset-0 w-[90vh] h-[90vh] left-0 right-0 z-50" onClick={()=>setEmoji(false)} ></div>)}
+
 
                                 <Textarea 
                                     ref={TextInputRef}
-                                    onChange={(e)=>setTextState(e.target.value)}
+                                    onChange={(e)=>handleInputChange(e)}
                                     disabled={isUploading}
                                     className={`${shouldAnimate ? 'animate-shake' : ''} `}
                                     placeholder="Type your message here." 
+
                                  />
+                                 {showSuggestions&&(
+                                    <div className="absolute insent-0 left-0 right-0 bg-black border-white rounded-sm max-width-[150px]">
+                                         {users?.map(user=>(
+                                            <li key={user.id} onClick={()=>handleUserClick(user)}>{user.name}</li>
+                                        ))}
+                                    </div>
+                                 )}
+
+
                      <div  className="mt-3 md:col-start-11 md:col-span-1 col-span-11 col-start-1  flex justify-around align-middle items-center p-1 mb-2">
                         <label title="Add image"  >
                             <MdAddPhotoAlternate className="scale-150 cursor-pointer "  />
@@ -191,36 +290,40 @@ const UserPostForm = () => {
                                 disabled={isUploading}
                                 />
                         </label>
-                        
+
+                        <Popover open={popoverState} >
+                            <PopoverTrigger onClick={handlePoppoverTrigger}>
                             <BsEmojiSmile 
-                            className={`scale-110 cursor-pointer  ${isEmoji ? 'text-yellow-500':'text-white'}`}
-                            title="Emoji!" onClick={()=>setEmoji(!isEmoji)}/>
-                        <div className="flex flex-wrap justify-center mt-2 z-50 absolute top-[6rem]" >
-                                <Picker open={isEmoji}  width={300} className="mt-4 " theme={Theme.DARK} onEmojiClick={(e)=>handleReactionClick(e)}/>
-                           
-                        </div>
-                       
-                            <p className="cursor-pointer" title="Mention">@</p>
-                           
+                                className={`scale-110 cursor-pointer  hover:text-yellow-500 text-white`}
+                                title="Emoji!" />
+                            </PopoverTrigger>
+                            <PopoverContent className="bg-transparent border-none shadow-none flex justify-center w-full" >
+                                <Suspense fallback={
+                                    <div className="w-[300px] flex justify-center item-center align-middle">
+                                        <PulseLoader color="white" className="w-full"/>
+                                    </div>
+                                    }>
+                                    <Picker  
+                                        lazyLoadEmojis={true} 
+                                        theme={Theme.DARK} 
+                                        onEmojiClick={(e)=>handleReactionClick(e)}
+                                        reactionsDefaultOpen={true}
+                                        height={350}
+                                        />
+                                </Suspense>
+                            </PopoverContent>
+                        </Popover>
+
+                        <button type="button" title="Mention" onClick={handleMention} className="z-50">
+                            <p >@</p>
+                        </button>
                     </div>
-                    <div className="flex relative p-1 mt-2 flex-wrap gap-5">
-                        
-                        {imagesBlobUrl?.map((image,index)=>(
-                            <div key={index}>
-                                <div className="relative" title="remove image">
-                                    <button 
-                                        onClick={()=>DeleteImage(image,index)} 
-                                        title="Delete image" 
-                                        type="button"
-                                        className="text-white absolute right-0" >
-                                        <IoMdClose className="bg-red-600 bg-opacity-50 rounded-full"/>
-                                    </button>
-                                </div>
-                             <img key={index} src={image} alt=""className="h-[100px] w-auto rounded-sm" />
-                            </div>
-                        ))}
-                    </div>
-                 
+
+                    <ImageBlobList 
+                        className="flex relative p-1 mt-2 flex-wrap gap-5"
+                        onImageDelete={DeleteImage} 
+                        imagesBlobUrl={imagesBlobUrl}
+                    />
                     <Button disabled={isUploading} type="submit" className="w-full mt-2" >
                         <IoSendSharp className="scale-150 mr-2"/>
                         Send
