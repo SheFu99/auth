@@ -1,0 +1,10 @@
+.placeholder-contenteditable:empty:before {
+    content: attr(data-placeholder);
+    color: gray; /* or use Tailwind CSS class equivalent */
+    position: absolute;
+    pointer-events: none; /* Ensure the placeholder text doesn't interfere with editing */
+}
+
+.placeholder-contenteditable:not(:empty):before {
+    content: none;
+}
