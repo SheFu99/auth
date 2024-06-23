@@ -14,6 +14,8 @@ type contentEditableInputProp = {
 export interface ContentEditableInputHandle {
     focusInput: () => void;
     insertEmoji: (emoji: string) => void;
+    insertMention: ()=>void;
+    clearInput: ()=>void;
 }
 
 const ContentEditableInput = forwardRef<ContentEditableInputHandle, contentEditableInputProp>(({ isEditable, onContentChange }, ref) => {
@@ -23,7 +25,7 @@ const ContentEditableInput = forwardRef<ContentEditableInputHandle, contentEdita
     const { cursorPosition, setCursorPosition } = useCursor();
     const { textState, setTextState } = useText();
     const [isUserChoose, setUserChoose] = useState(false);
-
+    const domain = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     useEffect(() => {
         console.log('cursorPosition', cursorPosition);
     }, [cursorPosition]);
@@ -98,6 +100,27 @@ const ContentEditableInput = forwardRef<ContentEditableInputHandle, contentEdita
                 TextInputRef.current.focus();
             }
         },
+        insertMention(){
+          if (TextInputRef.current) {
+            const content = TextInputRef.current.textContent || '';
+            const newText = content.slice(0, cursorPosition) + '@' + content.slice(cursorPosition);
+
+            TextInputRef.current.textContent = newText;
+            setTextState(TextInputRef.current.innerHTML);
+            setCursorPosition(cursorPosition + 1);
+            const selection = window.getSelection();
+                const range = document.createRange();
+                range.setStart(TextInputRef.current.childNodes[0], cursorPosition + 1);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                TextInputRef.current.focus();
+
+        }
+    },
+    clearInput (){
+      TextInputRef.current.innerText = ''
+    }
     }));
 
     const handleInput = () => {
@@ -125,12 +148,20 @@ const ContentEditableInput = forwardRef<ContentEditableInputHandle, contentEdita
     const handleUserClick = (user: ExtendedUser) => {
       setUserChoose(true)
       const mentionIndex = textState?.lastIndexOf('@');
-      const newRefValue =  `${textState?.substring(0,mentionIndex)}@${user.name}`
+      ///TODO:changeDangerouseSetInner injection mechanism, and find more roboust way to pass  a link with compact className
+      const profileUrl = `${domain}/profile/${user.id}`;
+      const mention = `<a href=${profileUrl} className='mention text-blue-200 hover:text-blue-100'>${user.name}</a>`
+      const newRefValue =  `${textState?.substring(0,mentionIndex)}${mention}`
+
       setTextState(newRefValue);
       TextInputRef.current?.focus();
       console.log('textState',newRefValue)
+
       TextInputRef.current.innerText = newRefValue
+
+      TextInputRef.current.innerHTML = DOMPurify.sanitize(newRefValue);
       setShowSuggestions(false);
+
     };
 
     return (
@@ -138,6 +169,7 @@ const ContentEditableInput = forwardRef<ContentEditableInputHandle, contentEdita
         <div
             ref={TextInputRef}
             id="editor"
+            // dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(textState) }}'
             onInput={handleInput}
             contentEditable={isEditable}
             data-placeholder="Enter text here..."

@@ -151,7 +151,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                     )}
             
                     <div className="ml-[3rem] mr-[1rem]">
-                        <h2 className="text-white col-span-10 col-start-2 py-2 text-xl">{htmlParser(convertMentionsToLinks(post.text))}</h2>
+                        <h2 className="text-white col-span-10 col-start-2 py-2 text-xl">{htmlParser(post.text)}</h2>
                             {currentUser?.id === post.userId&&(
                                 <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                             )}

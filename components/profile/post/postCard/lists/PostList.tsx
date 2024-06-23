@@ -16,7 +16,8 @@ import { useRouter } from "next/navigation";
 import {  usePostList } from "../../lib/usePost";
 import { PostListProps, usePostListMutation } from "../lib/postListMutations";
 import { awsBaseUrl } from "./InfinitePostList";
-
+import htmlParser from 'html-react-parser';
+import Link from 'next/link'
 
 
 
@@ -101,7 +102,7 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                     className="max-w-[250px]"
                 />
                 {post?.superText&&(
-                    <p className="px-10 mt-2">{post.superText}</p>
+                    <p className="px-10 mt-2">{htmlParser(post.superText)}</p>
                 )}
                 {post?.originPost?.user.name &&post?.originPost?.user.image&&(
                 <>
@@ -122,7 +123,7 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                 )}
         
                 <div className="ml-[3rem] mr-[1rem]">
-                    <p className="text-white text-xl col-span-10 col-start-2 mt-5">{post?.text}</p>
+                    <p className="text-white text-xl col-span-10 col-start-2 mt-5">{htmlParser(post?.text)}</p>
                         {currentSession?.id === post?.userId&&(
                             <button title="delete post"className="text-black" onClick={()=>deletePost(post)}><RiDeleteBin5Line color="white" className="scale-110  absolute top-2 right-2"/> </button>
                         )}

@@ -8,3 +8,7 @@
 .placeholder-contenteditable:not(:empty):before {
     content: none;
 }
+.mention{
+    color: blue;
+    text-underline-position: inherit;
+}

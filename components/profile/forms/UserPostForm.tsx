@@ -37,6 +37,7 @@ import { getUserListByName } from "@/actions/search/users";
 import { ExtendedUser } from "@/next-auth";
 import Link from "next/link";
 import ContentEditableInput, { ContentEditableInputHandle } from "./ui/ContentEditableInput";
+import { useText } from "./Context";
 
 
 
@@ -73,7 +74,8 @@ const UserPostForm = () => {
 
     const [isUserChoose,setUserChoose]=useState(false)
     const [isEmoji,setEmoji]=useState<boolean>(false)
-    const [textState,setTextState]=useState<string>('')
+    // const [textState,setTextState]=useState<string>('')
+    const {textState,setTextState}=useText()
     const [users,setUsers]=useState<ExtendedUser[]>()
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
     const [cursorPosition, setCursorPosition] = useState<number>(0);
@@ -164,7 +166,7 @@ const UserPostForm = () => {
                 setImageFiles([])
                 setImagesBlobUrl([])
                 setTextState(undefined)
-                TextInputRef.current.innerText = null
+                TextInputRef.current.clearInput() 
             }) 
         }) 
     return 
@@ -187,9 +189,10 @@ const UserPostForm = () => {
         setImagesBlobUrl(manager.getImagesBlobUrl());
     };
     const handleMention = () =>{
-        console.log('HandleMentions')
-        setTextState(prev=>prev + "@")
-        TextInputRef.current.value += "@"
+        if (TextInputRef.current) {
+            TextInputRef.current.insertMention();
+        }
+
     };
    
     useEffect(()=>{
@@ -205,87 +208,15 @@ const UserPostForm = () => {
         []
     );
 
-    // useEffect(() => {
-    //     const detectMention = async () => {
-    //         // console.log('DetectMentionEffect',isUserChoose)
-    //       const mentionIndex = textState.lastIndexOf('@');
-    //       if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
-    //         const query = textState.substring(mentionIndex + 1, cursorPosition);
-    //         if (query) {
-    //           const {searchResult,error} = await getUserListByName({name:query,pageParams:1});
-    //           if(error) {throw new Error (error)}
-    //           setUsers(searchResult);
-    //           setShowSuggestions(true);
-    //         }   
-    //       } else {
-    //         setShowSuggestions(false);
-    //       }
-    //     };
-    //     if(isUserChoose){
-    //         setUserChoose(false)
-    //         return ()=>null
-    //     }
+    useEffect(()=>{
+        console.log('textState',textState)
+        return ()=>setPopoverState(false)
+    },[popoverState])
 
-    //     const handleFocus = () => {
-    //         if (TextInputRef.current.innerText === 'Type here...') {
-    //           TextInputRef.current.innerText = '';
-    //           TextInputRef.current.classList.remove('placeholder');
-    //         }
-    //       };
-      
-    //       const handleBlur = () => {
-    //         if (TextInputRef.current.innerText === '') {
-    //           TextInputRef.current.innerText = 'Type here...';
-    //           TextInputRef.current.classList.add('placeholder');
-    //         }
-    //       };
-      
-    //       const editor = TextInputRef.current;
-    //       editor.addEventListener('input', detectMention);
-    //       editor.addEventListener('focus', handleFocus);
-    //       editor.addEventListener('blur', handleBlur);
-      
-    //       // Initialize the placeholder
-    //       handleBlur();
-      
-    //       return () => {
-    //         editor.removeEventListener('input', detectMention);
-    //         editor.removeEventListener('focus', handleFocus);
-    //         editor.removeEventListener('blur', handleBlur);
-    //       };
-    //     // detectMention()
-    //   }, [textState, cursorPosition]);
-
-    //   const placeCaretAtEnd = (el) => {
-    //     el.focus();
-    //     if (typeof window.getSelection != 'undefined' && typeof document.createRange != 'undefined') {
-    //       const range = document.createRange();
-    //       range.selectNodeContents(el);
-    //       range.collapse(false);
-    //       const sel = window.getSelection();
-    //       sel.removeAllRanges();
-    //       sel.addRange(range);
-    //     } else if (typeof document.body.createTextRange != 'undefined') {
-    //       const textRange = document.body.createTextRange();
-    //       textRange.moveToElementText(el);
-    //       textRange.collapse(false);
-    //       textRange.select();
-    //     }
-    //   };
-    useEffect(()=>{console.log('textState',textState)},[textState])
     const handlePoppoverTrigger = ()=>{
         debouncedTogglePopover()
     };
-    const handleUserClick = (user: ExtendedUser) => {
-        setUserChoose(true)
-        const mentionIndex = textState?.lastIndexOf('@');
-        const newRefValue =  `${textState?.substring(0,mentionIndex)}@${user.name}`
-        setTextState(newRefValue);
-        TextInputRef.current?.focus();
-        console.log('textState',newRefValue)
-        TextInputRef.current.innerText = newRefValue
-        setShowSuggestions(false);
-      };
+  
 
     return (
         
@@ -299,14 +230,7 @@ const UserPostForm = () => {
             textState={textState} 
             onContentChange={setTextState}
             />
-                                 {showSuggestions&&(
-                                    <div className="absolute insent-0 left-0 right-0 bg-black border-white rounded-sm max-width-[150px]">
-                                         {users?.map(user=>(
-                                            <li key={user.id} onClick={()=>handleUserClick(user)}>{user.name}</li>
-                                        ))}
-                                    </div>
-                                 )}
-
+                                
 
                      <div  className="mt-3 md:col-start-11 md:col-span-1 col-span-11 col-start-1  flex justify-around align-middle items-center p-1 mb-2">
                         <label title="Add image"  >
