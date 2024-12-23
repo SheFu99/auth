@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  engineType      = "dataproxy" // Enables Prisma Accelerate
 }
 
 datasource db {
@@ -12,7 +11,6 @@ model User {
   id                    String                 @id @default(cuid())
   name                  String?
   email                 String?                @unique
-  shortName             String?                @unique
   emailVerified         DateTime?
   image                 String?
   password              String?
@@ -26,7 +24,7 @@ model User {
   profile               Profile?
   twoFactorConfirmation TwoFactorConformation?
 
-@@index([id,shortName])
+@@index([id])
 }
 
 model Profile {
@@ -34,7 +32,7 @@ model Profile {
   lastName    String?
   coverImage  String? @default("")
   image       String?
-
+  shortName   String?
   gender      Gender? @map("gender")
   age         Int?
   phoneNumber String?
@@ -42,12 +40,12 @@ model Profile {
   /// Extend this {lat ,lng, zipCode, postService...} 
   adres       String?
   userId      String  @unique
-  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade,onUpdate: Cascade)
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     requested    FriendShip[] @relation("RequestedFriends")
     received     FriendShip[] @relation("ReceivedFriends")
 
-
+@@index([shortName])
 @@index([userId])
 @@index([firstName])
 }

@@ -16,6 +16,7 @@ interface ProtecteedLayoutProps{
 
 const ProtectedLayout = async ({children}:any) => {
     const session = await auth()
+    console.log('ProtectedLayout',session)
     const user = session.user
 
     return ( 

@@ -21,19 +21,18 @@ export const {
     signIn: "/login",
     error:  "/error",
   },
+
   events:{
     async linkAccount({user}){
        await db.user.update({
         where:{id:user.id},
         data: {emailVerified: new Date()}
       })
-
         try{
           const existedUser= await db.user.findFirst({
             where:{
               id: user.id,
             }
-        
           })
           if(!existedUser){
             return 
@@ -48,7 +47,6 @@ export const {
         }catch(error){
           console.log("Auth ERROr!",error)
         }
-      
       }
     
   },
@@ -58,8 +56,6 @@ export const {
         user,
         account,
       })
-    
-      
 
       if(account?.provider === "credentials")  {
         const userId: string = user.id!
@@ -78,14 +74,14 @@ export const {
 
           if (!twoFactorConfirmation) return false;
         }
-
-        
     }
     return true;
     },
 
     async session({token , session}) {
-  console.log("CALL_SESSIOn")
+
+      ///Add device fingerPrint into token and into db 
+  console.log("CALL_SESSIOn",session)
         if(token.sub&&session.user){
           session.user.id = token.sub
         }
@@ -112,26 +108,27 @@ export const {
      
     },
     async jwt({token}){
-      // console.log("Called again")
+      console.log("Called again",token)
       if(!token.sub) return token
+      console.log('DB_return_AUTH')
 
       const existingUser = await getUserById(token.sub);
-      
+      console.log('DB_return_AUTH',existingUser)
 
       if(!existingUser) return token;
 
-      const existingAccount = await getAccountByUserId(
-        existingUser.id
-      )
+      // const existingAccount = await getAccountByUserId(
+      //   existingUser.id
+      // )
 
-      token.isOAuth = !!existingAccount ///return a boolean of value
+      // token.isOAuth = !!existingAccount ///return a boolean of value
       token.name = existingUser.name;
       token.email = existingUser.email;
       token.role = existingUser.role;
       token.picture = existingUser.image;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
     
-      
+      console.log('TOKENJWT_LOG',token)
        return token
      } ,
     },

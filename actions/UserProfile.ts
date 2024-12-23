@@ -3,8 +3,9 @@
 import * as z from "zod"
 import { db } from "@/lib/db"
 import { UserProfile } from "@/schemas"
-import { CurrentProfile, currentUser } from "@/lib/auth"
+import { currentUser } from "@/lib/auth"
 import { ProfileData, friendshipStatus } from "@/components/types/globalTs"
+import { error } from "console"
 
 
 // type UserProfile = z.infer<typeof UserProfile>
@@ -29,6 +30,8 @@ export type Profile = z.infer<typeof UserProfile>
   profile?:ProfileData
 
  }
+
+ ////TODO: change method of serch 
 export const getCurrentProfile = async (userId:string):Promise<getProfileByIDPromise>=>{
   
   // const existingProfile = await CurrentProfile()
@@ -114,17 +117,13 @@ export type getProfilePromise ={
   profile?: ProfileData;
   friendStatus?: relation;
 }
-export const getPublicProfile = async (userId:string):Promise<getProfilePromise>=>{
-  console.log("Get_Public_Profile")
-    const user = await currentUser()
-  
-    if(!userId){
-      return {error: 'userId is required'}
-    }
-    let relation:relation
-  
-  
-   if(user){
+
+const initialCurrentRelation = async (userId:string)=>{
+  const user = await currentUser()
+  if(!userId){
+    return {error:'UserId requered!'}
+  }
+  if(user){
     try {
       const relationsFrom = await db.friendShip.findFirst({
         where:{
@@ -154,12 +153,23 @@ export const getPublicProfile = async (userId:string):Promise<getProfilePromise>
         }
         
       });
-      relation = relationsFrom !==null||undefined ? {relationFrom:relationsFrom}:{relationTo:relationsTo}
+     const relation:relation = relationsFrom !==null||undefined ? {relationFrom:relationsFrom}:{relationTo:relationsTo}
+      return {relation}
     } catch (error) {
+      console.log(error)
       return {error:'Error with profile FR.relation'}
     }
- }
-   
+  
+  }
+  else {
+    return {error:'No user is auth!'}
+  }
+
+
+}
+export const getPublicProfile = async (userId:string):Promise<getProfilePromise>=>{
+  console.log("Get_Public_Profile")
+    const user = await currentUser()
     const existingProfile = await db.profile.findFirst({
       where:{
         userId:userId,
@@ -169,10 +179,56 @@ export const getPublicProfile = async (userId:string):Promise<getProfilePromise>
       if(!existingProfile){
         return {error: 'Profile not found'}
       }
+    if(!userId){
+      return {error: 'userId is required'}
+    }
+  
+    const {relation,error} = await initialCurrentRelation(userId)
+
        return {
         profile: existingProfile,
         friendStatus: relation
       };
 
+  }
+
+  export const getProfileByShortName = async (shortName:string):Promise<getProfilePromise> =>{
+    console.log(shortName)
+    try {
+      const shortNameUser = await db.user.findFirst({
+        where:{
+          OR:[
+            {shortName:shortName},
+            {id:shortName},
+          ]
+         
+        },
+        include:{
+          profile:true
+        }
+      })
+      console.log(shortNameUser.profile)
+      const {relation,error} = await initialCurrentRelation(shortNameUser.id)
+      console.log('relationLOG',relation)
+
+      if(error){
+        console.log('error',error)
+      }
+
+      if(shortNameUser&&relation){
+        return {profile:shortNameUser.profile,friendStatus:relation}
+      }else if(shortNameUser){
+        console.log('next')
+        return {profile:shortNameUser.profile}
+
+      }
+      if(!shortNameUser){
+        return {error:'Found Nothing!'}
+      }
+    } catch (error) {
+      console.log(error)
+        return {error:error}
+    }
+        
   }
 

@@ -7,8 +7,8 @@ import PostModal from "../cropper/Post-modal";
 
 import { Suspense } from "react";
 import ListSkeleton from "../friends/FriendSkeleton";
-import IncomeOfferList from "../friends/incomeOfferList";
-import UserFriends from "../friends/privateUserFriends";
+
+import UserFriends from "../friends/private/privateUserFriends";
 import { usePostList } from "../post/lib/usePost";
 import InfinitePostList from "../post/postCard/lists/InfinitePostList";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -16,6 +16,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import SearchUsers from "@/app/profile/[id]/searchFriends";
 import { ExtendedUser } from "@/next-auth";
 import SearchResultOrFriendList from "@/components/search/user/SearchResult";
+import IncomeOfferList from "../friends/private/incomeOfferList";
 
 
 interface profileTabsProps {

@@ -9,24 +9,25 @@ import { NextRequest, NextResponse } from 'next/server';
 const {auth} =NextAuth(authConfig)
 const debouncedPaths = ['/api/auth/session'];
 
-const rateLimiter = new RateLimiterMemory({
-  points: 5, // 10 requests
-  duration: 1, // per 1 second by IP
-});
+// const rateLimiter = new RateLimiterMemory({
+//   points: 5, // 10 requests
+//   duration: 1, // per 1 second by IP
+// });
 
 
 export default auth(async (req) => {
   // console.log(req)
-  const ipAddr = req.headers.get('x-forwarded-for') || req.ip || '127.0.0.1';
-  if (debouncedPaths.includes(req.nextUrl.pathname)) {
-    try {
-        await rateLimiter.consume(ipAddr);
-    } catch (rateLimiterRes) {
-        // Rate limiter response if too many requests
-        return new Response('Too Many Requests', { status: 429 });
-    }
-}
-const userRole = await currentRole()           
+//   const ipAddr = req.headers.get('x-forwarded-for') || req.ip || '127.0.0.1';
+//   if (debouncedPaths.includes(req.nextUrl.pathname)) {
+//     try {
+//         await rateLimiter.consume(ipAddr);
+//     } catch (rateLimiterRes) {
+//         // Rate limiter response if too many requests
+//         return new Response('Too Many Requests', { status: 429 });
+//     }
+// }
+const userRole = await currentRole()  
+console.log("MiddlewwareUser role",userRole)         
 const {nextUrl}=req;
 const isLoggedIn = !!req.auth;
 const url = req.nextUrl;
@@ -40,6 +41,7 @@ const path = nextUrl.pathname;
   const isPublicRoute = publicRoutes.includes(path);
   const isAuthRoute = authRoutes.includes(path);
   const isAdminRoute = adminRoutes.includes(path);
+  console.log('Path',path)
 
   if (isProfileRoute||isPostRoute) {
     

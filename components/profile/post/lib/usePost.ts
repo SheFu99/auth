@@ -12,15 +12,15 @@ export type PostQueryPromise = {
 }
 
 export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQueryPromise> => {
-    console.log("fetchPostList")
+    // console.log("fetchPostList",userId)
     const {error,success,posts,totalPostCount} = await GetUserPostsById(userId, pageParam);
-    console.log(posts)
 
+    
     if (error) {
         console.log("ERROR")
         throw new Error('Network error');
     }
-   console.log(posts)
+//    console.log(posts)
 
     return {
         data: posts, 
@@ -29,7 +29,7 @@ export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQuery
     };
 };
   export const usePostList = (userId:string) =>{
-    console.log(userId)
+    // console.log(userId)
         return useInfiniteQuery({
             queryKey:['posts',userId],
             queryFn: ({pageParam=1})=>fetchPostList({pageParam,userId}),
@@ -39,6 +39,8 @@ export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQuery
                 const hasMore = totalFetchedPosts < lastPage.totalPostCount ? lastPage.nextPage : undefined
                 return hasMore
             },
+
+
         });
     }
 

@@ -194,4 +194,4 @@ export const getCommentByPost = async ({PostId, page}:getComentParams):Promise<C
     }
     
     return {success:true , comments:commentsWithLikes , totalCommentsCount}
-}
+};

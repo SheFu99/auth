@@ -1,82 +1,111 @@
 'use server'
-import { redis } from './../../lib/upstash';
 import { currentUser } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { ExtendedUser } from "@/next-auth"
-import {Ratelimit} from '@upstash/ratelimit'
-import { headers } from 'next/headers';
+// import { checkRateLimit } from '../tools/rateLimiting';
 
-
-type UserListPromise = {
-    success?:boolean,
-    error?:string,
-    postResult?:ExtendedUser[]
-};
-type getUserListParams = {
-    name:string,
-    pageParams:number,
+export type UserListPromise = {
+    success?: boolean,
+    error?: string,
+    searchResult?: ExtendedUser[]
 };
 
-const rateLimit = new Ratelimit ({
-    redis,
-    limiter:Ratelimit.slidingWindow(5,'120s')
-});
+export type GetUserListParams = {
+    name: string,
+    pageParams: number,
+};
 
 
-export const getUserListByName = async ({name,pageParams}:getUserListParams):Promise<UserListPromise>=>{
-    const ip = headers().get('x-forwarded-for');
-    const {remaining,limit,success:limitReached} = await rateLimit.limit(ip!)   
-    console.error('Limit',remaining)
-    
-    if(!limitReached) {
-        console.error('Limit',limitReached)
-        return {error:'Please wait 1 minute to continue search '}
+
+export const getUserListByName = async ({ name, pageParams }: GetUserListParams): Promise<UserListPromise> => {
+    console.log('getUserListByName')
+   
+    if (!name) {
+        return { error: 'Name parameter is required.' };
     }
-    if(!name){ 
+
+    const user = await currentUser();
+    if (!user) {
+        return { error: 'User not found.' };
+    }
+
+    const page = pageParams || 1;
+    const pageSize = 5;
+    const skip = (page - 1) * pageSize;
+
+    try {
+        const userList = await db.user.findMany({
+            where: {
+                name: {
+                    contains: name,
+                    mode: 'insensitive',
+                    not: {
+                        contains: user.name, // Assuming you want to exclude current user's name
+                    }
+                },
+            },
+            take: pageSize,
+            skip: skip,
+
+        });
+
+        return { searchResult: userList, success: true };
+    } catch (error) {
+        console.error('Error fetching user list: ', error);
+        return { error: 'Failed to fetch user list.' };
+    }
+};
+
+export const getUserListByShortName = async ({shortName,pageParams}:{shortName:string,pageParams:number}):Promise<UserListPromise>=>{
+    // const isOk = await checkRateLimit({tokens:15,duration:'120s'})
+    // console.log('isOk',isOk)
+
+    // if(!isOk){
+    //     console.error('RateLimit is Reached!')
+    //     return {error:'RateLimit!'}
+    // }
+    if(!shortName){ 
         return {error:'Params require!'}
     }
-    const user = await currentUser()
 
+    const user = await currentUser()
 
     let page:number = pageParams
     if(!page){
          page = 1
     }
-  
-const pageSize = 10
+const pageSize = 5
 const skip = (page-1)*pageSize
 try {
 
     const userList = await db.user.findMany({
         where:{
-            name:{
-                contains:name,
+            shortName:{
+                contains:shortName,
                 mode:'insensitive',
                 not: {
-                    contains: user.name,
+                    contains: user.shortName,
                 }
             },
+            // shortName: {
+            //     not: {
+            //         in: ["", null]  
+            //     }
+            // }
             
         },
         take:pageSize,
         skip:skip,
-        select:{
-            id:true,
-            name:true,
-            email:true,
-            image:true,
-            role:true
-        }
+       
     });
 
-    const filteredUserList = userList.filter(userObj=> userObj.id !==user.id)
+    // const filteredUserList = userList.filter(userObj=> userObj.id !==user.id)
 
-    return {postResult:userList,success:true}
+    return {searchResult:userList,success:true}
 } catch (error) {
     return {error:error}
 }
     
 
 
-}
-
+};

@@ -1,17 +1,32 @@
 import { auth } from "@/auth";
 import { db } from "./db";
+import { getUserById } from "@/data/user";
 
 
 export const currentUser = async () =>{
     const session = await auth()
-    console.trace('CURRENT_USER_HOOK')
-    return session?.user
+    console.log('CURRENT_USER_HOOK',session)
+    if(!session||session == null){
+        return 
+    }
+    const userFromAPI = await getUserById(session?.user?.id)
+    if (!userFromAPI){
+        return null 
+    }
+    return userFromAPI?.role
 }
 
 export const currentRole = async () =>{
     const session = await auth()
-    console.trace("CurrentRole")
-    return session?.user.role
+    // console.log('CURRENT_USER_HOOK',session)
+    if(!session||session == null){
+        return 
+    }
+    const userFromAPI = await getUserById(session?.user?.id)
+    if (!userFromAPI){
+        return null 
+    }
+    return userFromAPI.role
 }
 
 
