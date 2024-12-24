@@ -81,7 +81,6 @@ export const {
     async session({token , session}) {
 
       ///Add device fingerPrint into token and into db 
-  console.log("CALL_SESSIOn",session)
         if(token.sub&&session.user){
           session.user.id = token.sub
         }
@@ -108,12 +107,12 @@ export const {
      
     },
     async jwt({token}){
-      console.log("Called again",token)
+      // console.log("Called again",token)
       if(!token.sub) return token
-      console.log('DB_return_AUTH')
+      // console.log('DB_return_AUTH')
 
       const existingUser = await getUserById(token.sub);
-      console.log('DB_return_AUTH',existingUser)
+      // console.log('DB_return_AUTH',existingUser)
 
       if(!existingUser) return token;
 
@@ -128,7 +127,7 @@ export const {
       token.picture = existingUser.image;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
     
-      console.log('TOKENJWT_LOG',token)
+      // console.log('TOKENJWT_LOG',token)
        return token
      } ,
     },

@@ -19,14 +19,14 @@ interface ImageGridProps {
 export default  function ImageGrid( {images,className,type}:ImageGridProps ) {
     const [isOpen, setIsOpen] = useState(false);
     const [imageState , setImageState]= useState<number>()
-    const [loadingStatus, setLoadingStatus] = useState(images.map(() => true));
+    // const [loadingStatus, setLoadingStatus] = useState(images.map(() => true));
 
     // Function to update the loading status for a specific image
-    const handleLoadingComplete = index => {
-        const newLoadingStatus = [...loadingStatus];
-        newLoadingStatus[index] = false;
-        setLoadingStatus(newLoadingStatus);
-    };
+    // const handleLoadingComplete = index => {
+    //     const newLoadingStatus = [...loadingStatus];
+    //     newLoadingStatus[index] = false;
+    //     setLoadingStatus(newLoadingStatus);
+    // };
     
 
     const modifyiedArray= images?.map((url)=>{
@@ -78,9 +78,9 @@ export default  function ImageGrid( {images,className,type}:ImageGridProps ) {
                         alt={`Gallery image ${index + 1}`}
                         width={400}
                         height={150}
-                        className={`w-full h-full object-cover rounded-md ${loadingStatus[index] ? 'blur' : ''}`}
+                        className={`w-full h-full object-cover rounded-md `} ///${loadingStatus[index] ? 'blur' : ''}
                         priority
-                        onLoadingComplete={()=>handleLoadingComplete(index)}
+                        // onLoadingComplete={()=>handleLoadingComplete(index)}
                     />
                 </div>
                 

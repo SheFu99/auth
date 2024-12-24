@@ -1,12 +1,23 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { BeatLoader } from 'react-spinners';
 
-const InfiniteScroll = ({ loadMore, hasMore, children, isloaded, page }) => {
+
+interface InfiniteScroll {
+  loadMore?: any
+  hasMore?:boolean,
+  children?:React.ReactNode,
+  className?:string,
+  isloaded?:boolean
+}
+
+
+const InfiniteScroll = ({ loadMore, hasMore, children, isloaded, className }:InfiniteScroll) => {
   const [isFetching, setIsFetching] = useState(false);
   const loaderRef = useRef(null);
 
   useEffect(() => {
-    
+    console.log('hasMore',hasMore)
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore && !isFetching) {
@@ -31,7 +42,7 @@ const InfiniteScroll = ({ loadMore, hasMore, children, isloaded, page }) => {
   }, [hasMore, isFetching, loadMore]); // React on changes to hasMore, isFetching, loadMore
 
   return (
-    <div className='space-y-5'>
+    <div className={`${className}`}>
       {children}
       <div ref={loaderRef} className='flex w-full justify-center'>
         { hasMore && (

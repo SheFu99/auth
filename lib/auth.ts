@@ -13,7 +13,7 @@ export const currentUser = async () =>{
     if (!userFromAPI){
         return null 
     }
-    return userFromAPI?.role
+    return userFromAPI
 }
 
 export const currentRole = async () =>{
@@ -24,9 +24,9 @@ export const currentRole = async () =>{
     }
     const userFromAPI = await getUserById(session?.user?.id)
     if (!userFromAPI){
-        return null 
+        return  
     }
-    return userFromAPI.role
+    return userFromAPI?.role
 }
 
 

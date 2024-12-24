@@ -1,5 +1,6 @@
 import OneComment from "../OneComment";
-import { usePostCommentMutations } from "../lib/singlePostMutations";
+import InViewWrapper from "../helpers/inViewWrapper";
+import { usePostCommentMutations } from "../mutations/singlePostMutations";
 
 const CommentList = ({commentState,currentSession,postId}) => {
 
@@ -9,14 +10,22 @@ const CommentList = ({commentState,currentSession,postId}) => {
 
         <>
         {commentState?.map((comment, index)=>(
-                        <div className="px-5 border-b border-spacing-0 space-y-0  relative hover:bg-neutral-900" key={index}>
+                        <div className={` relative px-5 border-b border-spacing-0 hover:bg-neutral-900 mt-5`} key={index}>
+                            <InViewWrapper thresholdPixels={100} key={index}>
+                            {(inView)=>(
                             <OneComment 
                                 index={index} 
                                 comment={comment}   
                                 currentSession={currentSession} 
                                 onDelete={deleteComment.mutateAsync}
                                 onLike={likeComment.mutateAsync}
+                                className={`
+                                    transition-transform duration-300
+                                    ${inView? '' : 'scale-95'}
+                                     `}
                                 />
+                                )}
+                                </InViewWrapper>
                         </div>
                     ))}
             </>
