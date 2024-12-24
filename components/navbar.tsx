@@ -27,16 +27,7 @@ type navbarProps = {
             <div className="">
           
             </div>
-                <Sheet>
-                    <SheetTrigger 
-                        title="Humburger Menu" 
-                        className="md:block p-2 ml-4 xl:hidden hidden">
-                            <GiHamburgerMenu/>
-                        </SheetTrigger>
-                    <SheetContent className="g-f:w-[200px] sm:w-[225px] md:w-[225px] flex">
-                        <SideBar role={role} className="justify-start "/>
-                    </SheetContent>
-                    </Sheet>
+
                 <div className="col-start-12">
                     <div className='flex justify-end g-f:p-4 md:p-4 xl:p-3 '>
                         <UserButton user={user}/>

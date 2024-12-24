@@ -49,7 +49,7 @@ const ProtectedLayout = async ({children}:any) => {
                                     {children} 
                             </div>
                             <SideBar role={user.role}  bar={true}                  
-                                                     className="col-span-12 sticky bottom-0
+                                                     className="col-span-12 fixed inset-x-0 bottom-0
                                                                 sm:hidden inline  
                                                                 sm:col-start-1 sm:col-span-2"/>
 
