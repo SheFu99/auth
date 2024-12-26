@@ -35,7 +35,7 @@ const user = sessionUser
                  {isLoading&&(
                     <ListSkeleton/>
                 )}
-            <InfiniteScroll page={page} loadMore={fetchNextPage} hasMore={hasNextPage} isloaded = {!isLoading}>
+            <InfiniteScroll  loadMore={fetchNextPage} hasMore={hasNextPage} isloaded = {!isLoading}>
                 <>
                 {/* TODO: Need to pass key to parent component  */}
                 {data?.pages?.map((page,index)=>(

@@ -1,30 +1,56 @@
 "use server"
 
+import { getCurrentProfile } from "@/actions/UserProfile";
 import { getUserListByName } from "@/actions/search/users";
 import { auth } from "@/auth";
 import EditProfile from "@/components/profile/EditProfile";
 
 import ProfileTabs from "@/components/profile/navigation/Tabs";
+import { fetchProfile } from "@/components/profile/post/lib/usePost";
 import queryClientConfig from "@/lib/QueryClient";
-import { prefetchPostList } from "@/lib/prefetchQuery";
+import { currentUser } from "@/lib/auth";
+import { prefetchFriendList, prefetchPostList } from "@/lib/prefetchQuery";
 import QueryProvider from "@/util/QueryProvider";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
+import { Metadata } from "next";
+import { cache } from "react";
 
+const getProfile = cache(async(userId:string)=>{
 
+    const {profile,error} = await getCurrentProfile(userId)
+    if(error){
+        return
+    }
+    return profile
+  })
+  
+  export const generateMetadata = async ():Promise<Metadata> =>{
+    const user = await currentUser()
+   const profile = await getProfile(user?.id)
+    return {
+        title:'My profile' ,
+        description:`from ${profile?.adres}`,
+        openGraph:{
+            images: profile?.coverImage || profile?.image
+        },
+        icons:profile?.image
+    }
+  }
 
 const ProfilePage = async ({searchParams}) => {
-    console.log(searchParams.search)
 
   
     const session = await auth()
     const user = session?.user
     await prefetchPostList(user.id)
+    await prefetchFriendList(user?.id)
+
     const dehydratedState = dehydrate(queryClientConfig)
     // console.log('DATA:',profile)
     const search = searchParams?.search
     let searchResult
     if(search) {
-        const {postResult,error}= await getUserListByName({name:search,pageParams:1})
+        const {searchResult: postResult,error}= await getUserListByName({name:search,pageParams:1})
         searchResult = postResult
         console.log(searchResult)
     }

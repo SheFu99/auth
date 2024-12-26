@@ -140,7 +140,7 @@ export const getCommentByPost = async ({PostId, page}:getComentParams):Promise<C
     ///orederBy _count.likes
 
     orderBy:[
-        {timestamp:'asc'}
+        {timestamp:'desc'}
     ],
     skip:skip,
     take:pageSize,

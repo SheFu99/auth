@@ -21,7 +21,6 @@ export async function GET(req: Request): Promise<Response>{
     try {
 
         if(req){
-          
             return NextResponse.json({ succes: searchParams || req})
         }
       } catch (error) {

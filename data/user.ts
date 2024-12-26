@@ -15,7 +15,7 @@ export const getUserByEmail = async (email: string)=>{
 
        
         const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL|| "http://localhost:3000"}/api/session?id=${id}`);
-      console.log(res)
+      // console.log(res)
 
         if (!res.ok) throw new Error("Failed to fetch user");
         return res.json();

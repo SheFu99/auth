@@ -7,24 +7,29 @@ import RepostModalForm from "../../repostForm";
 import RepostHeader from "../../Repost-author-header";
 import { BiRepost } from "react-icons/bi";
 import { post } from "@/components/types/globalTs";
-import React ,{useRef, useState} from "react";
+import React ,{startTransition, useEffect, useRef, useState} from "react";
 import { toast } from "sonner";
 import { FaCommentDots } from "react-icons/fa";
 import CommentForm from "../../../forms/CommentForm";
 import OneComment from "../OneComment";
 import { useRouter } from "next/navigation";
 import {  usePostList } from "../../lib/usePost";
-import { PostListProps, usePostListMutation }  from '../mutations/postListMutations'
+import { PostListProps, usePostListMutation}  from '../mutations/postListMutations'
 import { awsBaseUrl } from "./InfinitePostList";
 import convertMentionsToLinks from "../helpers/convertMentionsToLink";
 import htmlParser from 'html-react-parser';
 import InViewWrapper from "../helpers/inViewWrapper";
+import { LoadMoreComment } from "@/actions/commentsAction";
+import { SyncLoader } from "react-spinners";
+
 
 
 
 const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => {
    
     const [addComent,setComentState]=useState([])
+    const [loadingMoreComments,setloadmoreComments] = useState(false)
+    const [state,setStete]= useState()
     const commentFormRef = useRef<HTMLTextAreaElement>(null)
     const router = useRouter()
     const {data,isError,isLoading}=usePostList(userId)
@@ -33,7 +38,8 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
         deletePostMutation,
         createCommentMutation,
         comentLikeMutation,
-        commentDeleteMutation}=usePostListMutation(userId)
+        commentDeleteMutation,
+        loadMoreCommentMutation,isMutateSucces}=usePostListMutation(userId)
 
         const Postlike =  (postId: string) => {
             if (!currentSession) {
@@ -75,14 +81,36 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                 router.push(`/post/${postId}`)
             }
         };
-        const handleCommentClick = (e,postId)=>{
-            if(e.currentTarget === e.target){
-                console.log("Parent Clicked")
-                router.push(`/post/${postId}`)
-            }
+        const handleCommentClick =  ( {postId,lastComment})=>{
+            // if(e.currentTarget === e.target){
+            //     console.log("Parent Clicked")
+            //     // router.push(`/post/${postId}`)
+
+            //     ///TODO: GET_10 comment with paginations
+            // }
+            setloadmoreComments(true)
+            const lastCommentId = lastComment.CommentId
+            const lastCommentTimestamp = lastComment.timestamp
+            console.log(postId,lastCommentId,lastCommentTimestamp,"Debug onClick ")
+
+             loadMoreCommentMutation.mutateAsync({CommentId:lastCommentId,postId:postId,createdAt:lastCommentTimestamp})
+            // console.log(queryClient.getQueryData(['posts', userId]));
+
+        //    try {
+        //        const moreDataState = await LoadMoreComment({postId:postId,CommentId:lastCommentId,createdAt:lastCommentTimestamp})
+        //     console.log('Dont forget!',moreDataState)
+        //     return moreDataState
+        //    } catch (error) {
+        //     throw new Error (error)
+        //    }
+
         };
         
-
+        useEffect(() => {
+            console.log("isMutateSucces",isMutateSucces,loadingMoreComments)
+                setloadmoreComments(false)
+          }, [isMutateSucces]);
+          
      
         return (    
                 <div>
@@ -179,7 +207,7 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                                         {post?.comments?.map((comment,index)=>(
                                             <div
                                             className="border-t px-10  cursor-pointer"
-                                            onClick={(e)=>handleCommentClick(e,comment.postId)}
+                                            // onClick={(e)=>handleCommentClick(e,comment.postId)}
                                             key={index}
                                             >
                             
@@ -195,14 +223,34 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                                                 />
                             
                                             </div>
+                                            
                                         </div>
                                         ))}
+                                        
                                         {post?._count?.comments>post?.comments?.length&&(
                                             <div className="w-full flex justify-center p-2 cursor-pointer border-t hover:bg-neutral-900 mb-1">
-                                                <p className="text-neutral-100 hover:text-white " onClick={(e)=>handleCommentClick(e,post.PostId)}>Read more...</p>
-                                            </div>
+                                            {loadingMoreComments ? (
+                                              <SyncLoader color="white"/>
+                                            ) : (
+                                              <p
+                                                key={post.PostId}
+                                                className="text-neutral-100 hover:text-white"
+                                                onClick={(e) =>
+                                                  handleCommentClick({
+                                                    postId: post.PostId,
+                                                    lastComment: post.comments.length > 0 ? post.comments[post.comments.length - 1] : null,
+                                                  })
+                                                }
+                                              >
+                                                Read more...
+                                              </p>
+                                            )}
+                                          </div>
+                                          
                                         )}
+                                        
                                 </article>
+                                
                            )}
                        </InViewWrapper>   
                     ))}

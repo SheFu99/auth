@@ -107,7 +107,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                 console.log('focus')
             }
         }
-        console.log(post.user.id)
+        // console.log(post.user.id)
     return ( 
 <div>
   
@@ -138,7 +138,6 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
                                 userName={post.originPost.user.name}
                                 userImage={post.originPost.user.image}
                                 timestamp={post.originPost.timestamp}
-                                
                                 />
                         </div>
                     </>

@@ -12,6 +12,7 @@ export const usePostCommentMutations = (postId:string)=>{
     const deleteComment = useMutation({
         mutationFn:DeleteComment,
         onSuccess :(data, variables, context)=> {
+            // console.log(data)
             const {commentId}=variables
             queryClient.setQueryData<InfiniteData<CommentQueryPromise>>(commentQuery,
                 old=> {
@@ -21,14 +22,18 @@ export const usePostCommentMutations = (postId:string)=>{
                         ...old,
                         pages:old.pages.map(page=>({
                             ...page,
-                            data:page.data.filter(comment=> comment.CommentId !==commentId)
-                        }))
+                            data:page.data.filter(comment=> comment.CommentId !==commentId),
+                            totalCommentsCount: page?.totalCommentsCount - 1
+                        })),
                     }
-                    console.log(newPost)
+                    // console.log(newPost)
                     return newPost
                 }
             )
         },
+
+
+       
         onError(error, variables, context) {
             queryClient.invalidateQueries({queryKey:commentQuery})
         },

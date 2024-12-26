@@ -5,7 +5,8 @@ import { changeLikeCount } from "./changeLikeCount";
 import { toast } from "sonner";
 import { post } from "@/components/types/globalTs";
 import { ExtendedUser } from "@/next-auth";
-import { CreateComment, DeleteComment, LikeComment } from "@/actions/commentsAction";
+import { CreateComment, DeleteComment, LikeComment, LoadMoreComment } from "@/actions/commentsAction";
+import { useState } from "react";
 
 export type PostListProps={
     postState:post[],
@@ -20,6 +21,7 @@ export interface PostMutationContext {
 export const usePostListMutation = (userId:string)=>{
     const queryClient = useQueryClient()
     const queryKey = ['posts', userId]
+    const [isMutateSucces, setIsSuccesMutate]=useState(false)
         ///createPostMutation?
         const PostLikeMutation = useMutation({
             mutationFn: LikePost,
@@ -108,7 +110,7 @@ export const usePostListMutation = (userId:string)=>{
                             })
                         }))
                     }
-                    console.log(updatedData)
+                    // console.log(updatedData)
                     queryClient.setQueryData(queryKey,updatedData)
                 }
                 return newComment
@@ -120,6 +122,7 @@ export const usePostListMutation = (userId:string)=>{
             },
             onSettled:()=>{
                 queryClient.invalidateQueries({queryKey:queryKey})
+                setIsSuccesMutate(false)
             }
     
     
@@ -162,9 +165,9 @@ export const usePostListMutation = (userId:string)=>{
                     queryClient.setQueryData(queryKey,context.preveousPosts)
                 }
             },
-            onSettled:()=>{
-                queryClient.invalidateQueries({queryKey:queryKey})
-            }
+            // onSettled:()=>{
+            //     queryClient.invalidateQueries({queryKey:queryKey})
+            // }
         });
         const commentDeleteMutation = useMutation({
     
@@ -199,7 +202,59 @@ export const usePostListMutation = (userId:string)=>{
             }
     
         });
+       const loadMoreCommentMutation = useMutation({
+                  mutationFn:LoadMoreComment,
+                  onSuccess: (newComment)=>{
+                    // console.log("newComment",newComment)
+
+                      // const {comment,postId}=variables
+                      const existingData = queryClient.getQueryData<InfiniteData<PostQueryPromise>>(queryKey)
+          
+                    
+                      if(existingData){
+                          const updatedData = {
+                              ...existingData,
+                              pages:existingData.pages.map(page=>({
+                                  ...page,
+                                  data:page.data.map(post=>{
+                                      if(post.PostId === newComment[0].postId){
+                                          return {
+                                              ...post,
+                                              comments: [...post.comments,...newComment]
+                                          }
+                                      } 
+                                      return post
+                                      
+                                  })
+                              }))
+                          }
+                        //   console.log("updateDAtaz",updatedData)
+                          queryClient.setQueryData(queryKey,updatedData)
+                      }
+                    setIsSuccesMutate(true)
+                    // console.log("updateDAtaz",isMutateSucces)
+
+                      return newComment
+                      
+                  },
+                  onError:(error,variables,context)=>{
+                 
+                    
+                      toast.error("ERROR")
+                      queryClient.invalidateQueries({queryKey:queryKey})
       
+                  },
+                //   onMutate:()=>{
+                //     setIsSuccesMutate(true)
+                //   },
+                //  
+
+                //   onSettled:()=>{
+                //     //   queryClient.invalidateQueries({queryKey:queryKey})
+                //   }
+          
+          
+              });
        
       
         return {
@@ -208,7 +263,9 @@ export const usePostListMutation = (userId:string)=>{
             createCommentMutation,
             comentLikeMutation,
             commentDeleteMutation,
-            queryKey
+            loadMoreCommentMutation,
+            queryKey,
+            isMutateSucces
         }
 }
 

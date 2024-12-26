@@ -87,6 +87,7 @@ if(!isLoggedIn&& !isPublicRoute){
   nextUrl
 ))
 }
+
 if(userRole !=="ADMIN" && isAdminRoute) {
   return Response.redirect(new URL('/settings',nextUrl))
 }

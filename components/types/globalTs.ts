@@ -100,6 +100,7 @@ export type Comment = {
   galleryId: string;
 };
 
+
 export type profileOfferDetail = {
   userId?: string;
   firstName: string;
