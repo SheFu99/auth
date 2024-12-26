@@ -206,10 +206,14 @@ export const usePostListMutation = (userId:string)=>{
                   mutationFn:LoadMoreComment,
                   onSuccess: (newComment)=>{
                     // console.log("newComment",newComment)
-
+                    if (!Array.isArray(newComment)) {
+                        console.error("Unexpected response format", newComment);
+                        return;
+                    }
+                    
                       // const {comment,postId}=variables
                       const existingData = queryClient.getQueryData<InfiniteData<PostQueryPromise>>(queryKey)
-          
+                    
                     
                       if(existingData){
                           const updatedData = {
@@ -217,6 +221,7 @@ export const usePostListMutation = (userId:string)=>{
                               pages:existingData.pages.map(page=>({
                                   ...page,
                                   data:page.data.map(post=>{
+                                    
                                       if(post.PostId === newComment[0].postId){
                                           return {
                                               ...post,
@@ -237,13 +242,11 @@ export const usePostListMutation = (userId:string)=>{
                       return newComment
                       
                   },
-                  onError:(error,variables,context)=>{
-                 
-                    
-                      toast.error("ERROR")
-                      queryClient.invalidateQueries({queryKey:queryKey})
-      
-                  },
+                  onError: (error, variables, context) => {
+                    console.error("Mutation failed", { error, variables, context });
+                    toast.error("Something went wrong!");
+                }
+                
                 //   onMutate:()=>{
                 //     setIsSuccesMutate(true)
                 //   },

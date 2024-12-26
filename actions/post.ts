@@ -154,6 +154,13 @@ export const getCommentByPost = async ({PostId, page}:getComentParams):Promise<C
         image:{
             select:{url:true}
         },
+       
+        likes:{
+            where:{
+                userId:user?.id
+            },
+            select:{userId:true}
+        },
         user:{
             select:{
                 name:true,
@@ -161,12 +168,6 @@ export const getCommentByPost = async ({PostId, page}:getComentParams):Promise<C
                 id:true,
             }
         },
-        likes:{
-            where:{
-                userId:user?.id
-            },
-            select:{userId:true}
-        }
        
     }
 }) 
