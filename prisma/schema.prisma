@@ -88,7 +88,7 @@ model Post {
   image       Images[]
   likes       Like[]
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  @@index([timestamp])
   @@index([PostId])
 }
 
@@ -118,7 +118,7 @@ model Comment {
   likes     Like[]
   originComment Comment? @relation("OriginOfComentAnswers",fields: [originCommentId],references: [CommentId],onDelete: Cascade)
   answers Comment[] @relation("OriginOfComentAnswers")
-
+  @@index([timestamp]) 
   @@index([postId])
  }
 

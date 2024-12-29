@@ -1,9 +1,9 @@
 "use server"
 import * as z from "zod"; 
-import { signIn } from "@/auth";
+import { signIn } from "next-auth/react";
 import { LoginSchema } from "@/schemas";
 import { DEFAULT_LOGIN_REDIRECT } from "../routes";
-import { AuthError } from "next-auth";
+
 import { getUserByEmail } from "@/data/user";
 import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import generateVerificationToken from "@/lib/tokens"
@@ -94,7 +94,7 @@ if (existingUser.isTwoFactorEnabled && existingUser.email){
          redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
    })
    }catch(error){
-      if(error instanceof AuthError){
+      if(error ){ ///instanceof AuthError
          switch(error.type){
             case "CredentialsSignin" :
                return {error:"Invalid credentials"}

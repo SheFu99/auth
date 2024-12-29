@@ -1,5 +1,6 @@
 import { ExtendedUser } from "@/next-auth";
 import { UserRole } from "@prisma/client";
+import { DefaultSession } from "next-auth";
 
 export interface ProfileData {
     firstName?: string | null;
@@ -120,3 +121,13 @@ export type CommentPrev = {
   image?:{ url?: string }[];
   userId?:string,
 };
+
+interface Session {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    image?: string;
+    role?: UserRole; // Add role type
+    shortName?: string; // Add shortName type
+  } & DefaultSession["user"];}

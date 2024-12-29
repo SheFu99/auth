@@ -5,7 +5,6 @@ import PublicProfile from "@/components/profile/PublicProfile";
 import { getProfileByShortName, getPublicProfile } from "@/actions/UserProfile";
 import TabSwitch from "@/components/profile/Tabs";
 import PublicProfileFriends from "@/components/profile/friends/publicProfileFriends";
-import { auth } from "@/auth";
 import { getProfileFriends } from "@/actions/friends";
 import { GetUserPostsById } from "@/actions/UserPosts";
 import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
@@ -16,6 +15,8 @@ import { prefetchFriendList, prefetchPostList } from "@/lib/prefetchQuery";
 import { getUserListByName } from "@/actions/search/users";
 import { cache } from "react";
 import { Metadata } from "next";
+import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
 
 const getProfile = cache(async(postId:string)=>{
   const {profile,error} = await getProfileByShortName(postId)
@@ -50,11 +51,11 @@ export default async function PublicProfileParams({
 
   const dehydratedState = dehydrate(queryClientConfig);
 
-      const session = await auth()
+      const session = await getServerSession()
       const sessionUser =session?.user
 
       // const {profile,error,friendStatus} = await getPublicProfile(params.id)
-     const userfriendsList = await getProfileFriends({userId:profile?.userId})
+    //  const userfriendsList = await getProfileFriends({userId:profile?.userId})
 
 
       

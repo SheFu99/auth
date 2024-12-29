@@ -230,7 +230,7 @@ const PostList:React.FC<PostListProps> = ({postState,currentSession,userId}) => 
                                         {post?._count?.comments>post?.comments?.length&&(
                                             <div className="w-full flex justify-center p-2 cursor-pointer border-t hover:bg-neutral-900 mb-1">
                                             {loadingMoreComments ? (
-                                              <SyncLoader color="white"/>
+                                              <SyncLoader color="white" className="scale-50"/>
                                             ) : (
                                               <p
                                                 key={post.PostId}
