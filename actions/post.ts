@@ -119,7 +119,7 @@ if(user){
     }
     return {post:postWithLike,success:true}
 }
-type CommentByPost = {
+export type CommentByPost = {
     comments?:Comment[],
     success?:boolean,
     error?:string,

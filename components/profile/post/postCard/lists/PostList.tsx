@@ -7,7 +7,7 @@ import RepostModalForm from "../../repostForm";
 import RepostHeader from "../../Repost-author-header";
 import { BiRepost } from "react-icons/bi";
 import { post } from "@/components/types/globalTs";
-import React ,{startTransition, useEffect, useRef, useState} from "react";
+import React ,{useEffect, useRef, useState} from "react";
 import { toast } from "sonner";
 import { FaCommentDots } from "react-icons/fa";
 import CommentForm from "../../../forms/CommentForm";
@@ -19,7 +19,7 @@ import { awsBaseUrl } from "./InfinitePostList";
 import convertMentionsToLinks from "../helpers/convertMentionsToLink";
 import htmlParser from 'html-react-parser';
 import InViewWrapper from "../helpers/inViewWrapper";
-import { LoadMoreComment } from "@/actions/commentsAction";
+
 import { SyncLoader } from "react-spinners";
 
 

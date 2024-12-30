@@ -4,6 +4,7 @@ import { db } from "@/lib/db"
 import { deleteImagefromS3 } from "./UserPosts"
 
 import { Comment, CommentPrev } from "@/components/types/globalTs"
+import { CommentByPost } from "./post"
 
 
 type CreateCommentParams = {
@@ -168,9 +169,14 @@ type LoadMoreCommentProps  = {
     createdAt:Date,
     limit?: number
 }
-type LoadMoreCommentResponse = Comment[];
+export type CommentByPost = {
+    comments?:Comment[],
+    success?:boolean,
+    error?:string
+} 
+export const LoadMoreComment = async ({postId,CommentId,createdAt,limit=5}:LoadMoreCommentProps): Promise<CommentByPost>=>{
 
-export const LoadMoreComment = async ({postId,CommentId,createdAt,limit=5}:LoadMoreCommentProps): Promise<LoadMoreCommentResponse>=>{
+    
     console.log(postId,CommentId,createdAt)
     if(!CommentId||!postId){
         throw new Error('PostIdCommentIdCreatedDate_is_required')
@@ -217,8 +223,15 @@ export const LoadMoreComment = async ({postId,CommentId,createdAt,limit=5}:LoadM
             }
            
         })  
+        const commentsWithLikes = commentList.map(com=>{
+            const commentLikedByUser = user && com?.likes && com.likes.some(like=>like.userId === user.id)
+            return{
+                ...com,
+                likedByUser:commentLikedByUser ?? false
+            }
+        })
         console.log('comment_list',commentList)
-        return commentList 
+        return commentsWithLikes 
     } catch (error) {
         throw new Error (error)
     }

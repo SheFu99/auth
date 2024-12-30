@@ -171,7 +171,8 @@ const InputMentions = forwardRef<MentionInputRef,InputMentionsProps>((
     };
     return (
         <section id="inputAria" className={className}>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
+            <meta name="viewport" 
+                  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
             <Textarea 
                 ref={TextInputRef}
                 onChange={(e)=>handleInputChange(e)}

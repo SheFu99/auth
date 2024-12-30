@@ -1,6 +1,6 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { adminRoutes, apiAuthPrefix, authRoutes, publicRoutes } from "./routes";
-import { currentRole } from "./lib/auth";
+import { currentRole, currentUser } from "./lib/auth";
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -32,8 +32,9 @@ export async function middleware(req) {
   // }
 
   // Fetch the JWT token
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
+  // const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  // const userRole = currentRole()
+  // console.log(userRole,'userRole')
   // const isLoggedIn = !!token;
   // const userRole = token?.role || (await currentRole()); // Assuming `currentRole` fetches the role if not in token.
 
