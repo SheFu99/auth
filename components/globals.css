@@ -1,0 +1,15 @@
+/* globals.css */
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+/* Prevent FOUC */
+[data-theme] {
+  visibility: visible;
+}
+html {
+  visibility: hidden;
+}

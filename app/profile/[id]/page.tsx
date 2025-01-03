@@ -5,17 +5,13 @@ import PublicProfile from "@/components/profile/PublicProfile";
 import { getProfileByShortName, getPublicProfile } from "@/actions/UserProfile";
 import TabSwitch from "@/components/profile/Tabs";
 import PublicProfileFriends from "@/components/profile/friends/publicProfileFriends";
-import { getProfileFriends } from "@/actions/friends";
-import { GetUserPostsById } from "@/actions/UserPosts";
 import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
 import queryClientConfig from "@/lib/QueryClient";
 import QueryProvider from "@/util/QueryProvider";
 import InfinitePostList from "@/components/profile/post/postCard/lists/InfinitePostList";
-import { prefetchFriendList, prefetchPostList } from "@/lib/prefetchQuery";
-import { getUserListByName } from "@/actions/search/users";
+import { prefetchFriendList, prefetchPostList } from "@/lib/reactQueryHooks/prefetchPost";;
 import { cache } from "react";
 import { Metadata } from "next";
-import { getSession } from "next-auth/react";
 import { getServerSession } from "next-auth";
 
 const getProfile = cache(async(postId:string)=>{
@@ -27,7 +23,9 @@ const getProfile = cache(async(postId:string)=>{
 })
 
 export const generateMetadata = async ({params:{id}}):Promise<Metadata> =>{
- const profile = await getProfile(id)
+  const paramsid =  id
+console.log('GEneratedIdFormHeadder',id)
+ const profile = await getProfile(paramsid)
   return {
       title:profile?.firstName ,
       description:`from ${profile?.adres}`,
@@ -39,15 +37,15 @@ export const generateMetadata = async ({params:{id}}):Promise<Metadata> =>{
 }
 
 export default async function PublicProfileParams({
-  params,
-  searchParams
+  params
 }) {
-  const {profile,error,friendStatus}= await getProfileByShortName(params.id)
+  const paramsid =  params.id
+  const {profile,error,friendStatus}= await getProfileByShortName(paramsid)
   // console.log('error',friendStatus)
   // console.log('profile?.userId',profile?.userId)
-  await prefetchPostList(profile?.userId||params.id)
-  await prefetchFriendList(profile?.userId||params.id)
-  const search = searchParams?.search
+  await prefetchPostList(profile?.userId||paramsid)
+  await prefetchFriendList(profile?.userId||paramsid)
+  
 
   const dehydratedState = dehydrate(queryClientConfig);
 
@@ -55,7 +53,7 @@ export default async function PublicProfileParams({
       const sessionUser =session?.user
 
       // const {profile,error,friendStatus} = await getPublicProfile(params.id)
-     const userfriendsList = await getProfileFriends({userId:profile?.userId})
+    //  const userfriendsList = await getProfileFriends({userId:profile?.userId})
 
 
       
@@ -72,7 +70,7 @@ export default async function PublicProfileParams({
                   sessionUser={sessionUser}
                   />
                     <TabSwitch
-                    chilldrenFriends={<PublicProfileFriends profileId={profile?.userId}  search={search}/> }
+                    chilldrenFriends={<PublicProfileFriends profileId={profile?.userId}  /> }
                     chilldrenPosts={<InfinitePostList  userId={profile?.userId} sessionUser={sessionUser}/>}
                     userId={profile?.userId}
                     />

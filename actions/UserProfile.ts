@@ -194,8 +194,17 @@ export const getPublicProfile = async (userId:string):Promise<getProfilePromise>
 
   export const getProfileByShortName = async (shortName:string):Promise<getProfilePromise> =>{
     console.log(shortName)
+   let shortNameUser
+    if(shortName.length<26){
+      shortNameUser = await db.user.findFirst({
+        where:{shortName:shortName},
+        include:{
+          profile:true
+        }}
+      )
+    }
     try {
-      const shortNameUser = await db.user.findFirst({
+      shortNameUser = await db.user.findFirst({
         where:{
           OR:[
             {shortName:shortName},

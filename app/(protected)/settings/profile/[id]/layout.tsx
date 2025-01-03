@@ -7,6 +7,7 @@ import SideBar from "@/components/SideBar";
 import QueryProvider from "@/util/QueryProvider";
 
 import { getServerSession } from "next-auth";
+import { ThemeProvider } from "@/components/theme-provider";
 
 type PublicProfileProps = {
     children?:React.ReactNode,
@@ -29,7 +30,12 @@ console.log(search)
                             <div className="grid space-y-10 mr-2 ml-2 grid-cols-12">
                             {/* <SideBar role={user?.role} className=" sticky top-0 z-10 bg-card shadow-sm"/> */}
                                     <div className="xl:col-start-4 xl:col-span-6 sm:col-span-10 sm:mr-5 sm:col-start-2 col-start-1 col-span-12 ">
-                                       <QueryProvider> {children} </QueryProvider>
+                                       <QueryProvider>
+                               
+                                                                                           
+                                                                                           {children} 
+                                                                                    
+                                                                                            </QueryProvider>
                                 </div>
                             </div>
                            

@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import PostCard from "@/components/profile/post/postCard/PostCard";
 import InfiniteCommentList from "@/components/profile/post/postCard/lists/InfiniteCommentList";
 import queryClientConfig from "@/lib/QueryClient";
-import { prefetchCommentList, prefetchPost } from "@/lib/prefetchQuery";
+import { prefetchCommentList, prefetchPost } from "@/lib/reactQueryHooks/prefetchPost";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { Metadata } from "next";
 import { cache } from "react";

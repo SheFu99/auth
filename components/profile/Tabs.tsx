@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { RiProfileLine } from "react-icons/ri";
 import { FaUser } from "react-icons/fa";
 import { usePostList } from "./post/lib/usePost";
+import { useFriendList } from "../../lib/reactQueryHooks/userFriends";
+
 
 type TabSwitchProps ={
     chilldrenPosts?:React.ReactNode|React.ReactNode[],
@@ -14,9 +16,11 @@ type TabSwitchProps ={
     userId?:string
 }
 
-const TabSwitch = ({chilldrenPosts,chilldrenFriends,friendsTotal,className,userId}:TabSwitchProps) => {
-  const {data,isError}=usePostList(userId)
+const TabSwitch = ({chilldrenPosts,chilldrenFriends,className,userId}:TabSwitchProps) => {
 
+  const {data,isError}=usePostList(userId)
+  const {data:friends,isError:isFriendsErreor}=useFriendList(userId)
+  const friendsTotal = friends?.pages[0]?.totalFriendsCount
     return ( 
         <div className={`${className}`}>
          <Tabs defaultId="tab2" >
@@ -27,19 +31,11 @@ const TabSwitch = ({chilldrenPosts,chilldrenFriends,friendsTotal,className,userI
             </TabsList>
 
             <TabsContent id="tab2" className="p-4">
-                
-                    {/* <Suspense fallback={<ListSkeleton/>}>  */}
                     {chilldrenPosts}
-                    {/* </Suspense> */}
-            
             </TabsContent>
 
             <TabsContent id="tab1" className="p-4">
-
-            {/* <Suspense fallback={<ListSkeleton/>}> */}
                 {chilldrenFriends}
-            {/* </Suspense> */}
-
             </TabsContent>
             <TabsContent id="tab3" className="p-4">
                 <h1>Content for Tab Three</h1>

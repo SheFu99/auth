@@ -191,10 +191,19 @@ const UserPostForm = () => {
         setImagesBlobUrl(manager.getImagesBlobUrl());
     };
 
-    const handleMention = () =>{
-        TextInputRef.current.handleMention()
-        TextInputRef.current.focusInput()
+    const handleMention = () => {
+        if (TextInputRef.current) {
+            const cursor = TextInputRef.current?.getCursor();
+            const selectionStart = cursor?.selectionStart ?? 0;
+
+            const newText = `${textState.slice(0, selectionStart)}@${textState.slice(selectionStart)}`;
+            setTextState(newText);
+            setCursorPosition(selectionStart + 1); // Move cursor after '@'.
+            TextInputRef.current?.focusInput();
+
+        }
     };
+    
  
     const handlePoppoverTrigger = ()=>{
         setPopoverState(prev => !prev);

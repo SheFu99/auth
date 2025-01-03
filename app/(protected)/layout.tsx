@@ -1,6 +1,6 @@
 
 "use server"
-import { getSession, SessionProvider } from "next-auth/react";
+import { getSession, SessionProvider, signOut } from "next-auth/react";
 
 // const Navbar =React.lazy(()=>import ('@/components/navbar'))
 // import SideBar from "@/components/SideBar";
@@ -13,6 +13,7 @@ import SessionProviderWrapper from "./sessionProviderWrapper";
 import { getCurrentProfile } from "@/actions/UserProfile";
 import { currentUser } from "@/lib/auth";
 import { Metadata } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
 
 
 // interface ProtecteedLayoutProps{
@@ -44,6 +45,10 @@ const getProfile = cache(async (userId: string) => {
 const ProtectedLayout = async ({children}:any) => {
     const session = await getServerSession(authConfig)
     console.log('ProtectedLayout',session)
+    // console.log('SessionError:',session)
+    // if(session == null){
+    //     signOut()
+    // }
     const user = session?.user
 
     return ( 
@@ -73,7 +78,10 @@ const ProtectedLayout = async ({children}:any) => {
                                                 sm:col-span-10 sm:mr-5 sm:col-start-3 
                                                 sm:ml-8
                                                 col-start-1 col-span-12 ">
+                                                
+
                                     {children} 
+                                                  
                             </div>
                             <SideBar role={user?.role}  bar={true}                  
                                                      className="col-span-12 fixed inset-x-0 bottom-0

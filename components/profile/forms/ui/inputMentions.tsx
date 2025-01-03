@@ -6,6 +6,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useSta
 import { FaUser } from "react-icons/fa";
 import _ from 'lodash';
 import { toast } from "sonner";
+import CustomTextareaWithMentions from "@/components/inputs/social_post/SocialPost";
 
 interface InputMentionsProps {
     shouldAnimate?:boolean,
@@ -21,15 +22,16 @@ interface InputMentionsProps {
     setIfMentionExist?:(value:boolean)=>void
     
 }
-export type MentionInputRef ={
-    clearInput?: ()=>void,
-    getValue?:()=>string,
-    focusInput?:()=>void,
-    setValue?:(value:string)=>void,
-    handleReactionClick?:(reacton:{emoji:string})=>void,
-    handleMention?:()=>void,
-    
-}
+export type MentionInputRef = {
+    clearInput?: () => void;
+    getValue?: () => string;
+    focusInput?: () => void;
+    setValue?: (value: string) => void;
+    handleReactionClick?: (reaction: { emoji: string }) => void;
+    handleMention?: () => void;
+    getCursor?: () => { selectionStart: number; selectionEnd: number }; // Add this method
+};
+
 
 const InputMentions = forwardRef<MentionInputRef,InputMentionsProps>((
     {shouldAnimate,
@@ -83,73 +85,67 @@ const InputMentions = forwardRef<MentionInputRef,InputMentionsProps>((
         };
         },
 
-        getCursor(){
-           const {selectionStart, selectionEnd }=TextInputRef.current
-           return {selectionStart, selectionEnd }
-        },
-        handleMention(){
-            if (TextInputRef.current) {
-                const { selectionStart, selectionEnd } = TextInputRef.current
-
-                const newText = textState.slice(0, selectionStart!) + '@' + textState.slice(selectionEnd!);
-                TextInputRef.current.value = newText 
-                setTextState(newText);
-          
-                setTimeout(() => {
-                  if (TextInputRef.current) {
-                   TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + 1;
-                    TextInputRef.current.focus();
-                  }
-                }, 0);
-        };
+        getCursor() {
+            const { selectionStart, selectionEnd } = TextInputRef.current!;
+            return { selectionStart, selectionEnd };
         }
+,        
+handleMention() {
+    if (TextInputRef.current) {
+        const { selectionStart, selectionEnd } = TextInputRef.current;
+        const newText = textState.slice(0, selectionStart!) + '@' + textState.slice(selectionEnd!);
+        TextInputRef.current.value = newText; 
+        setTextState(newText);
+        setTimeout(() => {
+            if (TextInputRef.current) {
+                TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + 1;
+                TextInputRef.current.focus();
+            }
+        }, 0);
+    }
+}
+
 
     }))
 
     const detectMention = async () => {
-        console.log('DetectMentionEffect',isUserChoose)
-      const mentionIndex = textState?.lastIndexOf('@');
-      if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
-        const query = textState.substring(mentionIndex + 1, cursorPosition);
-        if (query) {
-          const {searchResult,error} = await getUserListByShortName({shortName:query,pageParams:1});
-        //   console.log('searchResult',searchResult[0],error)
-        console.log(error)
-          if(error){
-            toast.error(error)
-            
-            setIfMentionExist(false)
-            return
-          }
-          if(!searchResult[0]){
-            setIfMentionExist(false)
-            return
-          }else if(isUserChoose){
-              setIfMentionExist(true)
-            }else{
-                setIfMentionExist(false)
-            }
-            
-          if(error) {throw new Error (error)}
-          setUsers(searchResult);
-          setShowSuggestions(true);
-        }   
-      } else {
-        setShowSuggestions(false);
+      const mentionRegex = /@(\w+)$/; // Matches '@' followed by alphanumeric characters.
+      const mentionMatch = textState.slice(0, cursorPosition).match(mentionRegex);
+      if (!mentionMatch) {
+          setShowSuggestions(false);
+          return;
       }
-    };
-    const debouncedDetectInput = useCallback(_.debounce(() => {
-        detectMention();
-      }, 600), [textState]);
-    useEffect(() => {
-        if(isUserChoose){
-            setUserChoose(false)
-            return ()=>null
-        }
-        debouncedDetectInput()
+      
+      const query = mentionMatch[1]; // Captures the text after '@'.
+      if (!query) {
+          setShowSuggestions(false);
+          return;
+      }
+  
+      try {
+          const { searchResult, error } = await getUserListByShortName({ shortName: query, pageParams: 1 });
+          if (error) throw new Error(error);
+          setIfMentionExist(!!searchResult?.length);
+          setUsers(searchResult);
+          setShowSuggestions(!!searchResult?.length);
+      } catch (err) {
+          toast.error(err.message);
+          setIfMentionExist(false);
+          setShowSuggestions(false);
+      }
+  };
 
-        return () => debouncedDetectInput.cancel();
-      }, [textState, cursorPosition,debouncedDetectInput, isUserChoose]);
+  
+  const debouncedDetectInput = useCallback(
+    _.debounce(detectMention, 300, { leading: true, trailing: false }),
+    [textState]
+);
+
+useEffect(() => {
+    debouncedDetectInput();
+    return () => debouncedDetectInput.cancel();
+}, [textState, cursorPosition]);
+
 
 
     const handleUserClick = (user: ExtendedUser) => {
@@ -164,16 +160,16 @@ const InputMentions = forwardRef<MentionInputRef,InputMentionsProps>((
         setShowSuggestions(false);
     };
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const target = e.target;
-        const cursorPos = target.selectionStart;
-        setCursorPosition(cursorPos);
-        setTextState(target.value);
-    };
+      const target = e.target;
+      setCursorPosition(target.selectionStart);
+      setTextState(target.value);
+  };
+  
     return (
         <section id="inputAria" className={className}>
             <meta name="viewport" 
                   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
-            <Textarea 
+            {/* <Textarea 
                 ref={TextInputRef}
                 onChange={(e)=>handleInputChange(e)}
                 disabled={isUploading||false}
@@ -182,8 +178,11 @@ const InputMentions = forwardRef<MentionInputRef,InputMentionsProps>((
                 onFocus={onFocus}
                 onBlur={onBlur}
 
-            />
-            {showSuggestions&&(
+            /> */}
+            <CustomTextareaWithMentions 
+          />
+
+            {/* {showSuggestions&&(
             <>
                     {users?.map(user=>(
                         <div 
@@ -225,7 +224,7 @@ const InputMentions = forwardRef<MentionInputRef,InputMentionsProps>((
                     </div>
                     ))}
             </>
-            )}
+            )} */}
 
         </section>
       );    

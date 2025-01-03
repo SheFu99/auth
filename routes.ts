@@ -24,7 +24,9 @@ export const authRoutes = [
     "/auth/error",
     "/auth/reset",
     "/auth/new-password",
-    '/api/session'
+    '/api/session',
+    '/api/tokens/revoke',
+    // '/api/session/invalidate'
 ];
 
 /**

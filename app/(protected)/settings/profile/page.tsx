@@ -1,6 +1,6 @@
 // app/profile/page.tsx (Server Component)
 import { getServerSession } from "next-auth";
-import { prefetchFriendList, prefetchPostList } from "@/lib/prefetchQuery";
+import { prefetchFriendList, prefetchPostList } from "@/lib/reactQueryHooks/prefetchPost";
 import { authConfig } from "@/auth.config";
 import { dehydrate } from "@tanstack/react-query";
 import queryClientConfig from "@/lib/QueryClient";

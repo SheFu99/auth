@@ -12,8 +12,8 @@ import { Card, CardContent, CardHeader } from '../ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
 import { MdAccountBox, MdEmail } from 'react-icons/md';
-import { Button } from '../ui/button';
 
+import { VscMention } from "react-icons/vsc";
 
 
 const ContactInformation = () => {
@@ -55,7 +55,8 @@ const [error,setError] =useState<string| undefined>()
             password:  undefined,
             newPassword : undefined,
             role: user?.role || undefined,
-            isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined
+            isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined,
+            shortName: user?.shortName || undefined
         }
     })
     const { handleSubmit, control, formState: { errors } } = form;
@@ -129,6 +130,31 @@ const [error,setError] =useState<string| undefined>()
                                             disabled ={isPending }
                                             className={shouldAnimate && errors.name ? 'animate-shake bg-gray-400  text-black font-semibold' : 'bg-gray-400  text-black font-semibold'}
                                             Icon={MdEmail}
+                                            editButton={true}
+                                            
+                                            />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+
+                                )}
+                            />
+                            </div>
+                            <div className='row-start-3 col-span-12'>
+                             <FormField
+                                control={form.control}
+                                name='shortName'
+                                render ={({field})=>(
+                                <FormItem>
+                                    <FormLabel className='text-xs font-semibold'>You short name:</FormLabel>
+                                    <FormControl>
+                                        <Input 
+                                            {...field}
+                                            placeholder= "@ShortName"
+                                            type='shortName'
+                                            disabled ={isPending }
+                                            className={shouldAnimate && errors.name ? 'animate-shake bg-gray-400  text-black font-semibold' : 'bg-gray-400  text-black font-semibold'}
+                                            Icon={VscMention}
                                             editButton={true}
                                             
                                             />
