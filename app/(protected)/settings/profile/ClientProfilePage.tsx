@@ -11,7 +11,7 @@ const ClientProfilePage = ({ user, dehydratedState }: any) => {
     <QueryProvider>
       <HydrationBoundary state={dehydratedState}>
         <EditProfile />
-        <ProfileTabs userId={user.id} />
+        <ProfileTabs userId={user.id}  />
       </HydrationBoundary>
     </QueryProvider>
   );

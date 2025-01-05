@@ -55,9 +55,12 @@ const IncomeOfferList = () => {
     },[click])
 
     return ( 
-        <div className="flex space-y-2 flex-wrap">
+        <div key={'incomeOfferList'}>
             {userList?.map((user,index)=>(
+                <div className="flex space-y-2 flex-wrap bg-slate-800 rounded-md">
+                    <h3 className="text-center w-full mt-2">🆕you have friends offer:</h3>
                 <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full "key={index}> 
+                
                         <Link  href={`/profile/${user.requester.userId}`} className="md:col-span-10 col-span-9 flex items-center gap-1 cursor-pointer">
                             <Avatar>
                                 <AvatarImage
@@ -69,7 +72,6 @@ const IncomeOfferList = () => {
                                          <FaUser color="white" className="w-[50px] h-[50px] bg-neutral-400 rounded-sm p-1"/>
                                     </AvatarFallback>
                             </Avatar>
-                               
                             <p className="text-white ml-2">{user?.requester?.firstName}</p>
                         </Link>
                   
@@ -93,6 +95,7 @@ const IncomeOfferList = () => {
                             <TiCancel color="white" className="scale-150" />
                         </button>
                     </div>
+                </div>
                 </div>
             )
             )}

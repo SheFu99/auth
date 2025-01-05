@@ -2,6 +2,16 @@ import { ExtendedUser } from "@/next-auth";
 import { UserRole } from "@prisma/client";
 import { DefaultSession } from "next-auth";
 
+
+export type MentionInputRef = {
+    clearInput?: () => void;
+    getValue?: () => string;
+    focusInput?: () => void;
+    setValue?: (value: string) => void;
+    handleReactionClick?: (reaction: { emoji: string }) => void;
+    handleMention?: () => void;
+};
+
 export interface ProfileData {
     firstName?: string | null;
     lastName?: string | null;

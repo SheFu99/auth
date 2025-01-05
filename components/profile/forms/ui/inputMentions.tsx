@@ -6,6 +6,13 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useSta
 import { FaUser } from "react-icons/fa";
 import _ from 'lodash';
 import { toast } from "sonner";
+import { MentionInputRef } from "@/components/types/globalTs";
+import { Editor } from "@tiptap/core";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Mention from "@tiptap/extension-mention";
+import { Placeholder } from '@tiptap/extension-placeholder';
+import './mentionStyle.css'
 
 interface InputMentionsProps {
     shouldAnimate?: boolean;
@@ -21,14 +28,6 @@ interface InputMentionsProps {
     setIfMentionExist?: (value: boolean) => void;
 }
 
-export type MentionInputRef = {
-    clearInput?: () => void;
-    getValue?: () => string;
-    focusInput?: () => void;
-    setValue?: (value: string) => void;
-    handleReactionClick?: (reaction: { emoji: string }) => void;
-    handleMention?: () => void;
-};
 
 const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
     shouldAnimate,
@@ -46,54 +45,73 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
     const [isUserChoose, setUserChoose] = useState(false);
     const [users, setUsers] = useState<ExtendedUser[]>();
-    const TextInputRef = useRef<HTMLTextAreaElement>();
+  
 
-    useImperativeHandle(ref, () => ({
-        clearInput() {
-            TextInputRef.current.value = '';
+    const editor = useEditor({
+        extensions: [
+          StarterKit,
+          Mention.configure({
+            HTMLAttributes: {
+              class: "mention-highlight",
+            },
+            
+            suggestion: {
+              items: async ({ query }) => {
+                const response = await getUserListByShortName({
+                  shortName: query,
+                  pageParams: 1,
+                });
+                return response.searchResult || [];
+              },
+            },
+          }),
+          Placeholder.configure({
+            placeholder: 'You can type here...', // Placeholder text
+         
+          }),
+        ],
+        content: "",
+        onUpdate: ({ editor }) => {
+          const content = editor.getText();
+          setTextState?.(content);
+          const cursorPos = editor.state.selection.from;
+          setCursorPosition?.(cursorPos);
         },
-        getValue() {
-            return TextInputRef.current.value;
+        onFocus: () => {
+          onFocus?.();
         },
-        focusInput() {
-            TextInputRef.current?.focus();
+        onBlur: () => {
+          onBlur?.();
         },
-        setValue(value: string) {
-            TextInputRef.current.value = value;
+      });
+  
+      // Use `useImperativeHandle` to expose methods to the parent
+      useImperativeHandle(ref, () => ({
+        clearInput: () => {
+          editor?.commands.clearContent();
         },
-        handleReactionClick(reaction: { emoji: string }) {
-            if (TextInputRef.current) {
-                const { selectionStart, selectionEnd } = TextInputRef.current;
-                const newText = textState.slice(0, selectionStart!) + reaction.emoji + textState.slice(selectionEnd!);
-                TextInputRef.current.value = newText;
-                setTextState(newText);
-
-                setTimeout(() => {
-                    if (TextInputRef.current) {
-                        TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + reaction.emoji.length;
-                        TextInputRef.current.focus();
-                    }
-                }, 0);
-            }
+        getValue: () => {
+          return editor?.getText() || "";
         },
-        handleMention() {
-            if (TextInputRef.current) {
-                const { selectionStart, selectionEnd } = TextInputRef.current;
-                const newText = textState.slice(0, selectionStart!) + '@' + textState.slice(selectionEnd!);
-                TextInputRef.current.value = newText;
-                setTextState(newText);
-
-                setTimeout(() => {
-                    if (TextInputRef.current) {
-                        TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + 1;
-                        TextInputRef.current.focus();
-                    }
-                }, 0);
-            }
+        focusInput: () => {
+          editor?.commands.focus();
         },
-    }));
+        setValue: (value: string) => {
+          editor?.commands.setContent(value);
+        },
+        handleReactionClick: (reaction: { emoji: string }) => {
+          editor?.commands.insertContent(reaction.emoji);
+        },
+        handleMention: () => {
+          editor?.commands.insertContent("@");
+        },
+      }));
+  
+      
 
     const detectMention = async () => {
+
+        ////use reg-ex insted of lastindexof()
         const mentionIndex = textState?.lastIndexOf('@');
         if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
             const query = textState.substring(mentionIndex + 1, cursorPosition);
@@ -134,53 +152,51 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
         setUserChoose(true);
         const mentionIndex = textState?.lastIndexOf('@');
         const newValue = `${textState?.substring(0, mentionIndex)}@${user.shortName} `;
-        TextInputRef.current.value = newValue;
+        editor?.commands.setContent(newValue);
+        
         setTextState(newValue);
         setShowSuggestions(false);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const target = e.target;
-        const cursorPos = target.selectionStart;
-        setCursorPosition(cursorPos);
-        setTextState(target.value);
-    };
-  useEffect(()=>{console.log('isUserChoose',isUserChoose),[isUserChoose]})
+
+    
+  useEffect(()=>{console.log('showSuggestions',showSuggestions),[showSuggestions]})
     return (
         <section id="inputAria" className={className}>
             <meta name="viewport" 
                   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
-            <Textarea 
-                ref={TextInputRef}
-                onChange={(e)=>handleInputChange(e)}
-                disabled={isUploading||false}
-                className={`${shouldAnimate ? 'animate-shake' : ''} `}
-                placeholder="Type your message here." 
-                onFocus={onFocus}
-                onBlur={onBlur}
-
-            />
-            {/* <CustomTextareaWithMentions 
-          /> */}
+                 <div
+                    className={`editor-wrapper ${shouldAnimate ? 'animate-shake' : ''} ${className}`}
+                    tabIndex={-1} // Allows the wrapper to participate in the focus chain
+                    >
+                        <EditorContent editor={editor}
+                  
+                            />
+                </div> 
+            {/* <CustomTextareaWithMentions/> */}
 
             {showSuggestions&&(
             <>
-            <div className="absolute mt-4 right-0  bg-black border border-white 
+            
+            <div className="absolute mt-4 right-2 
+                                bg-black border 
+                                border-white 
                                 rounded-md
                                 z-[100]
                                 transition-opacity
-                                
                                 ">
                                    
             {users?.map(user=>(
                         <div 
                             key={user.id}
+                            onClick={()=>handleUserClick(user)}
                             className={`
                                 ${suggestionsClass}
                                 py-[4px]
                                 px-3
                                  hover:bg-slate-800 rounded-md
                                  border-b border-dotted border-gray
+                                  cursor-pointer
                                 `}>
                         <div className="flex gap-2">
                             {user.image?(
@@ -199,17 +215,16 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
                         
                             <li
                                 key={user.id}
-                                onClick={()=>handleUserClick(user)}
-                                className="
-                                list-none
-                                cursor-pointer"
-                            >{user.name}</li>
+                                className="list-none">
+                            {user.name}
+                            </li>
                             
                     </div>
                    
                     </div>
                     
                     ))}
+
             </div>
                     
             </>

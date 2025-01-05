@@ -13,7 +13,7 @@ import SessionProviderWrapper from "./sessionProviderWrapper";
 import { getCurrentProfile } from "@/actions/UserProfile";
 import { currentUser } from "@/lib/auth";
 import { Metadata } from "next";
-import { ThemeProvider } from "@/components/theme-provider";
+
 
 
 // interface ProtecteedLayoutProps{

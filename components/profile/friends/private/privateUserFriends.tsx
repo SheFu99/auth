@@ -5,10 +5,10 @@ import { useCurrentUser } from "@/hooks/use-current-user"
 import { toast } from "sonner"
 
 import queryClientConfig from "@/lib/QueryClient"
-import IncomeOfferList from "./incomeOfferList"
+import IncomeOfferList from "./Lists/incomeOfferList"
 import InfiniteScroll from "../../post/functions/infinite-scroll"
 import { useFriendList } from "../../../../lib/reactQueryHooks/userFriends"
-import PrivateFriendList from "./privateFriendsList"
+import PrivateFriendList from "./Lists/privateFriendsList"
 
 const PrivateUserFriends = () => {
     const user = useCurrentUser()
@@ -46,9 +46,9 @@ const PrivateUserFriends = () => {
 
 
     return ( 
-        <div className=" w-full ">
+        <div className=" w-full space-y-2">
         {/* INCOME */}
-        <IncomeOfferList/>
+        <IncomeOfferList />
         <InfiniteScroll hasMore={hasNextPage} isloaded={isFetched} loadMore={fetchNextPage} className="space-y-2" >
             <PrivateFriendList onBan={changeFriendStatus} onDelete={deleteFriendButton} friendList={flatData}/>
 

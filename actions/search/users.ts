@@ -64,6 +64,7 @@ export const getUserListByShortName = async ({shortName,pageParams}:{shortName:s
     //     console.error('RateLimit is Reached!')
     //     return {error:'RateLimit!'}
     // }
+    console.log('GetUserListwithShortName',shortName)
     if(!shortName){ 
         return {error:'Params require!'}
     }

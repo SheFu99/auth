@@ -153,7 +153,7 @@ jwt:{
 
   // Enable Debugging for Development
 events:{
-  async signOut({ session,token }) {
+  async signOut({ token }) {
     try {
         if (token) {
             console.log("Signing out and revoking token:", token.accessToken);
@@ -164,7 +164,6 @@ events:{
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token: token.accessToken }),
             });
-            return session == null
         }
     } catch (error) {
         console.error("Error during sign-out:", error);

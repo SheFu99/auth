@@ -12,6 +12,7 @@ const SessionProviderWrapper = ({
   session: any;
 }) => {
   useEffect(() => {
+    console.log('Session:',session)
     if (session?.error === "RefreshAccessTokenError") {
       signIn(); // Force sign in to hopefully resolve error
     }

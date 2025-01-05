@@ -7,7 +7,6 @@ import SideBar from "@/components/SideBar";
 import QueryProvider from "@/util/QueryProvider";
 
 import { getServerSession } from "next-auth";
-import { ThemeProvider } from "@/components/theme-provider";
 
 type PublicProfileProps = {
     children?:React.ReactNode,

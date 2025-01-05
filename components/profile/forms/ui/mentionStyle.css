@@ -1,0 +1,42 @@
+.editor-wrapper {
+  position: relative;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.ProseMirror {
+  min-height: 50px;
+  outline: none;
+  position: relative;
+}
+
+.ProseMirror p.is-empty::before {
+  content: attr(data-placeholder);
+  color: #aaa;
+  font-style: italic;
+  pointer-events: none;
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  transform: translateY(-50%);
+  display: block;
+}
+
+.editor-wrapper:focus-within .ProseMirror p.is-empty::before {
+  color: #31363b;
+}
+
+/* Highlight mentions inside the editor */
+.mention-highlight {
+  background-color: #0073e6; /* Blue background */
+  color: white; /* White text */
+  font-weight: bold; /* Bold text */
+  border-radius: 4px; /* Rounded corners */
+  padding: 2px 4px; /* Padding for spacing */
+  cursor: pointer; /* Pointer cursor */
+}
+
+.mention-highlight:hover {
+  background-color: #005bb5; /* Darker blue on hover */
+}
