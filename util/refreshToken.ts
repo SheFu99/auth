@@ -40,6 +40,8 @@ export async function refreshAccessToken(token: JWT): Promise<RefreshedToken> {
       //   grant_type: 'refresh_token',
       //   refresh_token: token.refreshToken,
       // } 
+      console.log('RefreshAccessTokenError')
+
       return {error:'RefreshAccessTokenError'}
 
       

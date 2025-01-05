@@ -6,22 +6,21 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useSta
 import { FaUser } from "react-icons/fa";
 import _ from 'lodash';
 import { toast } from "sonner";
-import CustomTextareaWithMentions from "@/components/inputs/social_post/SocialPost";
 
 interface InputMentionsProps {
-    shouldAnimate?:boolean,
-    isUploading?:boolean,
-    setTextState?:(text:string)=>void,
-    textState?:string,
-    setCursorPosition?:(cursor:number)=>void,
-    cursorPosition?:number,
-    onFocus?:()=>void,
-    onBlur?:()=>void,
-    className?:string,
-    suggestionsClass?:string,
-    setIfMentionExist?:(value:boolean)=>void
-    
+    shouldAnimate?: boolean;
+    isUploading?: boolean;
+    setTextState?: (text: string) => void;
+    textState?: string;
+    setCursorPosition?: (cursor: number) => void;
+    cursorPosition?: number;
+    onFocus?: () => void;
+    onBlur?: () => void;
+    className?: string;
+    suggestionsClass?: string;
+    setIfMentionExist?: (value: boolean) => void;
 }
+
 export type MentionInputRef = {
     clearInput?: () => void;
     getValue?: () => string;
@@ -29,147 +28,129 @@ export type MentionInputRef = {
     setValue?: (value: string) => void;
     handleReactionClick?: (reaction: { emoji: string }) => void;
     handleMention?: () => void;
-    getCursor?: () => { selectionStart: number; selectionEnd: number }; // Add this method
 };
 
-
-const InputMentions = forwardRef<MentionInputRef,InputMentionsProps>((
-    {shouldAnimate,
-        isUploading,
-        textState,
-        setTextState,
-        setCursorPosition,
-        cursorPosition,
-        onFocus,
-        onBlur,
-        className,
-        suggestionsClass,
-        setIfMentionExist
-    },ref) => {
-    ///TODO: prevent incorect mention inside input listener 
+const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
+    shouldAnimate,
+    isUploading,
+    textState,
+    setTextState,
+    setCursorPosition,
+    cursorPosition,
+    onFocus,
+    onBlur,
+    className,
+    suggestionsClass,
+    setIfMentionExist,
+}, ref) => {
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-    const [isUserChoose,setUserChoose]=useState(false)
-    const [users,setUsers]=useState<ExtendedUser[]>()
-    const TextInputRef = useRef<HTMLTextAreaElement>()
+    const [isUserChoose, setUserChoose] = useState(false);
+    const [users, setUsers] = useState<ExtendedUser[]>();
+    const TextInputRef = useRef<HTMLTextAreaElement>();
 
-     useImperativeHandle(ref,()=>({
-        clearInput(){
-            TextInputRef.current.value = ''
+    useImperativeHandle(ref, () => ({
+        clearInput() {
+            TextInputRef.current.value = '';
         },
-        getValue(){
-            const value =TextInputRef.current.value
-            return value
+        getValue() {
+            return TextInputRef.current.value;
         },
         focusInput() {
             TextInputRef.current?.focus();
         },
-        setValue(value:string){
-            TextInputRef.current.value = value
+        setValue(value: string) {
+            TextInputRef.current.value = value;
         },
-
-        handleReactionClick(reaction:{emoji:string}){
-            
+        handleReactionClick(reaction: { emoji: string }) {
             if (TextInputRef.current) {
-                const { selectionStart, selectionEnd } = TextInputRef.current
-
+                const { selectionStart, selectionEnd } = TextInputRef.current;
                 const newText = textState.slice(0, selectionStart!) + reaction.emoji + textState.slice(selectionEnd!);
-                TextInputRef.current.value = newText 
+                TextInputRef.current.value = newText;
                 setTextState(newText);
-          
+
                 setTimeout(() => {
-                  if (TextInputRef.current) {
-                   TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + reaction.emoji.length;
-                    TextInputRef.current.focus();
-                  }
+                    if (TextInputRef.current) {
+                        TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + reaction.emoji.length;
+                        TextInputRef.current.focus();
+                    }
                 }, 0);
-        };
-        },
-
-        getCursor() {
-            const { selectionStart, selectionEnd } = TextInputRef.current!;
-            return { selectionStart, selectionEnd };
-        }
-,        
-handleMention() {
-    if (TextInputRef.current) {
-        const { selectionStart, selectionEnd } = TextInputRef.current;
-        const newText = textState.slice(0, selectionStart!) + '@' + textState.slice(selectionEnd!);
-        TextInputRef.current.value = newText; 
-        setTextState(newText);
-        setTimeout(() => {
-            if (TextInputRef.current) {
-                TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + 1;
-                TextInputRef.current.focus();
             }
-        }, 0);
-    }
-}
+        },
+        handleMention() {
+            if (TextInputRef.current) {
+                const { selectionStart, selectionEnd } = TextInputRef.current;
+                const newText = textState.slice(0, selectionStart!) + '@' + textState.slice(selectionEnd!);
+                TextInputRef.current.value = newText;
+                setTextState(newText);
 
-
-    }))
+                setTimeout(() => {
+                    if (TextInputRef.current) {
+                        TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + 1;
+                        TextInputRef.current.focus();
+                    }
+                }, 0);
+            }
+        },
+    }));
 
     const detectMention = async () => {
-      const mentionRegex = /@(\w+)$/; // Matches '@' followed by alphanumeric characters.
-      const mentionMatch = textState.slice(0, cursorPosition).match(mentionRegex);
-      if (!mentionMatch) {
-          setShowSuggestions(false);
-          return;
-      }
-      
-      const query = mentionMatch[1]; // Captures the text after '@'.
-      if (!query) {
-          setShowSuggestions(false);
-          return;
-      }
-  
-      try {
-          const { searchResult, error } = await getUserListByShortName({ shortName: query, pageParams: 1 });
-          if (error) throw new Error(error);
-          setIfMentionExist(!!searchResult?.length);
-          setUsers(searchResult);
-          setShowSuggestions(!!searchResult?.length);
-      } catch (err) {
-          toast.error(err.message);
-          setIfMentionExist(false);
-          setShowSuggestions(false);
-      }
-  };
+        const mentionIndex = textState?.lastIndexOf('@');
+        if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
+            const query = textState.substring(mentionIndex + 1, cursorPosition);
+            if (query) {
+                const { searchResult, error } = await getUserListByShortName({ shortName: query, pageParams: 1 });
+                if (error) {
+                    toast.error(error);
+                    setIfMentionExist(false);
+                    return;
+                }
+                if (!searchResult[0]) {
+                    setIfMentionExist(false);
+                } else if (isUserChoose) {
+                    setIfMentionExist(true);
+                } else {
+                    setIfMentionExist(false);
+                }
+                setUsers(searchResult);
+                setShowSuggestions(true);
+            }
+        } else {
+            setShowSuggestions(false);
+        }
+    };
 
-  
-  const debouncedDetectInput = useCallback(
-    _.debounce(detectMention, 300, { leading: true, trailing: false }),
-    [textState]
-);
+    const debouncedDetectInput = useCallback(_.debounce(detectMention, 600), [textState]);
 
-useEffect(() => {
-    debouncedDetectInput();
-    return () => debouncedDetectInput.cancel();
-}, [textState, cursorPosition]);
-
-
+    useEffect(() => {
+        if (isUserChoose) {
+            setUserChoose(false);
+            return () => null;
+        }
+        debouncedDetectInput();
+        return () => debouncedDetectInput.cancel();
+    }, [textState, cursorPosition, debouncedDetectInput]);
 
     const handleUserClick = (user: ExtendedUser) => {
-        setUserChoose(true)
+        setUserChoose(true);
         const mentionIndex = textState?.lastIndexOf('@');
-        const newValue = `${textState?.substring(0,mentionIndex)}@${user.shortName} `
-        TextInputRef.current?.focus();
-        TextInputRef.current.value = newValue
-
-
+        const newValue = `${textState?.substring(0, mentionIndex)}@${user.shortName} `;
+        TextInputRef.current.value = newValue;
         setTextState(newValue);
         setShowSuggestions(false);
     };
+
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const target = e.target;
-      setCursorPosition(target.selectionStart);
-      setTextState(target.value);
-  };
-  
+        const target = e.target;
+        const cursorPos = target.selectionStart;
+        setCursorPosition(cursorPos);
+        setTextState(target.value);
+    };
+  useEffect(()=>{console.log('isUserChoose',isUserChoose),[isUserChoose]})
     return (
         <section id="inputAria" className={className}>
             <meta name="viewport" 
                   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
-            {/* <Textarea 
+            <Textarea 
                 ref={TextInputRef}
                 onChange={(e)=>handleInputChange(e)}
                 disabled={isUploading||false}
@@ -178,25 +159,28 @@ useEffect(() => {
                 onFocus={onFocus}
                 onBlur={onBlur}
 
-            /> */}
-            <CustomTextareaWithMentions 
-          />
+            />
+            {/* <CustomTextareaWithMentions 
+          /> */}
 
-            {/* {showSuggestions&&(
+            {showSuggestions&&(
             <>
-                    {users?.map(user=>(
+            <div className="absolute mt-4 right-0  bg-black border border-white 
+                                rounded-md
+                                z-[100]
+                                transition-opacity
+                                
+                                ">
+                                   
+            {users?.map(user=>(
                         <div 
                             key={user.id}
                             className={`
-                                absolute
-                                mt-4
                                 ${suggestionsClass}
-                                bg-black border-white 
-                                rounded-md 
                                 py-[4px]
                                 px-3
-                                z-[100]
-                                transition-opacity
+                                 hover:bg-slate-800 rounded-md
+                                 border-b border-dotted border-gray
                                 `}>
                         <div className="flex gap-2">
                             {user.image?(
@@ -205,11 +189,11 @@ useEffect(() => {
                                 width={25}
                                 height={20}
                                 alt={user.name||`Author`}
-                                className="rounded-full"
+                                className="rounded-full "
                                 />
                             ):(
-                                <div className="flex justify-center align-middle items-center border-2 rounded-full w-[40px] h-[40px]">
-                                    <FaUser color="white" className="scale-110 "/>
+                                <div className="flex justify-center align-middle items-center border-2 rounded-full w-[30px] h-[30px] p-1 ml-[-1px]">
+                                    <FaUser color="white" className="scale-100 "/>
                                 </div>
                             )}
                         
@@ -220,11 +204,16 @@ useEffect(() => {
                                 list-none
                                 cursor-pointer"
                             >{user.name}</li>
+                            
                     </div>
+                   
                     </div>
+                    
                     ))}
+            </div>
+                    
             </>
-            )} */}
+            )}
 
         </section>
       );    

@@ -1,0 +1,43 @@
+/* Mentions.css */
+
+/* Main control area (the outer input container) */
+.my-mentions-control {
+    font-size: 14px;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    background-color: #000; /* Dark background */
+    color: #000; /* This is the text color. Adjust as needed. */
+  }
+  
+  /* Highlighter (the overlay that highlights mentions) */
+  .my-mentions-highlighter {
+    overflow: hidden;
+  }
+  
+  /* Actual input field for typing text */
+  .my-mentions-input {
+    margin: 0;
+    color: #fff; /* White text inside the dark background */
+  }
+  
+  /* Suggestions dropdown list */
+  .my-mentions-suggestions-list {
+    background-color: #000; /* Dark background */
+    border: 1px solid #333;
+    border-radius: 4px;
+    max-height: 150px;
+    overflow-y: auto;
+    color: #fff;
+  }
+  
+  /* Single suggestion item */
+  .my-mentions-suggestions-item {
+    padding: 8px;
+    color: #000;
+  }
+  
+  /* Focused (hovered/selected) suggestion item */
+  .my-mentions-suggestions-item--focused {
+    background-color: #333;
+  }
+  

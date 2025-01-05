@@ -272,7 +272,7 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
     
             userFriendsList.push(...userFriendsListRight)
             
-            console.log('totalFriendsCount',userFriendsList)
+            // console.log('totalFriendsCount',userFriendsList)
 
         return {success:true,profileFirendsList:userFriendsList,totalFriendsCount}
     } catch (error) {

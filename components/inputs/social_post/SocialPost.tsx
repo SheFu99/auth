@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { MentionsInput, Mention } from "react-mentions";
 import { getUserListByShortName } from "@/actions/search/users";
-
+import './socialPostInput.css'
 export default function CustomTextareaWithMentions() {
   const [text, setText] = useState("");
 
   // React Mentions calls this function with (query, callback)
   // whenever the user types after '@'
+ 
+
+
   const getUserSuggestionList = async (query: string, callback: any) => {
     if (!query) {
       // If there's no search term, return an empty array
@@ -23,6 +26,8 @@ export default function CustomTextareaWithMentions() {
       const { searchResult, error } = await getUserListByShortName({
         shortName: query,
         pageParams: 1,
+
+
       });
       console.log("searchResult", searchResult);
 
@@ -50,49 +55,19 @@ export default function CustomTextareaWithMentions() {
   return (
     <MentionsInput
     value={text}
+    placeholder="Type something here..."
     onChange={(e) => setText(e.target.value)}
-    style={{
-      control: {
-        // The textarea container styling
-        fontSize: "14px",
-        backgroundColor: "#fdfdfd",
-        border: "1px solid #ccc",
-        padding: "0.5rem",
-      },
-      highlighter: {
-        // The hidden highlighter layer
-        padding: "0.5rem",
-        overflow: "hidden",
-      },
-      input: {
-        // The actual text area
-        margin: 0,
-        fontSize: "14px",
-        fontFamily: "inherit",
-        color: "#333",
-      },
-      suggestions: {
-        // The suggestions dropdown
-        list: {
-          backgroundColor: "white",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          fontSize: "14px",
-          // you can add shadows, maxHeight, etc.
-          boxShadow: "0 2px 5px rgba(0,0,0,0.15)",
-          maxHeight: "200px",
-          overflowY: "auto",
-        },
-        item: {
-          padding: "8px 12px",
-          borderBottom: "1px solid #eee",
-          cursor: "pointer",
-          // style when hovered or focused
-          "&focused": {
-            backgroundColor: "#e6f7ff",
-          },
-        },
-      },
+    classNames={{
+      control: "relative w-full",
+      input: `
+      flex min-h-[30px] w-full
+      rounded-md bg-background px-3 py-2 text-xl ring-offset-background
+      placeholder:text-xl placeholder:text-white  
+      focus:placeholder:text-neutral-600          
+      focus:border-none focus:outline-none focus-visible:outline-none
+      disabled:cursor-not-allowed disabled:opacity-50
+      resize-none
+    `,
     }}
   >
     <Mention
@@ -101,6 +76,7 @@ export default function CustomTextareaWithMentions() {
       markup="@[__id__]"
       displayTransform={(id) => `@${id}`}
     />
+
   </MentionsInput>
   
   );
