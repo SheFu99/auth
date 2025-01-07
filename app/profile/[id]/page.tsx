@@ -39,7 +39,7 @@ console.log('GEneratedIdFormHeadder',id)
 export default async function PublicProfileParams({
   params
 }) {
-  const paramsid =  params.id
+  const paramsid =  params?.id
   const {profile,error,friendStatus}= await getProfileByShortName(paramsid)
   // console.log('error',friendStatus)
   // console.log('profile?.userId',profile?.userId)

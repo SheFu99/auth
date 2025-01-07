@@ -61,7 +61,7 @@ const IncomeOfferList = () => {
                 <div>
                 <h3 className="text-center w-full mt-2 mb-2">You have 🆕 friends offer: {userList.length}</h3>
                 {userList?.map((user,index)=>(
-                    <div className="flex space-y-2 flex-wrap bg-slate-800 rounded-md mb-2">
+                    <div className="flex space-y-2 flex-wrap bg-slate-800 rounded-md mb-2" key={index}>
                       
                     <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full "key={index}> 
                     
