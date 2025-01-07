@@ -28,7 +28,7 @@
 }
 
 /* Highlight mentions inside the editor */
-.mention-highlight {
+.m-hlt {
   background-color: #0073e6; /* Blue background */
   color: white; /* White text */
   font-weight: bold; /* Bold text */
@@ -37,6 +37,6 @@
   cursor: pointer; /* Pointer cursor */
 }
 
-.mention-highlight:hover {
+.m-hlt:hover {
   background-color: #005bb5; /* Darker blue on hover */
 }

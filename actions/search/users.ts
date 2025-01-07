@@ -46,6 +46,13 @@ export const getUserListByName = async ({ name, pageParams }: GetUserListParams)
             },
             take: pageSize,
             skip: skip,
+            select:{
+                id:true,
+                image:true,
+                role:true,
+                name:true,
+                shortName:true
+            },
 
         });
 
@@ -94,6 +101,13 @@ try {
             //     }
             // }
             
+        },
+        select:{
+            id:true,
+            image:true,
+            role:true,
+            name:true,
+            shortName:true
         },
         take:pageSize,
         skip:skip,

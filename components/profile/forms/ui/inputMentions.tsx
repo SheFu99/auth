@@ -7,12 +7,6 @@ import { FaUser } from "react-icons/fa";
 import _ from 'lodash';
 import { toast } from "sonner";
 import { MentionInputRef } from "@/components/types/globalTs";
-import { Editor } from "@tiptap/core";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Mention from "@tiptap/extension-mention";
-import { Placeholder } from '@tiptap/extension-placeholder';
-import './mentionStyle.css'
 
 interface InputMentionsProps {
     shouldAnimate?: boolean;
@@ -45,73 +39,54 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
     const [isUserChoose, setUserChoose] = useState(false);
     const [users, setUsers] = useState<ExtendedUser[]>();
-  
+    const TextInputRef = useRef<HTMLTextAreaElement>();
 
-    const editor = useEditor({
-        extensions: [
-          StarterKit,
-          Mention.configure({
-            HTMLAttributes: {
-              class: "mention-highlight",
-            },
-            
-            suggestion: {
-              items: async ({ query }) => {
-                const response = await getUserListByShortName({
-                  shortName: query,
-                  pageParams: 1,
-                });
-                return response.searchResult || [];
-              },
-            },
-          }),
-          Placeholder.configure({
-            placeholder: 'You can type here...', // Placeholder text
-         
-          }),
-        ],
-        content: "",
-        onUpdate: ({ editor }) => {
-          const content = editor.getText();
-          setTextState?.(content);
-          const cursorPos = editor.state.selection.from;
-          setCursorPosition?.(cursorPos);
+    useImperativeHandle(ref, () => ({
+        clearInput() {
+            TextInputRef.current.value = '';
         },
-        onFocus: () => {
-          onFocus?.();
+        getValue() {
+            return TextInputRef.current.value;
         },
-        onBlur: () => {
-          onBlur?.();
+        focusInput() {
+            TextInputRef.current?.focus();
         },
-      });
-  
-      // Use `useImperativeHandle` to expose methods to the parent
-      useImperativeHandle(ref, () => ({
-        clearInput: () => {
-          editor?.commands.clearContent();
+        setValue(value: string) {
+            TextInputRef.current.value = value;
         },
-        getValue: () => {
-          return editor?.getText() || "";
+        handleReactionClick(reaction: { emoji: string }) {
+            if (TextInputRef.current) {
+                const { selectionStart, selectionEnd } = TextInputRef.current;
+                const newText = textState.slice(0, selectionStart!) + reaction.emoji + textState.slice(selectionEnd!);
+                TextInputRef.current.value = newText;
+                setTextState(newText);
+
+                setTimeout(() => {
+                    if (TextInputRef.current) {
+                        TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + reaction.emoji.length;
+                        TextInputRef.current.focus();
+                    }
+                }, 0);
+            }
         },
-        focusInput: () => {
-          editor?.commands.focus();
+        handleMention() {
+            if (TextInputRef.current) {
+                const { selectionStart, selectionEnd } = TextInputRef.current;
+                const newText = textState.slice(0, selectionStart!) + '@' + textState.slice(selectionEnd!);
+                TextInputRef.current.value = newText;
+                setTextState(newText);
+
+                setTimeout(() => {
+                    if (TextInputRef.current) {
+                        TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + 1;
+                        TextInputRef.current.focus();
+                    }
+                }, 0);
+            }
         },
-        setValue: (value: string) => {
-          editor?.commands.setContent(value);
-        },
-        handleReactionClick: (reaction: { emoji: string }) => {
-          editor?.commands.insertContent(reaction.emoji);
-        },
-        handleMention: () => {
-          editor?.commands.insertContent("@");
-        },
-      }));
-  
-      
+    }));
 
     const detectMention = async () => {
-
-        ////use reg-ex insted of lastindexof()
         const mentionIndex = textState?.lastIndexOf('@');
         if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
             const query = textState.substring(mentionIndex + 1, cursorPosition);
@@ -152,32 +127,35 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
         setUserChoose(true);
         const mentionIndex = textState?.lastIndexOf('@');
         const newValue = `${textState?.substring(0, mentionIndex)}@${user.shortName} `;
-        editor?.commands.setContent(newValue);
-        
+        TextInputRef.current.value = newValue;
         setTextState(newValue);
         setShowSuggestions(false);
     };
 
-
-    
-  useEffect(()=>{console.log('showSuggestions',showSuggestions),[showSuggestions]})
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const target = e.target;
+        const cursorPos = target.selectionStart;
+        setCursorPosition(cursorPos);
+        setTextState(target.value);
+    };
+  useEffect(()=>{console.log('isUserChoose',isUserChoose),[isUserChoose]})
     return (
         <section id="inputAria" className={className}>
             <meta name="viewport" 
                   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
-                 <div
-                    className={`editor-wrapper ${shouldAnimate ? 'animate-shake' : ''} ${className}`}
-                    tabIndex={-1} // Allows the wrapper to participate in the focus chain
-                    >
-                        <EditorContent editor={editor}
-                  
-                            />
-                </div> 
+            <Textarea 
+                ref={TextInputRef}
+                onChange={(e)=>handleInputChange(e)}
+                disabled={isUploading||false}
+                className={`${shouldAnimate ? 'animate-shake' : ''} `}
+                placeholder="Type your message here." 
+                onFocus={onFocus}
+                onBlur={onBlur}
+            />
             {/* <CustomTextareaWithMentions/> */}
 
             {showSuggestions&&(
             <>
-            
             <div className="absolute mt-4 right-2 
                                 bg-black border 
                                 border-white 
@@ -215,16 +193,17 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
                         
                             <li
                                 key={user.id}
-                                className="list-none">
-                            {user.name}
-                            </li>
+                                
+                                className="
+                                list-none
+                               "
+                            >{user.name}</li>
                             
                     </div>
                    
                     </div>
                     
                     ))}
-
             </div>
                     
             </>

@@ -60,7 +60,7 @@ const PostCard:React.FC<PostCardWithStateProps> = ({postId,currentUser,userId}) 
     const [isPending,startTransition]=useTransition()
     const commentFormRef = useRef<HTMLTextAreaElement>(null)
     const {createComment}=usePostCommentMutations(postId)
-    const firstImage = post.image[0]
+   
     
   
     const Postlike =  (postId: string) => {
