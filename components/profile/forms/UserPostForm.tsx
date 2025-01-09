@@ -18,8 +18,9 @@ import { PostQueryPromise } from "../post/lib/usePost";
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ImageBlobList from "./ui/ImageBlobList";
-import InputMentions, { MentionInputRef } from "./ui/inputMentions";
+import InputMentions from "./ui/inputMentions";
 import useInViewRelational from "../post/postCard/helpers/useInView(relational)";
+import { MentionInputRef } from "@/components/types/globalTs";
 
 const Picker = dynamic(() => import('emoji-picker-react'), {
     loading: () => <BeatLoader color="white" />,
@@ -94,12 +95,12 @@ const UserPostForm = () => {
 
         try {
             postSchema.parse({ text: textState });
-            if (!isMentionExist) {
-                const error = 'User is not found';
-                onError(error);
-                setIsUploading(false);
-                return null;
-            }
+            // if (!isMentionExist) {
+            //     const error = 'User is not found';
+            //     onError(error);
+            //     setIsUploading(false);
+            //     return null;
+            // }
         } catch (error) {
             onError(error);
             setIsUploading(false);
@@ -127,7 +128,9 @@ const UserPostForm = () => {
                 });
         });
     };
-
+///debug_effects
+useEffect(()=>{console.log('textState',textState)},[textState])
+///
     const handleReactionClick = (reaction) => {
         TextInputRef.current?.handleReactionClick(reaction);
         TextInputRef.current?.focusInput();

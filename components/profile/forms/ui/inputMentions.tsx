@@ -7,6 +7,15 @@ import { FaUser } from "react-icons/fa";
 import _ from 'lodash';
 import { toast } from "sonner";
 import { MentionInputRef } from "@/components/types/globalTs";
+import { Editor } from "@tiptap/core";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Mention from "@tiptap/extension-mention";
+import { Placeholder } from '@tiptap/extension-placeholder';
+import './mentionStyle.css'
+import { useDetectMention } from "@/lib/reactQueryHooks/mentionQuery";
+import { useSession } from "next-auth/react";
+import { QueryClient, useQuery } from "@tanstack/react-query";
 
 interface InputMentionsProps {
     shouldAnimate?: boolean;
@@ -39,59 +48,107 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
     const [isUserChoose, setUserChoose] = useState(false);
     const [users, setUsers] = useState<ExtendedUser[]>();
-    const TextInputRef = useRef<HTMLTextAreaElement>();
+    const [selectedMentionLength,setSelectedMentionLength] = useState<number|null>(0)
+    const { data: session, status } = useSession();
+    const user = session.user
+    let mentionLength:number
 
-    useImperativeHandle(ref, () => ({
-        clearInput() {
-            TextInputRef.current.value = '';
-        },
-        getValue() {
-            return TextInputRef.current.value;
-        },
-        focusInput() {
-            TextInputRef.current?.focus();
-        },
-        setValue(value: string) {
-            TextInputRef.current.value = value;
-        },
-        handleReactionClick(reaction: { emoji: string }) {
-            if (TextInputRef.current) {
-                const { selectionStart, selectionEnd } = TextInputRef.current;
-                const newText = textState.slice(0, selectionStart!) + reaction.emoji + textState.slice(selectionEnd!);
-                TextInputRef.current.value = newText;
-                setTextState(newText);
 
-                setTimeout(() => {
-                    if (TextInputRef.current) {
-                        TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + reaction.emoji.length;
-                        TextInputRef.current.focus();
-                    }
-                }, 0);
-            }
+    const editor = useEditor({
+        extensions: [
+          StarterKit,
+          Mention.configure({
+            HTMLAttributes: {
+              class: "m-hlt",
+            },
+            
+            suggestion: {
+              items: async ({ query }) => {
+                const response = await getUserListByShortName({
+                  shortName: query,
+                  pageParams: 1,
+                });
+                
+                return response.searchResult || [];
+                
+              },
+              
+            },
+          }),
+          Placeholder.configure({
+            placeholder: 'You can type here...', // Placeholder text
+         
+          }),
+        ],
+        content: "",
+        onUpdate: ({ editor }) => {
+          const contentHTML = editor.getHTML()
+          console.log(contentHTML,'contentHTML')
+          const content = editor.getText();
+          setTextState?.(content);
+          const cursorPos = editor.state.selection.from +selectedMentionLength;
+          console.log(cursorPos,'cursorPos')
+          
+          setCursorPosition?.(cursorPos);
         },
-        handleMention() {
-            if (TextInputRef.current) {
-                const { selectionStart, selectionEnd } = TextInputRef.current;
-                const newText = textState.slice(0, selectionStart!) + '@' + textState.slice(selectionEnd!);
-                TextInputRef.current.value = newText;
-                setTextState(newText);
-
-                setTimeout(() => {
-                    if (TextInputRef.current) {
-                        TextInputRef.current.selectionStart = TextInputRef.current.selectionEnd = selectionStart! + 1;
-                        TextInputRef.current.focus();
-                    }
-                }, 0);
-            }
+        onFocus: () => {
+          onFocus?.();
         },
-    }));
-
+        onBlur: () => {
+          onBlur?.();
+        },
+      });
+  
+      // Use `useImperativeHandle` to expose methods to the parent
+      useImperativeHandle(ref, () => ({
+        clearInput: () => {
+          editor?.commands.clearContent();
+        },
+        getValue: () => {
+          return editor?.getText() || "";
+        },
+        focusInput: () => {
+          editor?.commands.focus();
+        },
+        setValue: (value: string) => {
+          editor?.commands.setContent(value);
+        },
+        handleReactionClick: (reaction: { emoji: string }) => {
+          editor?.commands.insertContent(reaction.emoji);
+        },
+        handleMention: () => {
+          editor?.commands.insertContent("@");
+        },
+      }));
+  
+      
+      const { data, isLoading, isError } = useDetectMention(textState, cursorPosition, user.id);
+      console.log('data',data,isError)
     const detectMention = async () => {
+    //   const mentionRange = editor.state.plugins
+    //   .find(plugin => plugin.key === "mention$")
+    //   ?.getState(editor.state)?.range;
+
+    // if (!mentionRange) return; // Ensure the range exists
         const mentionIndex = textState?.lastIndexOf('@');
-        if (mentionIndex !== -1 && cursorPosition > mentionIndex) {
-            const query = textState.substring(mentionIndex + 1, cursorPosition);
-            if (query) {
-                const { searchResult, error } = await getUserListByShortName({ shortName: query, pageParams: 1 });
+        // console.log('mentionIndex',mentionIndex)
+        const shouldFetch = mentionIndex !== -1 && cursorPosition > mentionIndex;
+        
+        const query = textState?.substring(mentionIndex + 1, cursorPosition);
+        
+        console.log('shouldFetch',mentionIndex,query,cursorPosition)
+      //   const {data,isLoading} = useQuery({
+      //     queryKey:['mentions', { user, query }],
+      //     queryFn:()=> getUserListByShortName({ shortName: query, pageParams: 1 }),
+      //     enabled:shouldFetch
+      //   }
+      // )
+        if (shouldFetch) {
+          if (query) {
+            const {searchResult,error} = data
+                // const { searchResult, error } = await getUserListByShortName({ shortName: query, pageParams: 1 });
+                console.log('query error:',data,error,isLoading)
+
                 if (error) {
                     toast.error(error);
                     setIfMentionExist(false);
@@ -112,7 +169,7 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
         }
     };
 
-    const debouncedDetectInput = useCallback(_.debounce(detectMention, 600), [textState]);
+    const debouncedDetectInput = useCallback(_.debounce(detectMention, 600), [data]);
 
     useEffect(() => {
         if (isUserChoose) {
@@ -121,41 +178,57 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
         }
         debouncedDetectInput();
         return () => debouncedDetectInput.cancel();
-    }, [textState, cursorPosition, debouncedDetectInput]);
+    }, [data, debouncedDetectInput]);
 
+    
     const handleUserClick = (user: ExtendedUser) => {
+      const id = user.id
+      const label = user.shortName
+      setSelectedMentionLength((prev)=>prev+label.length)
         setUserChoose(true);
         const mentionIndex = textState?.lastIndexOf('@');
-        const newValue = `${textState?.substring(0, mentionIndex)}@${user.shortName} `;
-        TextInputRef.current.value = newValue;
+     
+        const newValue = `${textState?.substring(0, mentionIndex)}@${user.shortName} `; 
+        // editor?.commands.setContent(newValue);
+        // const editorState = editor.state
+        const mentionRange = editor.state.plugins
+            .find(plugin => plugin?.key === "mention$")
+            ?.getState(editor.state)?.range;
+        console.log('mentionRange,mentionIndex:',mentionRange,mentionIndex)
+          if (!mentionRange) return; // Ensure the range exists
+        const { from, to } = mentionRange;
+
+        console.log('newValue',newValue)
+        editor.chain().focus().deleteRange({
+          from: from -1, // Start deleting after the @
+          to: to, 
+        }).insertContent([
+          { type: "mention", attrs: { id, label } }, 
+        ]).run();
         setTextState(newValue);
         setShowSuggestions(false);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const target = e.target;
-        const cursorPos = target.selectionStart;
-        setCursorPosition(cursorPos);
-        setTextState(target.value);
-    };
-  useEffect(()=>{console.log('isUserChoose',isUserChoose),[isUserChoose]})
+
+    
+  useEffect(()=>{console.log('showSuggestions',showSuggestions),[showSuggestions]})
     return (
         <section id="inputAria" className={className}>
             <meta name="viewport" 
                   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
-            <Textarea 
-                ref={TextInputRef}
-                onChange={(e)=>handleInputChange(e)}
-                disabled={isUploading||false}
-                className={`${shouldAnimate ? 'animate-shake' : ''} `}
-                placeholder="Type your message here." 
-                onFocus={onFocus}
-                onBlur={onBlur}
-            />
+                 <div
+                    className={`editor-wrapper ${shouldAnimate ? 'animate-shake' : ''} ${className}`}
+                    tabIndex={-1} // Allows the wrapper to participate in the focus chain
+                    >
+                        <EditorContent editor={editor}
+                  
+                            />
+                </div> 
             {/* <CustomTextareaWithMentions/> */}
 
             {showSuggestions&&(
             <>
+            
             <div className="absolute mt-4 right-2 
                                 bg-black border 
                                 border-white 
@@ -176,12 +249,12 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
                                  border-b border-dotted border-gray
                                   cursor-pointer
                                 `}>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
                             {user.image?(
                                 <Image
                                 src={user.image}
-                                width={25}
-                                height={20}
+                                width={24}
+                                height={19}
                                 alt={user.name||`Author`}
                                 className="rounded-full "
                                 />
@@ -193,17 +266,16 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
                         
                             <li
                                 key={user.id}
-                                
-                                className="
-                                list-none
-                               "
-                            >{user.name}</li>
+                                className="list-none text-sm  ">
+                            {user.name}
+                            </li>
                             
                     </div>
                    
                     </div>
                     
                     ))}
+
             </div>
                     
             </>
