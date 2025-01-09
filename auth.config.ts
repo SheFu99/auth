@@ -112,14 +112,14 @@ jwt:{
         // console.log("User in JWT Callback:", account);
         console.log('TokenExpires:',token.accessTokenExpires )
       }
-      // const BUFFER_TIME = 30000;
-      // if (Date.now() > ((token.accessTokenExpires as number) * 1000)- BUFFER_TIME) {
-      //   ///TODO: if provider is credentials, send verfification email 
-      //   console.log("Refreshing_token_inProgress",Date.now())
+      const BUFFER_TIME = 30000;
+      if (Date.now() > ((token.accessTokenExpires as number) * 1000)- BUFFER_TIME) {
+        ///TODO: if provider is credentials, send verfification email 
+        console.log("Refreshing_token_inProgress",Date.now())
      
-      //   return refreshAccessToken(token)
+        return refreshAccessToken(token)
 
-      // }
+      }
       const userInDb = await db.user.findUnique({
         where:{
           id: token.sub
