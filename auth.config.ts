@@ -120,18 +120,25 @@ jwt:{
         return refreshAccessToken(token)
 
       }
-      const userInDb = await db.user.findUnique({
-        where:{
-          id: token.sub
-        },
-        select:{
-          shortName:true,
-          role:true
-        }
-      })
-      token.role = userInDb.role
-      token.shortName = userInDb.shortName as string
-      return token;
+try {
+  const userInDb = await db.user.findUnique({
+    where:{
+      id: token.sub
+    },
+    select:{
+      shortName:true,
+      role:true
+    }
+  })
+  console.log('userInDb',userInDb)
+  token.role = userInDb.role
+  token.shortName = userInDb.shortName as string
+  return token;
+} catch (error) {
+  console.log('userInDb','error',error)
+  return error
+}
+      
     },
 
     async session({ session, token }) {
