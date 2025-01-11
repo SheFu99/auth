@@ -1,5 +1,4 @@
 import { getUserListByShortName } from "@/actions/search/users";
-import { Textarea } from "@/components/ui/textarea";
 import { ExtendedUser } from "@/next-auth";
 import Image from "next/image";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -7,15 +6,15 @@ import { FaUser } from "react-icons/fa";
 import _ from 'lodash';
 import { toast } from "sonner";
 import { MentionInputRef } from "@/components/types/globalTs";
-import { Editor } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Mention from "@tiptap/extension-mention";
 import { Placeholder } from '@tiptap/extension-placeholder';
 import './mentionStyle.css'
-import { useDetectMention } from "@/lib/reactQueryHooks/mentionQuery";
+import { useMention } from "@/lib/reactQueryHooks/mentionQuery";
 import { useSession } from "next-auth/react";
-import { QueryClient, useQuery } from "@tanstack/react-query";
+import { BeatLoader } from "react-spinners";
+
 
 interface InputMentionsProps {
     shouldAnimate?: boolean;
@@ -34,25 +33,19 @@ interface InputMentionsProps {
 
 const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
     shouldAnimate,
-    isUploading,
-    textState,
     setTextState,
-    setCursorPosition,
-    cursorPosition,
     onFocus,
     onBlur,
     className,
     suggestionsClass,
-    setIfMentionExist,
 }, ref) => {
-    const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-    const [isUserChoose, setUserChoose] = useState(false);
-    const [users, setUsers] = useState<ExtendedUser[]>();
-    const [selectedMentionLength,setSelectedMentionLength] = useState<number|null>(0)
+    const [query ,setQuery]=useState<string|undefined>(undefined)
     const { data: session, status } = useSession();
     const user = session.user
-    let mentionLength:number
-
+    if(!user){
+      return
+    }
+    const {data,isLoading,error}=useMention({query:query,userId:user?.id})
 
     const editor = useEditor({
         extensions: [
@@ -62,18 +55,7 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
               class: "m-hlt",
             },
             
-            suggestion: {
-              items: async ({ query }) => {
-                const response = await getUserListByShortName({
-                  shortName: query,
-                  pageParams: 1,
-                });
-                
-                return response.searchResult || [];
-                
-              },
-              
-            },
+            
           }),
           Placeholder.configure({
             placeholder: 'You can type here...', // Placeholder text
@@ -82,14 +64,19 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
         ],
         content: "",
         onUpdate: ({ editor }) => {
-          const contentHTML = editor.getHTML()
-          console.log(contentHTML,'contentHTML')
+          let mentionPlugin =  editor.state.plugins.find(plugin => plugin?.key === "mention$");
+
+          // const contentHTML = editor.getHTML()
+          // console.log(editor.state,'contentHTML')
+          console.log(editor,'editor')
           const content = editor.getText();
           setTextState?.(content);
-          const cursorPos = editor.state.selection.from +selectedMentionLength;
-          console.log(cursorPos,'cursorPos')
+
+          const query = mentionPlugin?.getState(editor.state)?.query;
+          console.log('data','query',query)
+          setQuery(query)
+          // console.log('data',data,isError)
           
-          setCursorPosition?.(cursorPos);
         },
         onFocus: () => {
           onFocus?.();
@@ -97,6 +84,9 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
         onBlur: () => {
           onBlur?.();
         },
+        onDestroy:()=>{
+          console.log('OnDestroyCallback')
+        }
       });
   
       // Use `useImperativeHandle` to expose methods to the parent
@@ -121,97 +111,38 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
         },
       }));
   
-      
-      const { data, isLoading, isError } = useDetectMention(textState, cursorPosition, user.id);
-      console.log('data',data,isError)
-    const detectMention = async () => {
-    //   const mentionRange = editor.state.plugins
-    //   .find(plugin => plugin.key === "mention$")
-    //   ?.getState(editor.state)?.range;
-
-    // if (!mentionRange) return; // Ensure the range exists
-        const mentionIndex = textState?.lastIndexOf('@');
-        // console.log('mentionIndex',mentionIndex)
-        const shouldFetch = mentionIndex !== -1 && cursorPosition > mentionIndex;
-        
-        const query = textState?.substring(mentionIndex + 1, cursorPosition);
-        
-        console.log('shouldFetch',mentionIndex,query,cursorPosition)
-      //   const {data,isLoading} = useQuery({
-      //     queryKey:['mentions', { user, query }],
-      //     queryFn:()=> getUserListByShortName({ shortName: query, pageParams: 1 }),
-      //     enabled:shouldFetch
-      //   }
-      // )
-        if (shouldFetch) {
-          if (query) {
-            const {searchResult,error} = data
-                // const { searchResult, error } = await getUserListByShortName({ shortName: query, pageParams: 1 });
-                console.log('query error:',data,error,isLoading)
-
-                if (error) {
-                    toast.error(error);
-                    setIfMentionExist(false);
-                    return;
-                }
-                if (!searchResult[0]) {
-                    setIfMentionExist(false);
-                } else if (isUserChoose) {
-                    setIfMentionExist(true);
-                } else {
-                    setIfMentionExist(false);
-                }
-                setUsers(searchResult);
-                setShowSuggestions(true);
-            }
-        } else {
-            setShowSuggestions(false);
-        }
-    };
-
-    const debouncedDetectInput = useCallback(_.debounce(detectMention, 600), [data]);
-
-    useEffect(() => {
-        if (isUserChoose) {
-            setUserChoose(false);
-            return () => null;
-        }
-        debouncedDetectInput();
-        return () => debouncedDetectInput.cancel();
-    }, [data, debouncedDetectInput]);
-
     
     const handleUserClick = (user: ExtendedUser) => {
       const id = user.id
       const label = user.shortName
-      setSelectedMentionLength((prev)=>prev+label.length)
-        setUserChoose(true);
-        const mentionIndex = textState?.lastIndexOf('@');
-     
-        const newValue = `${textState?.substring(0, mentionIndex)}@${user.shortName} `; 
+  
+        
+        
         // editor?.commands.setContent(newValue);
         // const editorState = editor.state
         const mentionRange = editor.state.plugins
             .find(plugin => plugin?.key === "mention$")
             ?.getState(editor.state)?.range;
-        console.log('mentionRange,mentionIndex:',mentionRange,mentionIndex)
+
           if (!mentionRange) return; // Ensure the range exists
+
         const { from, to } = mentionRange;
 
-        console.log('newValue',newValue)
+  
         editor.chain().focus().deleteRange({
-          from: from -1, // Start deleting after the @
+          from: from, // Start deleting after the @
           to: to, 
         }).insertContent([
           { type: "mention", attrs: { id, label } }, 
         ]).run();
-        setTextState(newValue);
-        setShowSuggestions(false);
+        const textState = editor.getText()
+        setTextState(textState);
+        // setShowSuggestions(false);
     };
 
 
     
-  useEffect(()=>{console.log('showSuggestions',showSuggestions),[showSuggestions]})
+  // useEffect(()=>{console.log('showSuggestions',showSuggestions),[showSuggestions]})
     return (
         <section id="inputAria" className={className}>
             <meta name="viewport" 
@@ -226,18 +157,22 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
                 </div> 
             {/* <CustomTextareaWithMentions/> */}
 
-            {showSuggestions&&(
+            {data?.searchResult &&(
             <>
             
             <div className="absolute mt-4 right-2 
-                                bg-black border 
-                                border-white 
+                                bg-card border
+                                border-accent 
                                 rounded-md
                                 z-[100]
                                 transition-opacity
+                                min-w-[210px]
+                                max-h-[150px]
+                                overflow-y-auto
+                                scrollbar-thin scrollbar-thumb-blue scrollbar-track-gray 
                                 ">
                                    
-            {users?.map(user=>(
+            {data?.searchResult?.map(user=>(
                         <div 
                             key={user.id}
                             onClick={()=>handleUserClick(user)}
@@ -245,11 +180,13 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
                                 ${suggestionsClass}
                                 py-[4px]
                                 px-3
-                                 hover:bg-slate-800 rounded-md
+                                 hover:bg-accent rounded-sm
                                  border-b border-dotted border-gray
-                                  cursor-pointer
+                                  cursor-pointer 
+                                  
                                 `}>
-                        <div className="flex gap-2 items-center">
+                                 
+                        <div className="col-span-2 flex gap-2 justify-center items-center">
                             {user.image?(
                                 <Image
                                 src={user.image}
@@ -259,8 +196,8 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
                                 className="rounded-full "
                                 />
                             ):(
-                                <div className="flex justify-center align-middle items-center border-2 rounded-full w-[30px] h-[30px] p-1 ml-[-1px]">
-                                    <FaUser color="white" className="scale-100 "/>
+                                <div className="flex justify-center align-middle items-center border-2 rounded-full w-[25px] h-[25px] p-1 ml-[-1px]">
+                                    <FaUser color="white" className="scale-[80%] "/>
                                 </div>
                             )}
                         
@@ -270,6 +207,7 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
                             {user.name}
                             </li>
                             
+                    
                     </div>
                    
                     </div>
@@ -279,6 +217,15 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
             </div>
                     
             </>
+            )}
+            {isLoading&&(
+                <div className="absolute mt-4 right-20 
+                z-[100]
+                transition-opacity
+                bg-card
+                ">
+                  <BeatLoader color="white"></BeatLoader>
+                </div>
             )}
 
         </section>

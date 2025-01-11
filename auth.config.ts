@@ -15,7 +15,7 @@ import { refreshAccessToken } from "./util/refreshToken";
 export const authConfig: NextAuthOptions = {
   // debug: true,
   // Secret for signing/encrypting tokens
-  secret: process.env.NEXTAUTH_SECRET || randomlasldsaewq123dasd9fjsdv,
+  secret: process.env.NEXTAUTH_SECRET || 'randomlasldsaewq123dasd9fjsdv',
 
   // Authentication Providers
   providers: [
