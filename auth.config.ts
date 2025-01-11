@@ -120,24 +120,24 @@ jwt:{
         return refreshAccessToken(token)
 
       }
-try {
-  const userInDb = await db.user.findUnique({
-    where:{
-      id: token.sub
-    },
-    select:{
-      shortName:true,
-      role:true
-    }
-  })
-  console.log('userInDb',userInDb)
-  token.role = userInDb.role
-  token.shortName = userInDb.shortName as string
-  return token;
-} catch (error) {
-  console.log('userInDb','error',error)
-  return error
-}
+        try {
+          const userInDb = await db.user.findUnique({
+            where:{
+              id: token.sub
+            },
+            select:{
+              shortName:true,
+              role:true
+            }
+          })
+          console.log('userInDb',userInDb)
+          token.role = userInDb.role
+          token.shortName = userInDb.shortName as string
+          return token;
+        } catch (error) {
+          console.log('userInDb','error',error)
+          return error
+        }
       
     },
 
@@ -166,7 +166,8 @@ events:{
             console.log("Signing out and revoking token:", token.accessToken);
 
             // Example: Revoke access token via provider API
-            await fetch("http://localhost:3000/api/tokens/revoke", {
+            const next_public_url = process.env.NEXTAUTH_URL
+            await fetch((`${next_public_url}/api/tokens/revoke`), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token: token.accessToken }),
