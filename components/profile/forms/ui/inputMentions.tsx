@@ -42,9 +42,9 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
     const [query ,setQuery]=useState<string|undefined>(undefined)
     const { data: session, status } = useSession();
     const user = session.user
-    if(!user){
-      return
-    }
+    // if(!user){
+    //   return
+    // }
     const {data,isLoading,error}=useMention({query:query,userId:user?.id})
 
     const editor = useEditor({
@@ -62,6 +62,7 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
          
           }),
         ],
+        immediatelyRender: false,
         content: "",
         onUpdate: ({ editor }) => {
           let mentionPlugin =  editor.state.plugins.find(plugin => plugin?.key === "mention$");
@@ -109,6 +110,7 @@ const InputMentions = forwardRef<MentionInputRef, InputMentionsProps>(({
         handleMention: () => {
           editor?.commands.insertContent("@");
         },
+
       }));
   
     

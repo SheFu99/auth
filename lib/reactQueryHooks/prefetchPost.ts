@@ -5,7 +5,7 @@ import { QueryFunctionContext } from '@tanstack/react-query';
 import { fetchFriendList } from '@/lib/reactQueryHooks/userFriends';
 
 export const prefetchPostList = async (userId:string)=>{
-  console.log("TESET")
+  // console.log("prefetchPostList")
     const queryKey: [string, string] = ['posts',userId] 
     const options = {
       queryKey,
@@ -54,14 +54,14 @@ export const prefetchCommentList = async (postId:string)=>{
 
 export const prefetchFriendList = async (userId:string)=>{
   ///TODO: Make prefetchFriendsList
-  console.log('prefetchFriendList',userId)
+  // console.log('prefetchFriendList',userId)
   const queryKey = ['friendList',userId]
   const options  = {
     queryKey,
     queryFn:({pageParam= ''}:QueryFunctionContext)=> fetchFriendList({cursor:pageParam as Date ,userId}),
     initialPageParam:null,
     getNextPageParam:(lastPage)=>{ 
-      console.log('LastPage:',lastPage?.data)
+      // console.log('LastPage:',lastPage?.data)
       const sorted = lastPage?.data?.sort((a, b) => new Date(a.createdAt).getDate() - new Date(b.createdAt).getDate());
       const index = lastPage?.data?.length-1 
       const cursor = index ? sorted[index]?.createdAt : null

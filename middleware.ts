@@ -48,7 +48,7 @@ export async function middleware(req) {
   const isProfileRoute = path.startsWith("/profile");
   const isPostRoute = path.startsWith("/post/");
   const isApiAuthRoute = path.startsWith(apiAuthPrefix);
-  console.log("ISAPIAUTH",isApiAuthRoute)
+  // console.log("ISAPIAUTH",isApiAuthRoute)
   const isPublicRoute = publicRoutes.includes(path);
   // console.log('isLoggedIn',isPublicRoute)
   const isAuthRoute = authRoutes.includes(path);
@@ -80,7 +80,7 @@ export async function middleware(req) {
     }
     return NextResponse.next();
   }
-console.log('ISloggedin',isLoggedIn)
+console.log('userRole',userRole)
   // Handle non-public routes for unauthenticated users
   if (!isLoggedIn && !isPublicRoute) {
     console.log("NotPublicRoute");

@@ -8,7 +8,7 @@ import { authConfig } from "@/auth.config";
 
 export const currentUser = async () =>{
     const session = await getServerSession(authConfig)
-    console.log('CURRENT_USER_HOOK',session)
+    // console.log('CURRENT_USER_HOOK',session)
     if(!session||session == null){
         return 
     }
@@ -35,12 +35,7 @@ export const currentRole = async () =>{
 
 
 ///protected ADMIN only 
-export const getAllUsers= async () => {
-    const allUsers = await db.user.findMany();
 
-
-    return allUsers
-}
 ///
 
 export const CurrentProfile = async ()=>{

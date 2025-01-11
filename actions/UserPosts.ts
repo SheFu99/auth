@@ -149,7 +149,7 @@ export const CreatePost= async(postCard:PostCard):Promise<createPostPromise>=>{
 ///add cache 
 
 export const GetUserPostsById = async (userId: string,page:number):Promise<postPromise> => {
-    console.log('GET_USERPOST_REQUESTs',page)
+    // console.log('GET_USERPOST_REQUESTs',page)
 if(!userId){
     return {error:'ID required!'}
 }

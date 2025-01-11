@@ -176,7 +176,7 @@ type getOfferProps ={
     success?:boolean
 };
 export const getCurrentUserOffer = async ():Promise<getOfferProps>=>{
-    console.log('getCurrentOfferListActions')
+    // console.log('getCurrentOfferListActions')
         const user = await currentUser()
         if(!user){
             return {error: 'You need to be authorize!'}
@@ -223,13 +223,13 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
     if(!userId){
         return {error:'Profile is not found'}
     }
-    console.log('CURSOR',cursor)
+    // console.log('CURSOR',cursor)
     const isFirstPage:boolean = !cursor
 
     let totalFriendsCount :number
     if(isFirstPage){
         const {error , count} = await getCountFriends(userId)
-        console.log('CountFriends:',count   )
+        // console.log('CountFriends:',count   )
         if(!error){
             totalFriendsCount = count
         }
@@ -310,7 +310,7 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
             
 
             })
-        console.log('CountFriendsInside:',totalFriendsCount)
+        // console.log('CountFriendsInside:',totalFriendsCount)
 
             if(!totalFriendsCount){
                 return {count:0}
@@ -341,7 +341,7 @@ export const getUserFreinds = async (cursor:Date):Promise<getPrivateFriendsPromi
     let totalFriendsCount :number
     if(isFirstPage){
         const {error , count} = await getCountFriends(user.id)
-        console.log('CountFriends:',count   )
+        // console.log('CountFriends:',count   )
         if(!error){
             totalFriendsCount = count
         }

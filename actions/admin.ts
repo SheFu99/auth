@@ -1,6 +1,7 @@
 "use server";
 
-import { currentRole, getAllUsers } from "@/lib/auth";
+import { currentRole } from "@/lib/auth";
+import { db } from "@/lib/db";
 
  const UserRole = {
     ADMIN: "ADMIN",
@@ -12,16 +13,22 @@ import { currentRole, getAllUsers } from "@/lib/auth";
 
 export const admin = async () =>{
     const role =await currentRole();
-   
+    console.log('AdminActionRole:',role)
 
 
     if(role!==UserRole.ADMIN){
         return {error: "Frobidden!"}
     }
         
-
-    const AllUser = await getAllUsers()
+    try {
+        const AllUser =  await db.user.findMany()
+        console.log('AdminActionAllUser:',AllUser)
+        return AllUser
+    } catch (error) {
+        console.log('AdminActionError:',error)
+        return {error}
+    }
     
-    return AllUser
+   
     
 }

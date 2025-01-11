@@ -26,7 +26,7 @@ type fetchSearchPromise ={
 
 const cursorSelect = (friendList:FriendsOffer[])=>{
     // const lastPage = friendList.data.flatMap(page=> page)
-    console.log('cursorSelect',friendList)
+    // console.log('cursorSelect',friendList)
     const sorted = friendList?.sort((a, b) => new Date(a.createdAt).getDate() - new Date(b.createdAt).getDate());
           const index = friendList?.length-1 
           const cursor = index ? sorted[index]?.createdAt : null
@@ -34,15 +34,15 @@ const cursorSelect = (friendList:FriendsOffer[])=>{
 }
 
 export const fetchFriendList = async ({cursor, userId}:fetchFrinendListParams):Promise<FriendsQueryPromise>=>{
-    console.log("fetchFrinendListParams",userId)
+    // console.log("fetchFrinendListParams",userId)
     const {success,profileFirendsList,totalFriendsCount,error}= await getProfileFriends({userId , cursor})
-    console.log("totalFriendsCount:",totalFriendsCount),
-    console.log("profileFirendsList",profileFirendsList)
-    console.log('profileFirendsListError',error)
+    // console.log("totalFriendsCount:",totalFriendsCount),
+    // console.log("profileFirendsList",profileFirendsList)
+    // console.log('profileFirendsListError',error)
 
     const sorted = cursorSelect(profileFirendsList)
 
-    console.log('cursorSelectSorted',sorted)
+    // console.log('cursorSelectSorted',sorted)
 
     if(error) {
         throw new Error(error)
@@ -54,7 +54,7 @@ export const fetchFriendList = async ({cursor, userId}:fetchFrinendListParams):P
     }
 };
 export const useFriendList = (userId:string)=>{
-    console.log('useFriendListParams',userId)
+    // console.log('useFriendListParams',userId)
     return useInfiniteQuery({
         queryKey:['friendList' ,userId],
         queryFn:({pageParam=''}:QueryFunctionContext)=>fetchFriendList({cursor:pageParam as Date,userId}),
@@ -63,7 +63,7 @@ export const useFriendList = (userId:string)=>{
           
           const totalFetchedPosts = allPages.flatMap(page=>page.data).length;
           const hasMore = totalFetchedPosts < allPages[0].totalFriendsCount ? lastPage.cursor : undefined
-          console.log('LastPage:',lastPage.cursor)
+        //   console.log('LastPage:',lastPage.cursor)
 
           return hasMore
         },
