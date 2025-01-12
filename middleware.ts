@@ -53,7 +53,7 @@ export async function middleware(req) {
   // console.log('isLoggedIn',isPublicRoute)
   const isAuthRoute = authRoutes.includes(path);
   const isAdminRoute = adminRoutes.includes(path);
-
+  console.log('isAuthRoute',isAuthRoute)
   // Allow profile and post routes without additional checks
   if (isProfileRoute || isPostRoute) {
     return NextResponse.next();

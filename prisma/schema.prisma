@@ -25,6 +25,7 @@ model User {
   posts                 Post[]
   profile               Profile?
   twoFactorConfirmation TwoFactorConformation?
+  createdAt           DateTime                @default(now())
 
 @@index([id,shortName])
 }

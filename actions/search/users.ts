@@ -7,58 +7,97 @@ import { ExtendedUser } from "@/next-auth"
 export type UserListPromise = {
     success?: boolean,
     error?: string,
-    searchResult?: ExtendedUser[]
+    searchResult?: ExtendedUser[],
+    matchCount?:number,
+    nextCursor?:string,
+    hasNextPage?:boolean
 };
 
 export type GetUserListParams = {
     name: string,
-    pageParams: number,
+    cursor:string,
+    pageSize: number,
 };
 
 
 
-export const getUserListByName = async ({ name, pageParams }: GetUserListParams): Promise<UserListPromise> => {
-    console.log('getUserListByName')
-   
+export const getUserListByName = async ({ name, cursor, pageSize = 5 }: GetUserListParams): Promise<UserListPromise> => {
+    
     if (!name) {
         return { error: 'Name parameter is required.' };
     }
-
+    
     const user = await currentUser();
     if (!user) {
-        return { error: 'User not found.' };
+        return { error: 'You need to be authorized to search users.' };
     }
-
-    const page = pageParams || 1;
-    const pageSize = 5;
-    const skip = (page - 1) * pageSize;
-
-    try {
-        const userList = await db.user.findMany({
-            where: {
-                name: {
-                    contains: name,
-                    mode: 'insensitive',
-                    not: {
-                        contains: user.name, // Assuming you want to exclude current user's name
+    // console.log('getUserListByName','Server_query',name);
+    
+    const queryBody = {
+        where: {
+            OR: [
+                {
+                    name: {
+                        contains: name,
+                        mode: 'insensitive',
+                        not: {
+                            contains: user.name,
+                        }
                     }
                 },
-            },
-            take: pageSize,
-            skip: skip,
-            select:{
-                id:true,
-                image:true,
-                role:true,
-                name:true,
-                shortName:true
-            },
+                {
+                    shortName: {
+                        contains: name,
+                        mode: 'insensitive',
+                        not: {
+                            contains: user.shortName,
+                        }
+                    }
+                }
+            ]
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        take: pageSize + 1, // Fetch one extra to check for next page
+        skip: cursor ? 1 : 0, // Skip the cursor if provided
+        ...(cursor ? { cursor: { id: cursor } } : {}),
+        select: {
+            id: true,
+            image: true,
+            role: true,
+            name: true,
+            shortName: true
+        }
+    } as any;
 
-        });
+    try {
+        const userList = await db.user.findMany(queryBody);
+        console.log('getUserListByName',userList);
 
-        return { searchResult: userList, success: true };
+        const hasNextPage = userList.length > pageSize;
+        const result = hasNextPage ? userList.slice(0, -1) : userList;
+        const nextCursor = hasNextPage ? result[result.length - 1].id : null;
+
+        let matchCount: number | undefined = undefined;
+        if (!cursor) {
+            matchCount = await db.user.count({
+                where: queryBody.where
+            });
+        }
+
+        return {
+            searchResult: result,
+            success: true,
+            nextCursor,
+            hasNextPage,
+            matchCount
+        };
     } catch (error) {
-        console.error('Error fetching user list: ', error);
+        console.error('Error fetching user list:', {
+            message: error?.message || 'Unknown error',
+            stack: error?.stack || 'No stack trace',
+        });
         return { error: 'Failed to fetch user list.' };
     }
 };

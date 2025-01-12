@@ -6,6 +6,8 @@ import SideBar from "@/components/SideBar";
 import QueryProvider from "@/util/QueryProvider";
 import { getServerSession } from "next-auth";
 import { authConfig } from "@/auth.config";
+import { SessionProvider } from "next-auth/react";
+import SessionProviderWrapper from "@/app/(protected)/sessionProviderWrapper";
 
 
 type PublicProfileProps = {
@@ -25,6 +27,8 @@ console.log(search)
                 <>
                 
                 {session ? (
+                    <SessionProviderWrapper session={session}>
+                     <QueryProvider>
                     <div> <Navbar user={user}/>
                     <div className="col-span-12 col-start-1 row-span-2">
                         <div className="grid space-y-10 mr-2 ml-2 grid-cols-12">
@@ -37,9 +41,10 @@ console.log(search)
                                             sm:col-span-10 sm:mr-5 sm:col-start-3 
                                             sm:ml-8
                                             col-start-1 col-span-12 ">
-                                    <QueryProvider>
+                                   
+
                                         {children}
-                                    </QueryProvider>
+                                    
                                 </div>
                                 <SideBar role={user.role}  bar={true}                  
                                                  className="col-span-12 fixed inset-x-0 bottom-0
@@ -48,8 +53,11 @@ console.log(search)
                         </div>
                     </div>
                     </div>
+                    </QueryProvider>
+                    </SessionProviderWrapper>
                 ) :(
                     <div>
+                            <QueryProvider>
                         <Navbar user={user}/>
                         <div className="col-span-12 col-start-1 row-span-2 mt-5">
                         <div className="grid space-y-10 mr-2 ml-2 grid-cols-12">
@@ -57,12 +65,11 @@ console.log(search)
                                             sm:col-span-10 sm:mr-5 sm:col-start-3 
                                             sm:ml-8
                                             col-start-1 col-span-12 ">
-                                    <QueryProvider>
                                         {children}
+                                </div>
+                                </div>
+                                </div>
                                     </QueryProvider>
-                                </div>
-                                </div>
-                                </div>
 
                     </div>
                 )}

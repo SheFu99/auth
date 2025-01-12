@@ -14,7 +14,7 @@ export type PostQueryPromise = {
 export const fetchPostList = async ({ pageParam = 1,userId }): Promise<PostQueryPromise> => {
     // console.log("fetchPostList",userId)
     const {error,success,posts,totalPostCount} = await GetUserPostsById(userId, pageParam);
-
+    console.log('fetchPostList',totalPostCount)
     
     if (error) {
         console.log("ERROR")

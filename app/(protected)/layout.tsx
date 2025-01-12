@@ -1,6 +1,5 @@
 
 "use server"
-import { getSession, SessionProvider, signOut } from "next-auth/react";
 
 // const Navbar =React.lazy(()=>import ('@/components/navbar'))
 // import SideBar from "@/components/SideBar";
@@ -13,6 +12,8 @@ import SessionProviderWrapper from "./sessionProviderWrapper";
 import { getCurrentProfile } from "@/actions/UserProfile";
 import { currentUser } from "@/lib/auth";
 import { Metadata } from "next";
+
+import QueryProvider from "@/util/QueryProvider";
 
 
 
@@ -30,7 +31,7 @@ const getProfile = cache(async (userId: string) => {
   
   export const generateMetadata = async (): Promise<Metadata> => {
     const user = await currentUser();
-    console.log("UserInlayout",user)
+    // console.log("UserInlayout",user)
     const profile = await getProfile(user?.id);
   
     return {
@@ -42,19 +43,18 @@ const getProfile = cache(async (userId: string) => {
       icons: profile?.image,
     };
   };
-const ProtectedLayout = async ({children}:any) => {
+const ProtectedLayout = async ({children,searchParams,params }) => {
     const session = await getServerSession(authConfig)
-    console.log('ProtectedLayout',session)
-    // console.log('SessionError:',session)
-    // if(session == null){
-    //     signOut()
-    // }
     const user = session?.user
-
+    // const searchParams = useSearchParams();
+    const context = params.route
+    const queryValues = searchParams
+    console.log('urlParams:',searchParams,context)
     return ( 
         
         <SessionProviderWrapper session={session}>
-        
+          <QueryProvider>
+                
                 <Navbar user={user}/>
             {/* <div className="col-span-12 col-start-1 row-span-2">
                 <div className="grid space-y-5 mr-2 ml-2 grid-cols-12">
@@ -90,7 +90,7 @@ const ProtectedLayout = async ({children}:any) => {
 
                         </div>
                     </div>
-  
+                    </QueryProvider>
         </SessionProviderWrapper>
      );
 }

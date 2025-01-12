@@ -22,11 +22,11 @@ const SearchBar = ({ search , context }: SearchBarProps) => {
         initialRender.current = false
         return
       }
-  
+    
       if (!query) {
         router.push(context)
       } else {
-        router.push(`${context}search=${query}`)
+        router.push(`search=${query}`)
       }
     }, [query])
   
