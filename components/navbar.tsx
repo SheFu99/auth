@@ -17,16 +17,13 @@ type navbarProps = {
     const goBack = ()=>{
         window.history.back()
     }
-    const baseURL = process.env.NEXT_PUBLIC_APP_URL
-    const currentPath = window.location.href
-    const route = currentPath.replace(baseURL,'')
-    console.log('currentPath',route)
+   
     return(
         <>
         
             <nav className=" bg-opacity-30 bg-neutral-900  col-start-1 col-span-12 row-span-1  rounded-xs md:w-full h-auto 
             grid grid-cols-12
-            item-center jus">
+            item-center align-middle p-2 mt-1">
             
             <div className="">
                 
@@ -39,12 +36,12 @@ type navbarProps = {
                         >
                         <IoChevronBackOutline color="white" className="scale-120"/>
                     </button>
-                    <div className="col-start-3 col-span-8 p-5 ml-5">
+                    <div className="xl:col-start-4 md:col-start-3  sm:col-span-8 align-middle md:ml-8 sm:col-start-4 sm:ml-1 col-start-3 col-span-7">
                         <NavSearch user={user}/>
 
                     </div>
                 <div className="col-start-12">
-                    <div className='flex justify-end g-f:p-4 md:p-4 xl:p-3 '>
+                    <div className='flex justify-end align-middle '>
                         <UserButton user={user}/>
                     </div>
                 </div>

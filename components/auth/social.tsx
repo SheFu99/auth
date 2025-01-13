@@ -6,7 +6,12 @@ import { signIn } from "next-auth/react";
 import { DEFAULT_LOGIN_REDIRECT } from "../../routes";
 import { useSearchParams } from "next/navigation";
 
-export const Social = () =>{
+interface socialButton {
+    className?:string,
+    // buttonSize?:"default" | "sm" | "lg" | "icon"
+}
+
+export const Social = ({className}:socialButton) =>{
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get("callbackUrl");
 
@@ -18,27 +23,27 @@ const onClick = (provider:"google"| "github") => {
 
 
     return(
-        <div className="flex items-center gap-x-2 w-full">
+        <div className={`${className} flex items-center gap-x-2 w-full`}>
             <Button 
                 title="Log/id with Google"
-                size="lg"
+                size='default'
                 className="w-full"
                 variant="outline"
                 onClick={()=>onClick("google")}
                 // onClick={handleSignInGoogle}
                 >
-                    <FcGoogle className="h-5 w-5"/>
+                    <FcGoogle className={`h-5 w-5`}/>
             </Button>
 
             <Button 
                 title="Log/id with GitHub"
-                size="lg"
+                size="default"
                 className="w-full"
                 variant="outline"
                 onClick={()=>onClick("github")}
                 // onClick={handleSignIn}
                 >
-                    <FaGithub className="h-5 w-5"/>
+                    <FaGithub className={`h-5 w-5`}/>
             </Button>
         </div>
     )

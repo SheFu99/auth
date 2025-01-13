@@ -23,7 +23,7 @@ const getProfile = cache(async(postId:string)=>{
 })
 
 export const generateMetadata = async ({params:{id}}):Promise<Metadata> =>{
-  const paramsid =  id
+  const paramsid = id
 console.log('GEneratedIdFormHeadder',id)
  const profile = await getProfile(paramsid)
   return {

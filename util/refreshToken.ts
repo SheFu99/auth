@@ -1,4 +1,5 @@
 // utils/auth.ts (Create a separate utils file for better organization)
+import { db } from '@/lib/db'
 import { JWT } from 'next-auth/jwt'
 
 interface RefreshedToken extends JWT {
@@ -30,6 +31,7 @@ export async function refreshAccessToken(token: JWT): Promise<RefreshedToken> {
         grant_type: 'refresh_token',
         refresh_token: token.refreshToken,
       }
+     
       break
       
     case 'github':
@@ -87,11 +89,18 @@ export async function refreshAccessToken(token: JWT): Promise<RefreshedToken> {
     
     const refreshedTokens = await response.json()
     
+    
     if (!response.ok) {
       console.error('Failed to refresh access token:', refreshedTokens)
       return { ...token, error: 'RefreshAccessTokenError' }
     }
-      console.log('response',refreshedTokens)
+    const update = await db.account.update({
+      where:{
+        access_token:refreshedTokens.accessToken
+      },
+      data:{expires_at:refreshedTokens.exp}
+    })
+      console.log('response_update',update)
     return {
       ...token,
       accessToken: refreshedTokens.access_token,

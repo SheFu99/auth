@@ -38,7 +38,7 @@ export const useInfiniteUserNameSearch = ({ query, userId }: useInfiniteUserName
             console.log('getNextPageUserSearchParams', lastPage, allPages);
             return lastPage.nextCursor || undefined;
         },
-        enabled:query.length>0 && userId
+        enabled:query.length>0 && !!userId
     };
 
     return useInfiniteQuery<UserListPromise, Error>(options);

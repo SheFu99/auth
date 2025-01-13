@@ -20,10 +20,10 @@ export const NavSearch = ({user}) => {
   const debouncedSearch = useDebounce({value:searchText, delay:500});
   const sessionUser = user
 
-  const baseURL = process.env.NEXT_PUBLIC_APP_URL
-  const currentPath = window.location.href
-  const route = currentPath.replace(baseURL,'')
-  console.log('currentPath',route)
+  // const baseURL = process.env.NEXT_PUBLIC_APP_URL
+  // const currentPath = window?.location.href
+  // const route = currentPath.replace(baseURL,'')
+  // console.log('currentPath',route)
 
   const {
     data,
@@ -57,7 +57,7 @@ useEffect(()=>console.log('getNextPageUserSearchParams','client' ,data),[data])
             value={searchText}
             onChange={handleInputChange}
             placeholder="Search users..."
-            className="block w-full rounded-md border-0 py-1.5 pl-10 text-secondary-foreground ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 py-1.5 pl-10 text-secondary-foreground ring-1 ring-inset ring-gray-400 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-secondary sm:text-sm sm:leading-6"
           />
         </form>
       )}
@@ -82,7 +82,7 @@ useEffect(()=>console.log('getNextPageUserSearchParams','client' ,data),[data])
                    <Avatar>
                         <AvatarImage
                         src={user.image}
-                        className="w-[50px] h-[50px] rounded-sm"
+                        className="w-[50px] h-[50px]  mt-[-5px]"
                         />
                         <AvatarFallback>
                                 <FaUser color="white" className="w-[50px] h-[50px] bg-neutral-400 rounded-sm p-1"/>

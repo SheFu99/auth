@@ -33,7 +33,7 @@ const PrivateUserFriends = () => {
     const deleteFriendButton = (userId:string)=>{
             deleteFriend(userId)
             .then(response=>{
-                console.log(response)
+                // console.log(response)
                 if(response.succes){
                     toast.success(`Your successfully delete friends from list`)
                     queryClientConfig.invalidateQueries({queryKey})

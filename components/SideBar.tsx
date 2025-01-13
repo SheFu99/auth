@@ -8,6 +8,9 @@ import { MdAdminPanelSettings } from "react-icons/md";
 import { RiAccountBoxFill } from "react-icons/ri";
 import { TbNews } from "react-icons/tb";
 import LoginForm from "./auth/loginForm";
+import { CardFooter } from "./ui/card";
+import { Social } from "./auth/social";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 
 
 interface SideBarProps{
@@ -86,11 +89,33 @@ const SideBar :React.FC<SideBarProps>=  ({className,role,bar}) => {
                 </>
                 </>
             ):(
-                <div>
-                    <div className="sm:hidden md:block">
-                        <LoginForm />
+                <div className="w-full">
+                    <div className="hidden md:block w-full">
+                        <div className="flex items-center justify-center align-bottom w-full">
+                        
+                                    <LoginForm />
+                            
+                        </div>
                     </div>
-
+                    <div className="xl:hidden sm:hidden md:hidden g-f:block w-full mb-[-15px]">
+                            <div className="flex items-center justify-center align-bottom w-full">
+                                <Accordion type="single" collapsible className="w-full " defaultValue="item-1">
+                                    <AccordionItem value="item-1" className="border-none">
+                                    <AccordionTrigger className="text-white hover:no-underline bg-black bg-opacity-50 backdrop-blur-md rounded-t-lg px-4 py-2 w-full">
+                                        Login/Sign-in
+                                    </AccordionTrigger>
+                                    <AccordionContent className="text-white bg-black bg-opacity-50 backdrop-blur-md rounded-b-lg px-4 py-2">
+                                        <LoginForm />
+                                    </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </div>
+                        </div>
+                    <div className="hidden sm:block md:hidden">
+               
+                                    <Social className='flex flex-wrap gap-2' />
+                   
+                    </div>
                 </div>
             )}
            </div>
