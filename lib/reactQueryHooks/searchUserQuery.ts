@@ -21,7 +21,7 @@ export const useSearchUserName = ({query, userId}:useInfiniteUserNameSearchInter
 
 export const useInfiniteUserNameSearch = ({ query, userId }: useInfiniteUserNameSearchInterface): ReturnType<typeof useInfiniteQuery> => {
     const queryKey = ['searchUser', userId, query];
-    console.log('getNextPageUserSearchParams','query',query,userId)
+    // console.log('getNextPageUserSearchParams','query',query,userId)
     const options = {
         queryKey: queryKey,
         queryFn: async ({ pageParam = null }) => {

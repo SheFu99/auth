@@ -13,7 +13,7 @@ return(
     <>
         {friendList?.map((page)=>(
         <div className="grid grid-cols-12 border-white rounded-md border-2 p-2 w-full" key={page.transactionId}> 
-        <Link 
+        <a 
             href={`/profile/${page?.addressee?.userId||page?.requester?.userId}`} 
             className="col-span-10 flex items-center gap-1 cursor-pointer"
         >
@@ -27,7 +27,7 @@ return(
                 </AvatarFallback>
            </Avatar>
             <p className="text-white ml-2">{page?.addressee?.firstName||page?.requester?.firstName}</p>
-        </Link>
+        </a>
         </div>)
     )}
     </>

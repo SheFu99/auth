@@ -39,7 +39,7 @@ const isTheSameUser = user?.id === userId
                 />
         </div>
             <div className="flex items-center relative ">
-                <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-30 -bottom-15 left-0 p-[1rem] justify-center ">
+                <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-0 -bottom-15 left-0 p-[1rem] justify-center ">
                                 <HeaderAvatar
                                  src={profile?.image}
                                  width={100}
@@ -50,7 +50,7 @@ const isTheSameUser = user?.id === userId
 
 
                 {user&&!isTheSameUser&&(
-                    <div className="absolute -bottom-15  md:right-[4rem] right-8 z-30 bg-black rounded-full ">
+                    <div className="absolute -bottom-15  md:right-[4rem] right-8 z-0 bg-black rounded-full ">
                         <FriendStatusButton 
                             friendStatus={friendStatus}
                             userId={profile?.userId}/>
@@ -62,7 +62,7 @@ const isTheSameUser = user?.id === userId
         </div>
           
 
-            <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md relative z-20 p-1">
+            <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md relative z-[-1] p-1">
               <PublicAccordion profile={profile}/>
             </div>
 

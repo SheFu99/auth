@@ -28,7 +28,8 @@ const SideBar :React.FC<SideBarProps>=  ({className,role,bar}) => {
      
 
         <div className={`${className}  `}>
-            <div className={bar ? 'space-x-2 w-full sticky bottom-0 p-3 rounded-xl flex justify-center items-center backdrop-blur-md' : "space-y-1 border p-5 rounded-xl mt-10 sticky top-3 "} >
+            <div className="z-40">
+            <div className={bar ? 'space-x-2 w-full sticky bottom-0 p-3 rounded-xl flex justify-center items-center backdrop-blur-md' : "space-y-1 border p-5 rounded-xl mt-10 sticky top-3 z-20"} >
             {role?(
                 <>
             {role === 'ADMIN'&&role &&(
@@ -89,7 +90,7 @@ const SideBar :React.FC<SideBarProps>=  ({className,role,bar}) => {
                 </>
                 </>
             ):(
-                <div className="w-full">
+                <div className="w-full z-[999]">
                     <div className="hidden md:block w-full">
                         <div className="flex items-center justify-center align-bottom w-full">
                         
@@ -120,7 +121,7 @@ const SideBar :React.FC<SideBarProps>=  ({className,role,bar}) => {
             )}
            </div>
         </div>
-       
+        </div>
      );
 }
  

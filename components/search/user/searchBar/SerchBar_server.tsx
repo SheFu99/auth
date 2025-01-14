@@ -57,7 +57,7 @@ useEffect(()=>console.log('getNextPageUserSearchParams','client' ,data),[data])
             value={searchText}
             onChange={handleInputChange}
             placeholder="Search users..."
-            className="block w-full rounded-md border-0 py-1.5 pl-10 text-secondary-foreground ring-1 ring-inset ring-gray-400 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-secondary sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 py-1.5 pl-10 text-secondary-foreground ring-1 ring-inset ring-card placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-secondary sm:text-sm sm:leading-6"
           />
         </form>
       )}
@@ -75,21 +75,21 @@ useEffect(()=>console.log('getNextPageUserSearchParams','client' ,data),[data])
               {page.searchResult.map((user: any) => (
                 <div className="grid grid-cols-12 bg-card border-white rounded-md border p-2 w-full absolute z-[11]" key={page.transactionId}> 
 
-                <Link 
+                <a 
                     href={`/profile/${user?.shortName || user.id}`} 
-                    className="col-span-10 flex items-center gap-1 cursor-pointer"
+                    className="col-span-11 flex items-center gap-1 cursor-pointer"
                 >
-                   <Avatar>
+                   <Avatar >
                         <AvatarImage
                         src={user.image}
-                        className="w-[50px] h-[50px]  mt-[-5px]"
+                        className="w-[40px] h-[40px]  mt-[2px]"
                         />
                         <AvatarFallback>
-                                <FaUser color="white" className="w-[50px] h-[50px] bg-neutral-400 rounded-sm p-1"/>
+                                <FaUser color="white" className="w-[35px] h-[35px] bg-neutral-400 rounded-full p-1 ml-[1px]"/>
                         </AvatarFallback>
                    </Avatar>
-                    <p className="text-white ml-2">{user.name}</p>
-                </Link>
+                    <p className="text-white ml-2 text-nowrap">{user.name}</p>
+                </a>
                 </div>
 
               ))}
