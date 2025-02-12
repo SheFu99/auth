@@ -1,13 +1,9 @@
 'use client'
 
-
-import useDebounce from "@/hooks/use-debounce";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
-
-
-
+import { useDebounce } from 'use-debounce';
 
 type SearchBarProps = {
   search:string,
@@ -16,27 +12,7 @@ type SearchBarProps = {
 
 const SearchStateFilter = ({ search,setSearch  }: SearchBarProps) => {
 
-    const [text, setText] = useState('')
-    const liftState = (e)=>{
-      setText(e.target.value)
-      // text = e.target.value
-      console.log('LiftState',search)
-      // setSearch(e.target.value)
-      // useDebounce(setSearch(text),400)
-      // setSearch(useDebounce({value:text,delay:400}))
-    }
-    useEffect(()=>{
-      const handler = setTimeout(()=>{
-        setSearch(text);
-      },400)
-
-      return ()=>{
-          clearTimeout(handler)
-      }
-  },[text])
-
-    // useEffect(()=>{
-    // },[text])
+    const [text, setText] = useState(search)
 
   
     return (
@@ -45,9 +21,9 @@ const SearchStateFilter = ({ search,setSearch  }: SearchBarProps) => {
           <IoSearchSharp color="white"/>
         </div>
         <input
-          value={text}
+          value={search}
           placeholder='Find some...'
-          onChange={e => liftState(e)}
+          onChange={e => setSearch(e.target.value)}
           className='block w-full rounded-md border-0 py-1.5 pl-10 text-wgite ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6'
         />
       </div>

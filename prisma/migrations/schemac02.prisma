@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  name                  String?
+  email                 String?                @unique
+  emailVerified         DateTime?
+  image                 String?
+  password              String?
+  role                  UserRole               @default(USER)
+  isTwoFactorEnabled    Boolean                @default(false)
+  accounts              Account[]
+  comments              Comment[]
+  gallery               Gallery[]
+  likes                 Like[]
+  posts                 Post[]
+  profile               Profile?
+  twoFactorConfirmation TwoFactorConformation?
+
+@@index([id])
+}
+
+model Profile {
+  firstName   String?
+  lastName    String?
+  coverImage  String? @default("")
+  image       String?
+  shortName   String?
+  gender      Gender? @map("gender")
+  age         Int?
+  phoneNumber String?
+  regionCode  String?
+  /// Extend this {lat ,lng, zipCode, postService...} 
+  adres       String?
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    requested    FriendShip[] @relation("RequestedFriends")
+    received     FriendShip[] @relation("ReceivedFriends")
+
+@@index([shortName])
+@@index([userId])
+@@index([firstName])
+}
+
+model FriendShip {
+  transactionId String @id @default(cuid())
+  requesterId String
+  adresseedId String 
+  status FriendStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  requester     Profile @relation("RequestedFriends" ,fields: [requesterId],references: [userId],onDelete: Cascade)
+  addressee     Profile @relation("ReceivedFriends"  ,fields: [adresseedId],references: [userId],onDelete: Cascade)
+
+  @@index([requesterId])
+  @@index([adresseedId])
+  @@unique([requesterId,adresseedId])
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+model Post {
+  PostId      String    @id @default(cuid())
+  timestamp   DateTime  @default(now())
+  superText   String?
+  text        String?
+  userId      String
+  repostCount Int? @default(0)
+  originPostId String?
+  originPost  Post? @relation("OriginalPost",fields: [originPostId],references: [PostId],onDelete: Cascade)
+  reposts     Post[] @relation("OriginalPost")
+  comments    Comment[]
+  image       Images[]
+  likes       Like[]
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([PostId])
+}
+
+model Images {
+  url       String
+  postId    String?
+  CommentId String?
+  id        Int      @id @default(autoincrement())
+  Comment   Comment? @relation(fields: [CommentId], references: [CommentId], onDelete: Cascade)
+  Post      Post?    @relation(fields: [postId], references: [PostId], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+model Comment {
+  CommentId String   @id @default(cuid())
+  text      String?
+  timestamp DateTime @default(now())
+  postId    String?
+  userId    String
+  galleryId String?
+  originCommentId String?
+  gallery   Gallery? @relation(fields: [galleryId], references: [imageId],onDelete: Cascade)
+  post      Post?    @relation(fields: [postId], references: [PostId],onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id],onDelete: Cascade)
+  image     Images[]
+  likes     Like[]
+  originComment Comment? @relation("OriginOfComentAnswers",fields: [originCommentId],references: [CommentId],onDelete: Cascade)
+  answers Comment[] @relation("OriginOfComentAnswers")
+
+  @@index([postId])
+ }
+
+model Gallery {
+  imageId   String    @id @default(cuid())
+  image     String
+  text      String?
+  timestamp DateTime  @default(now())
+  userId    String
+  coments   Comment[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes     Like[]
+}
+
+model Like {
+  likeId    Int      @id @default(autoincrement())
+  postId    String?
+  commentId String?
+  userId    String
+  galleryId String?
+  comment   Comment? @relation(fields: [commentId], references: [CommentId], onDelete: Cascade)
+  gallery   Gallery? @relation(fields: [galleryId], references: [imageId])
+  post      Post?    @relation(fields: [postId], references: [PostId], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@unique([commentId, userId])
+  @@unique([galleryId, userId])
+
+  @@index([userId])
+  @@index([postId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorConformation {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  EDITOR
+  GUEST
+}
+
+enum Gender {
+  Male
+  Female
+  Undefined
+}
+

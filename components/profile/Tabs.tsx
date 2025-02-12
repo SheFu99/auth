@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { RiProfileLine } from "react-icons/ri";
 import { FaUser } from "react-icons/fa";
 import { usePostList } from "./post/lib/usePost";
-import { useFriendList } from "./friends/lib/useFriends";
+import { useFriendList } from "../../lib/reactQueryHooks/userFriends";
+
 
 type TabSwitchProps ={
     chilldrenPosts?:React.ReactNode|React.ReactNode[],

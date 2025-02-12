@@ -15,7 +15,8 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import SearchUsers from "@/app/profile/[id]/searchFriends";
 import { ExtendedUser } from "@/next-auth";
 import SearchResultOrFriendList from "@/components/search/user/SearchResult";
-import { useFriendList } from "../friends/lib/useFriends";
+import { useFriendList } from "../../../lib/reactQueryHooks/userFriends";
+
 
 
 interface profileTabsProps {
@@ -28,7 +29,7 @@ const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
   const user = useCurrentUser()
   const {data} = usePostList(userId)
   const {data:friendsList,hasNextPage}=useFriendList(userId)
-  console.log('friendsList',hasNextPage)
+  // console.log('friendsList',hasNextPage)
     return (  
         <Tabs defaultId="tab1" >
         <TabsList className=" p-1 rounded-lg flex  flex-wrap mt-1">
@@ -56,7 +57,7 @@ const ProfileTabs = ({userId,searchParams,searchResult}:profileTabsProps) => {
             {searchResult?(
               <SearchResultOrFriendList searchResult={searchResult}/>
             ):(
-              <div className="space-y-1">
+              <div className="">
                 <PrivateUserFriends/>
               </div>
             )}

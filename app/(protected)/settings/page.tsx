@@ -77,7 +77,7 @@ const SettingPage =  () => {
             password:  undefined,
             newPassword : undefined,
             role: user?.role || undefined,
-            isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined
+            isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined,
         }
     })
     const { handleSubmit, control, formState: { errors } } = form;
@@ -166,6 +166,7 @@ const SettingPage =  () => {
                                         )}
                                     />
                                 </div>
+                               
                                 </div>
                             </>
                           

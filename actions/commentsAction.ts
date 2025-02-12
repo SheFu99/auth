@@ -4,6 +4,8 @@ import { db } from "@/lib/db"
 import { deleteImagefromS3 } from "./UserPosts"
 
 import { Comment, CommentPrev } from "@/components/types/globalTs"
+import { CommentByPost } from "./post"
+
 
 type CreateCommentParams = {
     postId:String,
@@ -161,3 +163,77 @@ export const LikeComment = async (CommentId: string) => {
         return { success: true, message: "Post liked", likesCount: existingComment.likes.length + 1,hasLike:true };
     }
 };
+type LoadMoreCommentProps  = {
+    postId: string,
+    CommentId:string,
+    createdAt:Date,
+    limit?: number
+}
+export type CommentByPost = {
+    comments?:Comment[],
+    success?:boolean,
+    error?:string
+} 
+export const LoadMoreComment = async ({postId,CommentId,createdAt,limit=5}:LoadMoreCommentProps): Promise<CommentByPost>=>{
+
+    
+    console.log(postId,CommentId,createdAt)
+    if(!CommentId||!postId){
+        throw new Error('PostIdCommentIdCreatedDate_is_required')
+    }
+ const user = await currentUser()
+    try {
+        const commentList = await db.comment.findMany({
+            where:{
+                postId,
+                timestamp:{
+                    lt:createdAt
+                },
+            },
+            orderBy:{
+                timestamp: "desc"
+            },
+            take: limit,
+            include:{
+                user:{
+                    select:{
+                        id:true,
+                        name:true,
+                        // shortName:true,
+                        image:true,
+                        role:true
+                    }
+                },
+                _count:{
+                    select:{
+                        likes:true,
+        
+                    }
+                } ,
+                image:{
+                    select:{url:true}
+                },
+               
+                likes:{
+                    where:{
+                        userId:user?.id
+                    },
+                    select:{userId:true}
+                }
+            }
+           
+        })  
+        const commentsWithLikes = commentList.map(com=>{
+            const commentLikedByUser = user && com?.likes && com.likes.some(like=>like.userId === user.id)
+            return{
+                ...com,
+                likedByUser:commentLikedByUser ?? false
+            }
+        })
+        console.log('comment_list',commentList)
+        return commentsWithLikes 
+    } catch (error) {
+        throw new Error (error)
+    }
+   
+}

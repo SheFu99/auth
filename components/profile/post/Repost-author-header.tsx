@@ -1,13 +1,9 @@
 
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import React from 'react';
 import { FaUser } from "react-icons/fa6";
-
-const TimeAgo = dynamic(()=>import('react-timeago')
-.then(module=>module.default),{ssr:false}) as typeof import('react-timeago').default;
-
+import TimeAgo from 'react-timeago';
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
 import csStrings from 'react-timeago/lib/language-strings/en';
 

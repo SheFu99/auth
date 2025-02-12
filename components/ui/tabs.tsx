@@ -38,7 +38,7 @@ const TabsTrigger = ({ children, id, className }) => {
   );
 };
 
-const TabsContent = ({ children, id, className }) => {
+const TabsContent = ({ children, id, className, type }) => {
   const { activeTab, direction } = useTabs();
   const isActive = activeTab === id;
   const [loading, setLoading] = useState(false);
@@ -56,17 +56,32 @@ const TabsContent = ({ children, id, className }) => {
         setContentVisible(false);
       }, 300);
     }
+    console.log('minHeightClass',type,minHeightClass)
   }, [isActive]);
 
-  const motionClass = isActive
-    ? (direction === 'right' ? 'animate-slide-in-from-right' : 'animate-slide-in-from-left')
-    : (direction === 'right' ? 'animate-slide-out-to-left' : 'animate-slide-out-to-right');
+  let minHeightClass = ''
+  let minHeightLoader = ''
+  switch (type) {
+    case 'stats':
+      minHeightClass = 'max-h-[65px]';
+      minHeightLoader = 'max-h-[75px]';
+      break;
+    case 'posts':
+      minHeightClass = 'min-h-[40vh]';
+      minHeightLoader = 'min-h-[40vh]'; // or whatever loader style you want
+      break;
+    default:
+      minHeightClass = '';
+      minHeightLoader = '';
+      break;
+  }
+  
 
   return (
-    <>
+    <div className={`${minHeightLoader}`}>
       {loading && (
-        <div className="w-full flex justify-center items-center min-h-[40vh]">
-          <HashLoader color="white" />
+        <div className={`w-full   flex justify-center items-center ${minHeightClass}`}>
+          <HashLoader color="white" className='mt-5'/>
         </div>
       )}
       <div className={`${!contentVisible ? 'hidden' : ''} ${loading ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}`}>
@@ -74,7 +89,7 @@ const TabsContent = ({ children, id, className }) => {
           {children}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -22,7 +22,7 @@ const  EditProfile =  () => {
   
   const user = useCurrentUser();
   const {data:profileData,isError,isLoading} =useProfile(user?.id)
-  const {update} = useSession() ///replace to updateProfile redux hook 
+  const {update} = useSession() 
   const [avatarUploading, setAvatarUloading] = useState(false);
   const [sessionImage, setSessionImage] = useState( user?.image); 
   const [imageSrc, setImageSrc] = useState<string>(''); // State to hold the source URL of the image to crop

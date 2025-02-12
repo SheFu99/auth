@@ -98,10 +98,12 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         const imageUrls = await uploadFilesToS3(files);
+        console.log("S3_error",imageUrls)
+        
 
         return NextResponse.json({ success: true, imageUrls });
     } catch (error) {
-        console.log(error)
+        console.log("S3_error",error)
         return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
     }
 }

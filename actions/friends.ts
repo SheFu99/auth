@@ -15,8 +15,12 @@ export const sendFriendShipOffer = async (userId:string)=> {
         const recepient = await db.user.findFirst({
             where:{id:userId}
         })
+
         if(!recepient){
             return {error:'Recipient is not found'}
+        }
+        if(userId == user.id){
+            return {error:'You can`t do that! =('}
         }
         const requester = await db.friendShip.findFirst({
             where:{
@@ -141,18 +145,15 @@ export type changeStatusParams = {
 }
 export const changeFriendOfferStatus = async ({transactionId,status}:changeStatusParams)=>{
     const user = await currentUser()
-
     if(!user){
         return {error:'You need to be athorize!'}
     };
-
     const existingTransaction = await db.friendShip.findFirst({
         where:{transactionId:transactionId}
     })
     if(user.id !== existingTransaction.requesterId && user.id !== existingTransaction.adresseedId){
         return {error:'You can`t change status of unAuthorized transaction!'}
     }
-
     try {
         await db.friendShip.update({
             where:{
@@ -175,6 +176,7 @@ type getOfferProps ={
     success?:boolean
 };
 export const getCurrentUserOffer = async ():Promise<getOfferProps>=>{
+    // console.log('getCurrentOfferListActions')
         const user = await currentUser()
         if(!user){
             return {error: 'You need to be authorize!'}
@@ -221,13 +223,13 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
     if(!userId){
         return {error:'Profile is not found'}
     }
-    console.log('CURSOR',cursor)
+    // console.log('CURSOR',cursor)
     const isFirstPage:boolean = !cursor
 
     let totalFriendsCount :number
     if(isFirstPage){
         const {error , count} = await getCountFriends(userId)
-        console.log('CountFriends:',count   )
+        // console.log('CountFriends:',count   )
         if(!error){
             totalFriendsCount = count
         }
@@ -272,7 +274,7 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
     
             userFriendsList.push(...userFriendsListRight)
             
-            console.log('totalFriendsCount',userFriendsList)
+            // console.log('totalFriendsCount',userFriendsList)
 
         return {success:true,profileFirendsList:userFriendsList,totalFriendsCount}
     } catch (error) {
@@ -308,7 +310,7 @@ export const getProfileFriends = async ({userId,cursor}:{userId:string,cursor?:D
             
 
             })
-        console.log('CountFriendsInside:',totalFriendsCount)
+        // console.log('CountFriendsInside:',totalFriendsCount)
 
             if(!totalFriendsCount){
                 return {count:0}
@@ -339,7 +341,7 @@ export const getUserFreinds = async (cursor:Date):Promise<getPrivateFriendsPromi
     let totalFriendsCount :number
     if(isFirstPage){
         const {error , count} = await getCountFriends(user.id)
-        console.log('CountFriends:',count   )
+        // console.log('CountFriends:',count   )
         if(!error){
             totalFriendsCount = count
         }

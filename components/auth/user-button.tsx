@@ -22,7 +22,7 @@ type userButtonProps = {
 }
 
  const UserButton: React.FC<userButtonProps> =  ({user})=>{
- console.log("TRIGGER_ROLE_FETCH")
+//  console.log("TRIGGER_ROLE_FETCH")
     const pathname = usePathname()
     const userImage = user?.image || ""
     const role = user?.role

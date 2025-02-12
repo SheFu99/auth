@@ -45,14 +45,15 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
     })
     const {handleSubmit,control,formState:{errors}} = Profileform
     useEffect(()=>{
+        console.log('error',error)
         if(Object.keys(errors).length>3){
             setShouldAnimate(false)
         }
     },[errors])
 
-    useEffect(()=>{
+    // useEffect(()=>{
 
-    console.log(editProfileProps)},[editProfileProps])
+    // console.log(editProfileProps)},[editProfileProps])
 
     const onSubmit=(values:z.infer<typeof UserProfile>)=>{
         startTransition(()=>{
@@ -83,6 +84,7 @@ const UserProfileForm = ({profile,editProfileProps,onChange}:Profileform) => {
         }
     }
 
+    useEffect(()=>{console.log('shouldAnimate',shouldAnimate),[shouldAnimate]})
     const gender = profile?.gender
     const getGenderIcon = (gender:any)=>{
         switch(gender){

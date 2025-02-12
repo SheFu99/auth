@@ -1,11 +1,12 @@
 'use client'
 
-import { Fragment, useEffect, useState } from "react";
+import {useState } from "react";
 import SearchStateFilter from "@/components/search/user/SearchStateFilter";
-import { useFriendList, useFriendsSearch } from "./lib/useFriends";
+
 import FriendList from "./FriendsList";
 import PostSkeleton from "../post/skeleton";
 import QueryProvider from "@/util/QueryProvider";
+import { useFriendList, useFriendsSearch } from "../../../lib/reactQueryHooks/userFriends";
 
 
 interface props {

@@ -19,7 +19,7 @@ type userListProps ={
 const InfinitePostList :React.FC<userListProps> = ({userId,sessionUser}) => {
 console.log(userId,sessionUser)
 const {data,fetchNextPage,hasNextPage,isError,isLoading,isFetched}=usePostList(userId)
-console.log(data)
+console.log('prefetchStatus',isError,isLoading,isFetched)
 const page = 2 
 const user = sessionUser
 
@@ -27,7 +27,7 @@ const user = sessionUser
            
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1 ">
-              {!data&&isFetched&&!isLoading&&(
+              {!data&&isFetched&&!isLoading&&isError&&(
                     <div className="w-full flex justify-center py-10 items-center align-middle">
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>
@@ -35,7 +35,7 @@ const user = sessionUser
                  {isLoading&&(
                     <ListSkeleton/>
                 )}
-            <InfiniteScroll page={page} loadMore={fetchNextPage} hasMore={hasNextPage} isloaded = {!isLoading}>
+            <InfiniteScroll  loadMore={fetchNextPage} hasMore={hasNextPage} isloaded = {!isLoading}>
                 <>
                 {/* TODO: Need to pass key to parent component  */}
                 {data?.pages?.map((page,index)=>(

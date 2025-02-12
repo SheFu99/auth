@@ -16,7 +16,6 @@ const font = Poppins({
 
  
 export default async function Home() {
-  const router = useRouter()
 
   return (
     <>

@@ -1,5 +1,16 @@
 import { ExtendedUser } from "@/next-auth";
 import { UserRole } from "@prisma/client";
+import { DefaultSession } from "next-auth";
+
+
+export type MentionInputRef = {
+    clearInput?: () => void;
+    getValue?: () => string;
+    focusInput?: () => void;
+    setValue?: (value: string) => void;
+    handleReactionClick?: (reaction: { emoji: string }) => void;
+    handleMention?: () => void;
+};
 
 export interface ProfileData {
     firstName?: string | null;
@@ -10,6 +21,7 @@ export interface ProfileData {
     age?: number | null;
     phoneNumber?: string | null;
     regionCode?: string | null;
+    createdAt:Date 
     adres?: string | null;
     userId: string;
     error?:string;
@@ -26,7 +38,6 @@ export type friendRelation = {
 };
 
 export type FriendsOffer ={
-  _count?:{addressee?:number,requerter?:number}
   addressee?:profileOfferDetail;
   requester?: profileOfferDetail;
   transactionId: string;
@@ -101,6 +112,7 @@ export type Comment = {
   galleryId: string;
 };
 
+
 export type profileOfferDetail = {
   userId?: string;
   firstName: string;
@@ -120,3 +132,13 @@ export type CommentPrev = {
   image?:{ url?: string }[];
   userId?:string,
 };
+
+interface Session {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    image?: string;
+    role?: UserRole; // Add role type
+    shortName?: string; // Add shortName type
+  } & DefaultSession["user"];}

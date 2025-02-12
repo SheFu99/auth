@@ -119,7 +119,7 @@ if(user){
     }
     return {post:postWithLike,success:true}
 }
-type CommentByPost = {
+export type CommentByPost = {
     comments?:Comment[],
     success?:boolean,
     error?:string,
@@ -140,7 +140,7 @@ export const getCommentByPost = async ({PostId, page}:getComentParams):Promise<C
     ///orederBy _count.likes
 
     orderBy:[
-        {timestamp:'asc'}
+        {timestamp:'desc'}
     ],
     skip:skip,
     take:pageSize,
@@ -154,6 +154,13 @@ export const getCommentByPost = async ({PostId, page}:getComentParams):Promise<C
         image:{
             select:{url:true}
         },
+       
+        likes:{
+            where:{
+                userId:user?.id
+            },
+            select:{userId:true}
+        },
         user:{
             select:{
                 name:true,
@@ -161,12 +168,6 @@ export const getCommentByPost = async ({PostId, page}:getComentParams):Promise<C
                 id:true,
             }
         },
-        likes:{
-            where:{
-                userId:user?.id
-            },
-            select:{userId:true}
-        }
        
     }
 }) 
