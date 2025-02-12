@@ -34,7 +34,7 @@ export const NavSearch = ({user}) => {
   } = useInfiniteUserNameSearch(
    {query:debouncedSearch,userId:sessionUser?.id}
   );
-// useEffect(()=>console.log('getNextPageUserSearchParams','client' ,data),[data])
+useEffect(()=>console.log('getNextPageUserSearchParams','client' ,data),[data])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);

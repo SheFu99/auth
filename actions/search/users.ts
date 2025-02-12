@@ -22,7 +22,7 @@ export type GetUserListParams = {
 
 
 export const getUserListByName = async ({ name, cursor, pageSize = 5 }: GetUserListParams): Promise<UserListPromise> => {
-    
+    console.log('getuserListByName_with_params:',name, cursor)
     if (!name) {
         return { error: 'Name parameter is required.' };
     }
@@ -37,7 +37,7 @@ export const getUserListByName = async ({ name, cursor, pageSize = 5 }: GetUserL
         where: {
             OR: [
                 {
-                    name: {
+                    firstName: {
                         contains: name,
                         mode: 'insensitive',
                         not: {
@@ -50,7 +50,7 @@ export const getUserListByName = async ({ name, cursor, pageSize = 5 }: GetUserL
                         contains: name,
                         mode: 'insensitive',
                         not: {
-                            contains: user.shortName,
+                            contains: user?.shortName,
                         }
                     }
                 }
@@ -63,16 +63,15 @@ export const getUserListByName = async ({ name, cursor, pageSize = 5 }: GetUserL
         skip: cursor ? 1 : 0, // Skip the cursor if provided
         ...(cursor ? { cursor: { id: cursor } } : {}),
         select: {
-            id: true,
+            userId: true,
             image: true,
-            role: true,
-            name: true,
+            firstName: true,
             shortName: true
         }
     } as any;
 
     try {
-        const userList = await db.user.findMany(queryBody);
+        const userList = await db.profile.findMany(queryBody);
         console.log('getUserListByName',userList);
 
         const hasNextPage = userList.length > pageSize;
@@ -81,7 +80,7 @@ export const getUserListByName = async ({ name, cursor, pageSize = 5 }: GetUserL
 
         let matchCount: number | undefined = undefined;
         if (!cursor) {
-            matchCount = await db.user.count({
+            matchCount = await db.profile.count({
                 where: queryBody.where
             });
         }
@@ -94,11 +93,11 @@ export const getUserListByName = async ({ name, cursor, pageSize = 5 }: GetUserL
             matchCount
         };
     } catch (error) {
-        console.error('Error fetching user list:', {
+        console.log('Error fetching user list:', {
             message: error?.message || 'Unknown error',
             stack: error?.stack || 'No stack trace',
         });
-        return { error: 'Failed to fetch user list.' };
+        return { error: error };
     }
 };
 

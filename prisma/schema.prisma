@@ -29,6 +29,105 @@ model User {
 @@index([id])
 }
 
+model ProfileSettings {
+  userId String @id
+  profile Profile @relation(references: [userId],fields: [userId])
+  pirvate         Boolean @default(true)
+  showNumber      Boolean @default(false)
+  showEmail       Boolean @default(false)
+
+  updateDate DateTime @default(now())
+}
+
+model Worker {
+  userId String @id @unique
+  profile Profile @relation(references: [userId],fields: [userId])
+  department String
+  experienceLevel String?
+
+  workingHours WorkingHours[]
+  reviews Reviews[] 
+
+
+
+  contracts Contract[] 
+
+  creationDate DateTime @default(now())
+}
+model WorkingHours {
+workingHoursId String @id @default(cuid())
+  worker_id String
+  worker Worker @relation(references: [userId],fields: [worker_id])
+
+  day_of_week WeekDays
+
+  start_time DateTime?
+  end_time DateTime?
+  is_open Boolean @default(false)
+}
+enum WeekDays {
+  monday
+  tuesday
+  wednesday
+  thursday
+  friday
+  saturday
+  sunday
+}
+
+model Reviews {
+  review_id String @id @default(cuid()) @unique
+
+  worker_id String
+  worker Worker @relation(fields: [worker_id],references: [userId])
+
+  client_id String
+  author Client @relation(fields: [client_id],references: [userId])
+
+  rating Int
+   comment Comment? 
+}
+
+
+model Client {
+  userId String @id @unique
+  profile Profile @relation(references: [userId],fields: [userId])
+  contactNumber String
+  contracts Contract[] 
+
+  reviews Reviews[]
+  creationDate DateTime @default(now())
+
+}
+
+model Contract {
+
+contractId String @id @default(cuid())
+
+  workerId String @unique
+  worker Worker @relation(references: [userId],fields: [workerId])
+
+  clientId  String @unique
+  client Client @relation(references: [userId],fields: [clientId])
+
+timeStamp DateTime @default(now())
+
+}
+
+model ProfileStats {
+  userId String @id @unique
+  profile Profile @relation(references: [userId],fields: [userId])
+
+  commentsCount Int? @default(0)
+  likesCount    Int? @default(0)
+  rating        Int? @default(0)
+
+  rewiewsCount  Int? @default(0)
+  contractCount Int? @default(0)
+
+  partnersCount Int? @default(0)
+}
+
 model Profile {
   firstName   String?
   lastName    String?
@@ -37,26 +136,28 @@ model Profile {
 
   shortName   String? @unique
   gender      Gender? @map("gender")
+
   age         Int?
   phoneNumber String?
-  regionCode  String?
-  /// Extend this {lat ,lng, zipCode, postService...} 
+  
   userId      String  @unique @id
   adres       String?
 
-  commentsCount Int? @default(0)
-  likesCount    Int? @default(0)
-  rating        Int? @default(0)
+ 
   // accounts    Account[]
-  pirvate         Boolean @default(true)
-  showNumber      Boolean @default(false)
-  showEmail       Boolean @default(false)
-  experienceLevel String?
+ 
   bio             String?
 
   createdAt   DateTime @default(now())
+
+  stats       ProfileStats?
+  settings    ProfileSettings? 
   sessions    Session[]
   coords      Coords[]  @relation("ProfileCoords")
+
+  worker      Worker?
+  client      Client?
+  
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade,onUpdate: Cascade)
 
     requested    FriendShip[] @relation("RequestedFriends")
@@ -141,23 +242,29 @@ model Images {
 
 model Comment {
   CommentId String   @id @default(cuid())
-  text      String?
-  timestamp DateTime @default(now())
-  postId    String?
   userId    String
-  galleryId String?
+  
+  postId    String?
   originCommentId String?
+  review_id String? @unique
+
+  galleryId String?
   coordsId  String?
 
+  text      String?
   gallery   Gallery? @relation(fields: [galleryId], references: [imageId],onDelete: Cascade)
   post      Post?    @relation(fields: [postId], references: [PostId],onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id],onDelete: Cascade)
+
+  review    Reviews?  @relation(fields: [review_id],references: [review_id],onDelete: Cascade)
+  
   image     Images[]
   likes     Like[]
   originComment Comment? @relation("OriginOfComentAnswers",fields: [originCommentId],references: [CommentId],onDelete: Cascade)
   answers Comment[] @relation("OriginOfComentAnswers")
 
   coords Coords? @relation(fields: [coordsId], references: [coordsId])
+  timestamp DateTime @default(now())
 
   @@index([timestamp]) 
   @@index([postId])
