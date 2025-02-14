@@ -42,6 +42,7 @@ model ProfileSettings {
 model Worker {
   userId String @id @unique
   profile Profile @relation(references: [userId],fields: [userId])
+  
   department String
   experienceLevel String?
 
@@ -49,7 +50,7 @@ model Worker {
   reviews Reviews[] 
 
 
-
+  balance Int?
   contracts Contract[] 
 
   creationDate DateTime @default(now())
@@ -84,8 +85,12 @@ model Reviews {
   client_id String
   author Client @relation(fields: [client_id],references: [userId])
 
+  contract Contract @relation(fields: [review_id],references: [contractId])
+
   rating Int
    comment Comment? 
+
+  timestamp DateTime @default(now())
 }
 
 
@@ -110,6 +115,7 @@ contractId String @id @default(cuid())
   clientId  String @unique
   client Client @relation(references: [userId],fields: [clientId])
 
+  review Reviews?
 timeStamp DateTime @default(now())
 
 }
@@ -231,6 +237,7 @@ model Post {
 
 model Images {
   url       String
+  alt       String?
   postId    String?
   CommentId String?
   id        Int      @id @default(autoincrement())
