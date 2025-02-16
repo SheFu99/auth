@@ -36,25 +36,43 @@ model ProfileSettings {
   showNumber      Boolean @default(false)
   showEmail       Boolean @default(false)
 
+
   updateDate DateTime @default(now())
 }
 
 model Worker {
   userId String @id @unique
   profile Profile @relation(references: [userId],fields: [userId])
-  
+
+  stats Stats? 
+
   department String
   experienceLevel String?
+  hour_rate Hour_rate?
 
   workingHours WorkingHours[]
   reviews Reviews[] 
-
+  
 
   balance Int?
   contracts Contract[] 
 
+  currentLoaction Coords?
+
   creationDate DateTime @default(now())
+  updateTime  DateTime? 
 }
+model Hour_rate {
+  userId String @id 
+
+  worker Worker @relation(fields: [userId],references: [userId],onDelete: Cascade)
+  from  Int
+  to    Int
+
+  createDate DateTime @default(now())
+  updateTime DateTime?
+}
+
 model WorkingHours {
 workingHoursId String @id @default(cuid())
   worker_id String
@@ -91,6 +109,7 @@ model Reviews {
    comment Comment? 
 
   timestamp DateTime @default(now())
+  updateTime DateTime?
 }
 
 
@@ -101,7 +120,9 @@ model Client {
   contracts Contract[] 
 
   reviews Reviews[]
+
   creationDate DateTime @default(now())
+  updateTime  DateTime?
 
 }
 
@@ -116,13 +137,17 @@ contractId String @id @default(cuid())
   client Client @relation(references: [userId],fields: [clientId])
 
   review Reviews?
+
 timeStamp DateTime @default(now())
+updateTime DateTime?
 
 }
 
-model ProfileStats {
+model Stats {
   userId String @id @unique
+
   profile Profile @relation(references: [userId],fields: [userId])
+  worker  Worker @relation(references: [userId],fields: [userId],map: "WorkerId")
 
   commentsCount Int? @default(0)
   likesCount    Int? @default(0)
@@ -156,7 +181,7 @@ model Profile {
 
   createdAt   DateTime @default(now())
 
-  stats       ProfileStats?
+  stats       Stats?
   settings    ProfileSettings? 
   sessions    Session[]
   coords      Coords[]  @relation("ProfileCoords")
@@ -338,10 +363,11 @@ model Account {
 
 model Coords {
   coordsId    String @id @default(cuid())
-  userId      String? 
+  userId      String? @unique
   adminId     String?
 
   profile Profile[] @relation("ProfileCoords")
+  worker  Worker? @relation(fields: [userId],references: [userId])
 
   placeName   String?
 
