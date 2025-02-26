@@ -28,7 +28,7 @@ export const authRoutes = [
     "/auth/new-password",
     '/api/session',
     '/api/tokens/revoke',
-    '/',
+    '/api/tokens/verify',
     // '/api/session/invalidate'
 ];
 

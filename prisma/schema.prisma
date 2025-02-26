@@ -38,30 +38,54 @@ model ProfileSettings {
 
 
   updateDate DateTime @default(now())
+  @@index([userId])
 }
 
 model Worker {
   userId String @id @unique
+
+  telegramId BigInt? @unique 
+  watsAppId  String? @unique
+  viberId    String? @unique
+  
+  driverLicenseNumber String?
+
+
   profile Profile @relation(references: [userId],fields: [userId])
-
-  stats Stats? 
-
   department String
+  workingHours WorkingHours[]
+  currentLocaction Coords?
+
+  primeRate  Int?
+  balance Int?
+
+  // stats Stats? 
   experienceLevel String?
   hour_rate Hour_rate?
-
-  workingHours WorkingHours[]
-  reviews Reviews[] 
   
 
-  balance Int?
   contracts Contract[] 
+  reviews Reviews[] 
 
-  currentLoaction Coords?
 
   creationDate DateTime @default(now())
   updateTime  DateTime? 
+
+  @@index([userId])
+  @@index([telegramId])
 }
+
+
+model Vechicle {
+
+  vechicleId     String @id @default(uuid())
+  userId         String? 
+
+  vinCode        String?
+  registerNumber String?
+
+}
+
 model Hour_rate {
   userId String @id 
 
@@ -71,6 +95,8 @@ model Hour_rate {
 
   createDate DateTime @default(now())
   updateTime DateTime?
+
+  @@index([userId])
 }
 
 model WorkingHours {
@@ -83,6 +109,9 @@ workingHoursId String @id @default(cuid())
   start_time DateTime?
   end_time DateTime?
   is_open Boolean @default(false)
+
+  @@index([workingHoursId])
+  @@index([worker_id])
 }
 enum WeekDays {
   monday
@@ -110,6 +139,10 @@ model Reviews {
 
   timestamp DateTime @default(now())
   updateTime DateTime?
+
+  @@index([review_id])
+  @@index([worker_id])
+  @@index([client_id])
 }
 
 
@@ -136,6 +169,8 @@ contractId String @id @default(cuid())
   clientId  String @unique
   client Client @relation(references: [userId],fields: [clientId])
 
+  budget Int?
+
   review Reviews?
 
 timeStamp DateTime @default(now())
@@ -147,7 +182,7 @@ model Stats {
   userId String @id @unique
 
   profile Profile @relation(references: [userId],fields: [userId])
-  worker  Worker @relation(references: [userId],fields: [userId],map: "WorkerId")
+  // worker  Worker @relation(references: [userId],fields: [userId],map: "WorkerId")
 
   commentsCount Int? @default(0)
   likesCount    Int? @default(0)
@@ -174,9 +209,8 @@ model Profile {
   userId      String  @unique @id
   adres       String?
 
- 
-  // accounts    Account[]
- 
+  socialMedia    Socialmedia[]
+
   bio             String?
 
   createdAt   DateTime @default(now())
@@ -198,6 +232,21 @@ model Profile {
 @@index([userId])
 @@index([firstName])
 }
+
+model Socialmedia {
+  userId String @id @unique
+
+  profile Profile @relation(fields: [userId],references: [userId])
+
+  type String 
+  link String
+
+  verifiedToken String? 
+
+  timestamp DateTime @default(now())
+  updateDate DateTime?
+}
+
 
 model Session {
   id          String   @id @default(cuid()) // Unique session ID
@@ -371,8 +420,8 @@ model Coords {
 
   placeName   String?
 
-  latitude    Int
-  longitude   Int
+  latitude  Decimal @db.Decimal(9, 6) // Example: 9 digits total, 6 after decimal
+  longitude Decimal @db.Decimal(9, 6)
 
   comments    Comment[] 
   gallery     Gallery[]
@@ -430,3 +479,26 @@ enum Gender {
   Undefined
 }
 
+model Cars {
+  id Int @id @default(autoincrement())
+  marque  String?
+  imgUrl  String?
+  wikiLink String?
+  website String?
+
+  models Carmodels[]
+
+  @@index([marque])
+}
+
+model Carmodels {
+  id Int @id @default(autoincrement())
+
+  carId Int 
+  years Int
+  series String
+  imageurl String
+
+  cars Cars @relation(fields: [carId],references: [id])
+  
+}
