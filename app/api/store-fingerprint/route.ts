@@ -20,20 +20,29 @@ export async function POST(req: NextRequest) {
     })
     
     if (!existing) {
-      await db.session.create({
-        data: {
-          userId: currentSession.user.id,
-          fingerprint:fingerprint,
-          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      })
+      try {
+        await db.session.create({
+          data: {
+            userId: currentSession.user.id,
+            fingerprint:fingerprint,
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        })
+      } catch (error) {
+        return NextResponse.json({ error:error}, { status: 500 })
+      }
     } else {
-      await db.session.update({
-        where: { id: existing.id },
-        data: { fingerprint:fingerprint, updatedAt: new Date() }
-      })
+      try {
+        await db.session.update({
+          where: { id: existing.id },
+          data: { fingerprint:fingerprint, updatedAt: new Date() }
+        })
+      } catch (error) {
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+      }
+     
     }
     
 
@@ -46,7 +55,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 30 // 30 days
+      maxAge: 60 * 60 * 24 * 7 // 7 days
     })
 
     return response

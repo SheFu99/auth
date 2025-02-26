@@ -199,7 +199,7 @@ export const LoadMoreComment = async ({postId,CommentId,createdAt,limit=5}:LoadM
                     select:{
                         id:true,
                         name:true,
-                        // shortName:true,
+                        shortName:true,
                         image:true,
                         role:true
                     }

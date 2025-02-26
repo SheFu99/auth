@@ -19,7 +19,7 @@ type userListProps ={
 const InfinitePostList :React.FC<userListProps> = ({userId,sessionUser}) => {
 console.log(userId,sessionUser)
 const {data,fetchNextPage,hasNextPage,isError,isLoading,isFetched}=usePostList(userId)
-console.log('prefetchStatus',isError,isLoading,isFetched)
+console.log(data)
 const page = 2 
 const user = sessionUser
 
@@ -27,7 +27,7 @@ const user = sessionUser
            
     return ( 
         <div className="bg-opacity-0  space-y-5 p-1 ">
-              {!data&&isFetched&&!isLoading&&isError&&(
+              {!data&&isFetched&&!isLoading&&(
                     <div className="w-full flex justify-center py-10 items-center align-middle">
                         <p className=" text-neutral-500">The user has no posts...</p>
                     </div>

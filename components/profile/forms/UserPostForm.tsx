@@ -158,7 +158,7 @@ useEffect(()=>{console.log('textState',textState)},[textState])
     };
 
     const [ref, inView] = useInViewRelational({ threshold: [0.5] });
-    ////add is mention active state
+
     return (
         <form onSubmit={submitPost} className="p-2 mt-3 border border-white rounded-md relative">
             <section ref={ref}>

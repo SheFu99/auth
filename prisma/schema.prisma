@@ -12,6 +12,7 @@ model User {
   id                    String                 @id @default(cuid())
   name                  String?
   email                 String?                @unique
+  shortName             String?                @unique
   emailVerified         DateTime?
   image                 String?
   password              String?
@@ -26,172 +27,7 @@ model User {
   twoFactorConfirmation TwoFactorConformation?
   createdAt           DateTime                @default(now())
 
-@@index([id])
-}
-
-model ProfileSettings {
-  userId String @id
-  profile Profile @relation(references: [userId],fields: [userId])
-  pirvate         Boolean @default(true)
-  showNumber      Boolean @default(false)
-  showEmail       Boolean @default(false)
-
-
-  updateDate DateTime @default(now())
-  @@index([userId])
-}
-
-model Worker {
-  userId String @id @unique
-
-  telegramId BigInt? @unique 
-  watsAppId  String? @unique
-  viberId    String? @unique
-  
-  driverLicenseNumber String?
-
-
-  profile Profile @relation(references: [userId],fields: [userId])
-  department String
-  workingHours WorkingHours[]
-  currentLocaction Coords?
-
-  primeRate  Int?
-  balance Int?
-
-  // stats Stats? 
-  experienceLevel String?
-  hour_rate Hour_rate?
-  
-
-  contracts Contract[] 
-  reviews Reviews[] 
-
-
-  creationDate DateTime @default(now())
-  updateTime  DateTime? 
-
-  @@index([userId])
-  @@index([telegramId])
-}
-
-
-model Vechicle {
-
-  vechicleId     String @id @default(uuid())
-  userId         String? 
-
-  vinCode        String?
-  registerNumber String?
-
-}
-
-model Hour_rate {
-  userId String @id 
-
-  worker Worker @relation(fields: [userId],references: [userId],onDelete: Cascade)
-  from  Int
-  to    Int
-
-  createDate DateTime @default(now())
-  updateTime DateTime?
-
-  @@index([userId])
-}
-
-model WorkingHours {
-workingHoursId String @id @default(cuid())
-  worker_id String
-  worker Worker @relation(references: [userId],fields: [worker_id])
-
-  day_of_week WeekDays
-
-  start_time DateTime?
-  end_time DateTime?
-  is_open Boolean @default(false)
-
-  @@index([workingHoursId])
-  @@index([worker_id])
-}
-enum WeekDays {
-  monday
-  tuesday
-  wednesday
-  thursday
-  friday
-  saturday
-  sunday
-}
-
-model Reviews {
-  review_id String @id @default(cuid()) @unique
-
-  worker_id String
-  worker Worker @relation(fields: [worker_id],references: [userId])
-
-  client_id String
-  author Client @relation(fields: [client_id],references: [userId])
-
-  contract Contract @relation(fields: [review_id],references: [contractId])
-
-  rating Int
-   comment Comment? 
-
-  timestamp DateTime @default(now())
-  updateTime DateTime?
-
-  @@index([review_id])
-  @@index([worker_id])
-  @@index([client_id])
-}
-
-
-model Client {
-  userId String @id @unique
-  profile Profile @relation(references: [userId],fields: [userId])
-  contactNumber String
-  contracts Contract[] 
-
-  reviews Reviews[]
-
-  creationDate DateTime @default(now())
-  updateTime  DateTime?
-
-}
-
-model Contract {
-
-contractId String @id @default(cuid())
-
-  workerId String @unique
-  worker Worker @relation(references: [userId],fields: [workerId])
-
-  clientId  String @unique
-  client Client @relation(references: [userId],fields: [clientId])
-
-  budget Int?
-
-  review Reviews?
-
-timeStamp DateTime @default(now())
-updateTime DateTime?
-
-}
-
-model Stats {
-  userId String @id @unique
-
-  profile Profile @relation(references: [userId],fields: [userId])
-  // worker  Worker @relation(references: [userId],fields: [userId],map: "WorkerId")
-
-  commentsCount Int? @default(0)
-  likesCount    Int? @default(0)
-  rating        Int? @default(0)
-
-  rewiewsCount  Int? @default(0)
-  contractCount Int? @default(0)
-
-  partnersCount Int? @default(0)
+@@index([id,shortName])
 }
 
 model Profile {
@@ -200,30 +36,14 @@ model Profile {
   coverImage  String? @default("")
   image       String?
 
-  shortName   String? @unique
   gender      Gender? @map("gender")
-
   age         Int?
   phoneNumber String?
-  
-  userId      String  @unique @id
+  regionCode  String?
+  /// Extend this {lat ,lng, zipCode, postService...} 
   adres       String?
-
-  socialMedia    Socialmedia[]
-
-  bio             String?
-
-  createdAt   DateTime @default(now())
-
-  stats       Stats?
-  settings    ProfileSettings? 
-  sessions    Session[]
-  coords      Coords[]  @relation("ProfileCoords")
-
-  worker      Worker?
-  client      Client?
-  
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade,onUpdate: Cascade)
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade,onUpdate: Cascade)
 
     requested    FriendShip[] @relation("RequestedFriends")
     received     FriendShip[] @relation("ReceivedFriends")
@@ -232,42 +52,6 @@ model Profile {
 @@index([userId])
 @@index([firstName])
 }
-
-model Socialmedia {
-  userId String @id @unique
-
-  profile Profile @relation(fields: [userId],references: [userId])
-
-  type String 
-  link String
-
-  verifiedToken String? 
-
-  timestamp DateTime @default(now())
-  updateDate DateTime?
-}
-
-
-model Session {
-  id          String   @id @default(cuid()) // Unique session ID
-  userId      String   // Reference to User model
-  profile        Profile     @relation(fields: [userId], references: [userId], onDelete: Cascade)
-
-  expires     DateTime // Expiry of the session
-  deviceType  String?  // Device info (e.g., 'desktop', 'mobile')
-  osInfo      String?  // OS info (e.g., 'Windows 10', 'iOS 17')
-  browserInfo String?  // Browser info (e.g., 'Chrome 115')
-  ipAddress   String?  // IP address for security
-  
-
-  fingerprint String? @unique
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([fingerprint,userId])
-}
-
 
 model FriendShip {
   transactionId String @id @default(cuid())
@@ -311,7 +95,6 @@ model Post {
 
 model Images {
   url       String
-  alt       String?
   postId    String?
   CommentId String?
   id        Int      @id @default(autoincrement())
@@ -323,30 +106,19 @@ model Images {
 
 model Comment {
   CommentId String   @id @default(cuid())
-  userId    String
-  
-  postId    String?
-  originCommentId String?
-  review_id String? @unique
-
-  galleryId String?
-  coordsId  String?
-
   text      String?
+  timestamp DateTime @default(now())
+  postId    String?
+  userId    String
+  galleryId String?
+  originCommentId String?
   gallery   Gallery? @relation(fields: [galleryId], references: [imageId],onDelete: Cascade)
   post      Post?    @relation(fields: [postId], references: [PostId],onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id],onDelete: Cascade)
-
-  review    Reviews?  @relation(fields: [review_id],references: [review_id],onDelete: Cascade)
-  
   image     Images[]
   likes     Like[]
   originComment Comment? @relation("OriginOfComentAnswers",fields: [originCommentId],references: [CommentId],onDelete: Cascade)
   answers Comment[] @relation("OriginOfComentAnswers")
-
-  coords Coords? @relation(fields: [coordsId], references: [coordsId])
-  timestamp DateTime @default(now())
-
   @@index([timestamp]) 
   @@index([postId])
  }
@@ -356,14 +128,10 @@ model Gallery {
   image     String
   text      String?
   timestamp DateTime  @default(now())
-
   userId    String
-  coordsId  String?    
-
   coments   Comment[]
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   likes     Like[]
-  coords    Coords?    @relation(fields: [coordsId],references: [coordsId])
 }
 
 model Like {
@@ -386,9 +154,8 @@ model Like {
 }
 
 model Account {
-  id                String  @default(cuid())
+  id                String  @id @default(cuid())
   userId            String
-
   type              String
   provider          String
   providerAccountId String
@@ -399,36 +166,11 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  // profile           Profile @relation(fields: [userId],references: [userId])
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([userId,id])
-  @@unique([userId,access_token])
-  @@unique([provider,providerAccountId])
-  @@unique([userId,provider])
+  @@unique([provider, providerAccountId])
   @@index([userId])
 }
-
-model Coords {
-  coordsId    String @id @default(cuid())
-  userId      String? @unique
-  adminId     String?
-
-  profile Profile[] @relation("ProfileCoords")
-  worker  Worker? @relation(fields: [userId],references: [userId])
-
-  placeName   String?
-
-  latitude  Decimal @db.Decimal(9, 6) // Example: 9 digits total, 6 after decimal
-  longitude Decimal @db.Decimal(9, 6)
-
-  comments    Comment[] 
-  gallery     Gallery[]
-  image       String?
-  coverImage  String?
-}
-
 
 model VerificationToken {
   id      String   @id @default(cuid())
@@ -465,12 +207,9 @@ model TwoFactorConformation {
 
 enum UserRole {
   ADMIN
-  EDITOR
-  WORKER
-  CLIENT
   USER
+  EDITOR
   GUEST
-  BLOCKED
 }
 
 enum Gender {
@@ -479,26 +218,3 @@ enum Gender {
   Undefined
 }
 
-model Cars {
-  id Int @id @default(autoincrement())
-  marque  String?
-  imgUrl  String?
-  wikiLink String?
-  website String?
-
-  models Carmodels[]
-
-  @@index([marque])
-}
-
-model Carmodels {
-  id Int @id @default(autoincrement())
-
-  carId Int 
-  years Int
-  series String
-  imageurl String
-
-  cars Cars @relation(fields: [carId],references: [id])
-  
-}

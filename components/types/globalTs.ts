@@ -21,7 +21,6 @@ export interface ProfileData {
     age?: number | null;
     phoneNumber?: string | null;
     regionCode?: string | null;
-    createdAt:Date 
     adres?: string | null;
     userId: string;
     error?:string;

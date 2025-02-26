@@ -101,37 +101,38 @@ jwt:{
   // Callback Functions
   callbacks: {
     async jwt({ token, user,account  }) {
-      console.log('account',token)
       if (user && account) {
         // Include user ID in the token
         token.provider = account.provider
         token.id = user.id;
         token.email = user.email;
-        token.accessToken = account?.access_token ||  token.accessToken
-        token.refreshToken = account?.refresh_token || token.refreshToken
-        token.accessTokenExpires = account?.expires_at || token.accessTokenExpires
+        token.accessToken = account.access_token
+        token.refreshToken = account.refresh_token
+        token.accessTokenExpires = account.expires_at 
         // console.log("User in JWT Callback:", account);
-        console.log('TokenCallback:',token )
+        console.log('TokenExpires:',token.accessTokenExpires )
       }
-      // const BUFFER_TIME = 30000;
-      // if (Date.now() > ((token.accessTokenExpires as number) * 1000)- BUFFER_TIME) {
-      //   ///TODO: if provider is credentials, send verfification email 
-      //   console.log("Refreshing_token_inProgress",Date.now(),'expires:',token.accessTokenExpires as number)
+      const BUFFER_TIME = 30000;
+      if (Date.now() > ((token.accessTokenExpires as number) * 1000)- BUFFER_TIME) {
+        ///TODO: if provider is credentials, send verfification email 
+        console.log("Refreshing_token_inProgress",Date.now(),'expires:',token.accessTokenExpires as number)
      
-      //   return refreshAccessToken({token:token,user:user})
-      // }
+        return refreshAccessToken(token)
+
+      }
         try {
           const userInDb = await db.user.findUnique({
             where:{
               id: token.sub
             },
             select:{
-
+              shortName:true,
               role:true
             }
           })
           console.log('userInDb',userInDb)
           token.role = userInDb.role
+          token.shortName = userInDb.shortName as string
           return token;
         } catch (error) {
           console.log('userInDb','error',error)
@@ -142,12 +143,10 @@ jwt:{
 
     async session({ session, token }) {
       // Include user ID in the session
-      console.log('TokenCallback',token)
-      
-      session.user.id = token.sub as string;
+      session.user.id = token.id as string;
       session.user.email = token.email as string;
       session.user.role = token.role as UserRole || null;;
-      console.log('SessionCallback',session)
+      session.user.shortName  = token.shortName as string || null;
       return session;
     },
   },

@@ -11,9 +11,7 @@ export const publicRoutes = [
     "/api/s3-array-upload",
     '/profile/',
     '/api/s3-delete',
-    '/post/',
-    '/api/store-fingerprint'
-
+    '/post/'
 ]
 /**
  * An Array of router thats are used for authentication
@@ -28,7 +26,7 @@ export const authRoutes = [
     "/auth/new-password",
     '/api/session',
     '/api/tokens/revoke',
-    '/api/tokens/verify',
+    '/'
     // '/api/session/invalidate'
 ];
 

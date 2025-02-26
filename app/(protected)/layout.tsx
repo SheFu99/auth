@@ -49,7 +49,7 @@ const ProtectedLayout = async ({children,searchParams,params }) => {
     // const searchParams = useSearchParams();
     const context = params.route
     const queryValues = searchParams
-    console.log('urlParams:', searchParams, user)
+    console.log('urlParams:',searchParams,context)
     return ( 
         
         <SessionProviderWrapper session={session}>
@@ -68,7 +68,7 @@ const ProtectedLayout = async ({children,searchParams,params }) => {
             </div> */}
             <div className="col-span-12 col-start-1 row-span-2">
                         <div className="grid space-y-10 mr-2 ml-2 grid-cols-12 ">
-
+                            
                             <SideBar role={user?.role} bar={false}
                                                         className="xl:col-start-2 xl:col-span-2 
                                                                 hidden 
@@ -78,9 +78,11 @@ const ProtectedLayout = async ({children,searchParams,params }) => {
                                                 sm:col-span-10 sm:mr-5 sm:col-start-3 
                                                 sm:ml-8
                                                 col-start-1 col-span-12 ">
-                                    {children}        
-                            </div>
+                                                
 
+                                    {children} 
+                                                  
+                            </div>
                             <SideBar role={user?.role}  bar={true}                  
                                                      className="col-span-12 fixed inset-x-0 bottom-0
                                                                 sm:hidden inline  

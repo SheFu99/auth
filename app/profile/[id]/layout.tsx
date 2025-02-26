@@ -6,6 +6,7 @@ import SideBar from "@/components/SideBar";
 import QueryProvider from "@/util/QueryProvider";
 import { getServerSession } from "next-auth";
 import { authConfig } from "@/auth.config";
+import { SessionProvider } from "next-auth/react";
 import SessionProviderWrapper from "@/app/(protected)/sessionProviderWrapper";
 
 
@@ -19,7 +20,7 @@ const PublicProfileLayout = async ({children,searchParams}:PublicProfileProps) =
 console.log(search)
     const session = await getServerSession(authConfig)
     const user = session?.user
-    console.log('Render_SSSION_TRIGGERED',session)
+    console.log('Render_SSSION_TRIGGERED')
     return ( 
         //Do not use session provider with <Link/> component!
         // <SessionProvider session={session}>
@@ -31,7 +32,7 @@ console.log(search)
                     <div> <Navbar user={user}/>
                     <div className="col-span-12 col-start-1 row-span-2">
                         <div className="grid space-y-10 mr-2 ml-2 grid-cols-12">
-                        <SideBar role={user?.role} bar={false}
+                        <SideBar role={user.role} bar={false}
                                                     className="xl:col-start-2 xl:col-span-2 
                                                             hidden 
                                                             sm:inline sm:col-start-1 sm:col-span-2"/>
@@ -56,8 +57,6 @@ console.log(search)
                     </SessionProviderWrapper>
                 ) :(
                     <div>
-                        <SessionProviderWrapper session={session}>
-
                             <QueryProvider>
                         <Navbar user={user}/>
                         <div className="col-span-12 col-start-1 row-span-2 mt-5">
@@ -82,7 +81,6 @@ console.log(search)
                                 </div>
                                 </div>
                                     </QueryProvider>
-                        </SessionProviderWrapper>
 
                     </div>
                 )}

@@ -24,7 +24,6 @@ const PublicPostLayout:React.FC<PublicProfileProps> = async ({children}) => {
         // <SessionProvider session={session}>
                 <>
                 {session ? (
-                         <QueryProvider>
                     <SessionProviderWrapper session={session}>
                     <div> <Navbar user={user}/>
                     <div className="col-span-12 col-start-1 row-span-2">
@@ -38,9 +37,9 @@ const PublicPostLayout:React.FC<PublicProfileProps> = async ({children}) => {
                                             sm:col-span-10 sm:mr-5 sm:col-start-3 
                                             sm:ml-8
                                             col-start-1 col-span-12 ">
-                    
+                                    <QueryProvider>
                                         {children}
-                      
+                                    </QueryProvider>
                                 </div>
                                 <SideBar role={user.role}  bar={true}                  
                                                  className="col-span-12 fixed inset-x-0 bottom-0
@@ -50,8 +49,6 @@ const PublicPostLayout:React.FC<PublicProfileProps> = async ({children}) => {
                     </div>
                     </div>
                     </SessionProviderWrapper>
-                    </QueryProvider>
-
                 ) :(
                     <div>
                          <QueryProvider>

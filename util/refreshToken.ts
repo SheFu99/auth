@@ -1,6 +1,5 @@
 // utils/auth.ts (Create a separate utils file for better organization)
 import { db } from '@/lib/db'
-import { ExtendedUser } from '@/next-auth'
 import { JWT } from 'next-auth/jwt'
 
 interface RefreshedToken extends JWT {
@@ -10,9 +9,9 @@ interface RefreshedToken extends JWT {
     error?: string
     provider?: string
   }
-export async function refreshAccessToken({token,user}:{token:RefreshedToken,user:ExtendedUser}): Promise<RefreshedToken> {
+export async function refreshAccessToken(token: JWT): Promise<RefreshedToken> {
 
-  // console.log("token_refreshAccessToken",token,token.accessToken)
+  console.log("token_refreshAccessToken",token)
   const provider = token.provider as string
   
   if (!provider) {
@@ -20,8 +19,6 @@ export async function refreshAccessToken({token,user}:{token:RefreshedToken,user
     return { ...token, error: 'NoProviderError' }
   }
   console.log('RefreshTokenProvider:',provider)
-  console.log('Token in cooke:',token)
-
   let tokenEndpoint = ''
   let body: any = {}
   
@@ -92,63 +89,24 @@ export async function refreshAccessToken({token,user}:{token:RefreshedToken,user
     
     const refreshedTokens = await response.json()
     
-    console.log('refreshedTokens',Date.now() + refreshedTokens.expires_in +(1000*60*15))
+    
     if (!response.ok) {
       console.error('Failed to refresh access token:', refreshedTokens)
       return { ...token, error: 'RefreshAccessTokenError' }
     }
-    try {
-      const update = await db.account.update({
-        where: {
-          userId_access_token: {
-            userId: token.sub,
-            access_token: token.accessToken as string
-          }
-        }
-  ,      
-          data:{
-            expires_at:token.accessTokenExpires,
-            access_token:refreshedTokens.accessToken,
-            refresh_token:token.refreshToken
-        },
-      })
-  console.log('update',update)
-  
-    } catch (error) {
-  console.log('update',error)
-      
-    }
-// TEST_CASE:test when user is not exist 
-    const refreshTokenSecurity  = !!await db.user.findFirst({
+    const update = await db.account.update({
       where:{
-        id:token.sub
-    },
-    select: { id: true },
-  })
-  console.log('refreshTokenSecurity',refreshTokenSecurity)
-  
-  // // ADD: Cache layer for repeted request or find method to determinate it 
-  // if(refreshTokenSecurity==false){
-  //   return {error:'You can`t use this token!'}
-  // }
-
-
-    
-// const existing = await prisma.account.findUnique({
-//   where: {
-//     userId_access_token: {
-//       userId: token.sub,
-//       access_token: token.accessToken,
-//     },
-//   },
-// })
-
-//       console.log('response_query',token.sub)
-//       console.log('response_update',token.accessToken)
+        access_token:refreshedTokens.accessToken
+      },
+      data:{expires_at:refreshedTokens.exp}
+    })
+      console.log('response_update',update)
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + (1000*60*15),
+      accessTokenExpires: refreshedTokens.expires_in
+        ? Math.floor(Date.now() / 1000) + refreshedTokens.expires_in
+        : (token.accessTokenExpires as number),
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Some providers may not return a new refresh token
       error: undefined,
     }

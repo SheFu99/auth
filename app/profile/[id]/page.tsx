@@ -13,7 +13,6 @@ import { prefetchFriendList, prefetchPostList } from "@/lib/reactQueryHooks/pref
 import { cache } from "react";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
-import SessionProviderWrapper from "@/app/(protected)/sessionProviderWrapper";
 
 const getProfile = cache(async(postId:string)=>{
   const {profile,error} = await getProfileByShortName(postId)
@@ -41,7 +40,6 @@ export default async function PublicProfileParams({
   params
 }) {
   const paramsid =  params?.id
-  console.log('paramsid',paramsid)
   const {profile,error,friendStatus}= await getProfileByShortName(paramsid)
   // console.log('error',friendStatus)
   // console.log('profile?.userId',profile?.userId)
@@ -61,7 +59,6 @@ export default async function PublicProfileParams({
       
     return (
       <QueryProvider>
-       {/* <SessionProviderWrapper session={session} > */}
         <HydrationBoundary state={dehydratedState}>
           
           <div>
@@ -86,7 +83,6 @@ export default async function PublicProfileParams({
             )}
           </div>
         </HydrationBoundary>
-        {/* </SessionProviderWrapper> */}
       </QueryProvider>
       
       );

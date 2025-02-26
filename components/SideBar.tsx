@@ -11,7 +11,6 @@ import LoginForm from "./auth/loginForm";
 import { CardFooter } from "./ui/card";
 import { Social } from "./auth/social";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import { useSession } from "next-auth/react";
 
 
 interface SideBarProps{
@@ -24,11 +23,10 @@ interface SideBarProps{
 
 const SideBar :React.FC<SideBarProps>=  ({className,role,bar}) => {
     const pathname = usePathname();
-    const userSession = useSession()
-    // const userRole = userSession?.data?.user?.role
 
-    console.log('SideBar_role',userSession?.data?.user)
     return ( 
+     
+
         <div className={`${className}  `}>
             <div className="z-40">
             <div className={bar ? 'space-x-2 w-full sticky bottom-0 p-3 rounded-xl flex justify-center items-center backdrop-blur-md' : "space-y-1 border p-5 rounded-xl mt-10 sticky top-3 z-20"} >

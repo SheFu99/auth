@@ -8,7 +8,6 @@ import QueryProvider from "@/util/QueryProvider";
 
 import { getServerSession } from "next-auth";
 import SessionProviderWrapper from "@/app/(protected)/sessionProviderWrapper";
-import { authConfig } from "@/auth.config";
 
 type PublicProfileProps = {
     children?:React.ReactNode,
@@ -18,9 +17,9 @@ type PublicProfileProps = {
 const PublicProfileLayout = async ({children,searchParams}:PublicProfileProps) => {
   const search = searchParams?.search
 console.log(search)
-    const session = await getServerSession(authConfig)
+    const session = await getServerSession()
     const user = session?.user
-    console.log('Render_SSSION_TRIGGERED',user)
+    console.log('Render_SSSION_TRIGGERED')
     return ( 
         //Do not use session provider with <Link/> component!
         // <SessionProvider session={session}>

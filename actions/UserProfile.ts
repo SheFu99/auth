@@ -193,27 +193,31 @@ export const getPublicProfile = async (userId:string):Promise<getProfilePromise>
   }
 
   export const getProfileByShortName = async (shortName:string):Promise<getProfilePromise> =>{
-    console.log('shortName',shortName)
+    console.log(shortName)
    let shortNameUser
     if(shortName.length<26){
-      shortNameUser = await db.profile.findFirst({
+      shortNameUser = await db.user.findFirst({
         where:{shortName:shortName},
-        }
+        include:{
+          profile:true
+        }}
       )
     }
     try {
-      shortNameUser = await db.profile.findFirst({
+      shortNameUser = await db.user.findFirst({
         where:{
           OR:[
             {shortName:shortName},
-            {userId:shortName}
+            {id:shortName},
           ]
          
         },
-   
+        include:{
+          profile:true
+        }
       })
-      console.log(shortNameUser,'shortNameUser') 
-      const {relation,error} = await initialCurrentRelation(shortNameUser.userId)
+      console.log(shortNameUser.profile)
+      const {relation,error} = await initialCurrentRelation(shortNameUser.id)
       console.log('relationLOG',relation)
 
       if(error){
@@ -221,17 +225,17 @@ export const getPublicProfile = async (userId:string):Promise<getProfilePromise>
       }
 
       if(shortNameUser&&relation){
-        return {profile:shortNameUser,friendStatus:relation}
+        return {profile:shortNameUser.profile,friendStatus:relation}
       }else if(shortNameUser){
         console.log('next')
-        return {profile:shortNameUser}
+        return {profile:shortNameUser.profile}
 
       }
       if(!shortNameUser){
         return {error:'Found Nothing!'}
       }
     } catch (error) {
-      // console.log(error)
+      console.log(error)
         return {error:error}
     }
         

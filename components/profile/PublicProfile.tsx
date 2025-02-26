@@ -7,8 +7,6 @@ import FriendStatusButton from "./friends/function/publicFriendButton";
 import PublicAccordion from "./post/public/profileAccordion";
 import CoverPublic from "./post/public/publicCover";
 import { ExtendedUser } from "@/next-auth";
-import { useSession } from "next-auth/react";
-import { authConfig } from "@/auth.config";
 
 
 
@@ -22,27 +20,26 @@ export interface Profile{
 
 const  PublicProfile =  ({profile,sessionUser,friendStatus}:Profile) => {
 
-const data = useSession()
+
+const user = sessionUser
 const userId = profile?.userId
-const currentUserId = data?.data.user.id
-const isTheSameUser = currentUserId=== userId
-console.log('SeconUser',data)
+const isTheSameUser = user?.id === userId
 
 
   return (
     
     <div className="col-span-12 grid-row-6 ">
-        <div className='mb-5 border-b-2 rounded-xl'>
+        <div className=''>
         
+        <div>
                 <CoverPublic
                     url={profile?.coverImage} 
                     editable={false} 
                     className="z-1 rounded-md shadow-xs col-span-12"
                 />
-        
+        </div>
             <div className="flex items-center relative ">
-                <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit 
-                                md:p-[1rem] z-1 -bottom-15 left-0 p-[1rem] justify-center mt-12">
+                <div className="absolute md:left-0 md:-bottom-15 m-auto w-fit md:p-[1rem] z-0 -bottom-15 left-0 p-[1rem] justify-center ">
                                 <HeaderAvatar
                                  src={profile?.image}
                                  width={100}
@@ -50,37 +47,27 @@ console.log('SeconUser',data)
                                  alt={profile?.firstName}
                                 />
                 </div>
-                {currentUserId&&!isTheSameUser&&(
-                    <div className="absolute mt-[4.4rem]  
-                                    md:right-[6rem] right-8 z-[1] bg-black rounded-full ">
+
+
+                {user&&!isTheSameUser&&(
+                    <div className="absolute -bottom-15  md:right-[4rem] right-8 z-0 bg-black rounded-full ">
                         <FriendStatusButton 
                             friendStatus={friendStatus}
                             userId={profile?.userId}/>
                     </div>
                 )}
               
-              <div className="absolute 
-                      text-card-foreground text-xl font-bold md:text-2xl
-
-                      md:ml-[5rem] ml-[2rem] md:mr-[5rem] mr-[6rem] mt-[4rem] 
-                      rounded-md pl-[4rem] md:pl-[3rem] w-auto  z-0 ">
-          {profile?.firstName}
-        </div>
+           
             </div>
-            
         </div>
-          {/* <div className="absolute  z-50  "> 
-            <p className="text-xl">{profile.firstName}</p> 
-        </div> */}
+          
 
+            <div className=" col-start-1 col-span-12 mt-1  bg-white  rounded-md shadow-md relative z-[-1] p-1">
+              <PublicAccordion profile={profile}/>
+            </div>
+
+       
       
-
-    <div className="pl-3 pr-3 pt-3 mt-10">
-      <div className="col-start-1 col-span-12 mt-3
-                      border-2 rounded-md shadow-md relative z-[0] p-2">
-                    <PublicAccordion profile={profile}/>
-                  </div>
-      </div> 
     </div>
 
 

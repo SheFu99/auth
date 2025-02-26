@@ -20,8 +20,8 @@ export async function middleware(req) {
   // console.log("Process Version:", process.version);
   const { nextUrl } = req;
   const path = nextUrl.pathname;
-  const fpCookie = req.cookies.get('fp')?.value;
-  console.log("Request Path:", path,fpCookie); // Debugging output
+
+  console.log("Request Path:", path); // Debugging output
 
   // // Apply rate limiter to specific paths
   // if (debouncedPaths.includes(path)) {
@@ -53,7 +53,7 @@ export async function middleware(req) {
   // console.log('isLoggedIn',isPublicRoute)
   const isAuthRoute = authRoutes.includes(path);
   const isAdminRoute = adminRoutes.includes(path);
-  // console.log('isAuthRoute',isAuthRoute)
+  console.log('isAuthRoute',isAuthRoute)
   // Allow profile and post routes without additional checks
   if (isProfileRoute || isPostRoute) {
     return NextResponse.next();

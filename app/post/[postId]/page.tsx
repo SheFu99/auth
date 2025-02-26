@@ -19,13 +19,13 @@ const getPost = cache(async(postId:string)=>{
     return post
 })
 
-export const generateMetadata = async  ({params:{postId}}):Promise<Metadata> =>{
-    // const postId = id
+export const generateMetadata = async ({params}):Promise<Metadata> =>{
+    const { postId } = params
 
     console.log('post',postId)
     const post  = await getPost(postId)
     return {
-        title:post?.superText || post?.text,
+        title:post?.superText || post.text,
         description:`Author ${post.user.name}`,
         openGraph:{
             images: post?.image && post.image.length > 0 ? [{ url: post.image[0].url }] : []
@@ -33,8 +33,8 @@ export const generateMetadata = async  ({params:{postId}}):Promise<Metadata> =>{
     }
 }
 
-const PostPage = async ({params:{postId}}) => {
-    // const postId = id
+const PostPage = async ({params}) => {
+    const {postId} = params
     await prefetchPost(postId)
     await prefetchCommentList(postId)
 
